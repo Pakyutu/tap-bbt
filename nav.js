@@ -15,7 +15,8 @@
    +'#bbtnav .pop a:active,#bbtnav .pop a:hover{background:#eef2f8}'
    +'#bbtnav .pop a.cur{font-weight:600;color:#0b3a6e;background:#e6eef9}'
    +'@media (prefers-color-scheme:dark){#bbtnav .pop{background:#18212f;color:#e8edf6}#bbtnav .pop a:hover{background:#243044}#bbtnav .pop a.cur{background:#22344f;color:#9cc3ff}}'
-   +'@media print{#bbtnav{display:none}}';
+   +'#bbtoff{position:fixed;left:50%;top:calc(8px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:35;background:#ffb020;color:#1a1200;font:600 12px system-ui,sans-serif;padding:6px 12px;border-radius:999px;box-shadow:0 3px 10px rgba(0,0,0,.2);display:none}'
+   +'@media print{#bbtnav,#bbtoff{display:none}}';
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
   var w = document.createElement("div"); w.id = "bbtnav";
   w.setAttribute("data-html2canvas-ignore","true");
@@ -27,6 +28,9 @@
   w.innerHTML = html;
   document.body.appendChild(w);
   var fab = w.querySelector(".fab");
-  fab.addEventListener("click", function(e){ e.stopPropagation(); w.classList.toggle("open"); });
+  fab.addEventListener("click", function(e){ e.stopPropagation(); try{navigator.vibrate&&navigator.vibrate(10)}catch(_){} w.classList.toggle("open"); });
   document.addEventListener("click", function(e){ if(!w.contains(e.target)) w.classList.remove("open"); });
+  var off=document.createElement("div");off.id="bbtoff";off.setAttribute("data-html2canvas-ignore","true");off.textContent="Mode offline · data tersimpan";document.body.appendChild(off);
+  function net(){off.style.display=navigator.onLine?"none":"block"}
+  addEventListener("online",net);addEventListener("offline",net);net();
 })();
