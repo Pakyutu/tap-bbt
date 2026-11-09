@@ -1,9 +1,9 @@
 // Versi cache: naikkan angka ini kalau ada perubahan besar pada file app.
-const V = "tap-bbt-v3";
+const V = "tap-bbt-v4";
 const SAME = self.location.origin;
 const SHELL = [
   "./", "index.html", "digipos.html", "penjualan.html", "manifest.json",
-  "icon-192.png", "icon-512.png", "nav.js", "icon-maskable.png",
+  "icon-192.png", "icon-512.png", "nav.js", "penjualan-x.js", "icon-maskable.png",
   "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
   "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
   "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
@@ -33,7 +33,7 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
-  const isPage = req.mode === "navigate" || (req.url.startsWith(SAME) && /\.html$|\/$/.test(new URL(req.url).pathname));
+  const isPage = req.mode === "navigate" || req.url.startsWith(SAME); // file app sendiri: jaringan dulu
 
   if (isPage) {
     // HTML: ambil dari jaringan dulu (supaya update data langsung terlihat), kalau offline pakai cache
