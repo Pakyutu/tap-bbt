@@ -112,9 +112,57 @@ const X={"cut": 9, "mon": ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags
       <div class="sub">Warna relatif terhadap bulan tertinggi tiap validity.</div></div>`;
   }
 
+
+  // ===== Stock on Hand: minimal 15 hari kerja (Senin–Sabtu) =====
+  const MINHK=15;
+  const hk=(d,m=10,y=2026)=>{let n=0;for(let i=1;i<=d;i++){if(new Date(y,m,i).getDay()!==0)n++}return n};
+  let sohP='PV';
+  function sohCard(){
+    const P=(D.P||{})[sohP]||{};const ds=Object.keys(P).map(Number).sort((a,b)=>a-b);const d=ds[ds.length-1];
+    if(!d)return `<div class="note">Laporan petugas ${sohP} belum ada.</div>`;
+    const R=P[d],H=hk(d);
+    const rows=R.rows.filter(r=>!/^(BO |DS BAGAN|HELPER)/.test(r.nm)&&(r.mtd||r.stok)).map(r=>{
+      const rate=r.mtd/H,need=Math.ceil(rate*MINHK),dk=rate>0?r.stok/rate:(r.stok>0?Infinity:0),gap=r.stok-need;
+      const stt=rate===0?(r.stok?'idle':'none'):dk>=MINHK?'ok':dk>=7?'warn':'crit';return{...r,rate,need,dk,gap,stt}})
+      .sort((a,b)=>({crit:0,warn:1,ok:2,idle:3,none:4}[a.stt]-{crit:0,warn:1,ok:2,idle:3,none:4}[b.stt])||(a.gap-b.gap));
+    const act=rows.filter(r=>r.rate>0),kurang=act.filter(r=>r.gap<0),tk=kurang.reduce((s,r)=>s-r.gap,0);
+    const sfStok=R.rows.filter(r=>!/^BO /.test(r.nm)).reduce((t,r)=>t+r.stok,0),bo=Math.max(0,R.tap.stok-sfStok);
+    const tRate=R.tap.mtd/H,tNeed=Math.ceil(tRate*MINHK),tDk=tRate?R.tap.stok/tRate:0;
+    const lab={ok:['Aman','k4'],warn:['Waspada','k2'],crit:['Kritis','k1'],idle:['Tidak jual','k0'],none:['–','k0']};
+    const unit=sohP==='SA'?'pcs':'pcs';
+    const tr=rows.map(r=>{const w=Math.min(100,r.dk===Infinity?100:r.dk/MINHK*100);
+      return `<tr><td style="text-align:left"><span class="xs-f">${es(tc(r.nm))}</span><span class="xs-s">${es(tc(r.nm).replace(/^DS /,"").replace(/ Bagan Batu$/,"").split(" ").slice(0,2).join(" "))}</span></td><td class="xs-h">${nf(r.rate)}</td><td>${nf(r.stok)}</td><td class="xs-h">${nf(r.need)}</td>
+      <td><div class="xs-d"><b>${r.dk===Infinity?'∞':r.rate?(r.dk<10?r.dk.toFixed(1).replace('.',','):Math.round(r.dk)):'–'}</b><span class="xs-bar"><i class="${lab[r.stt][1]}" style="width:${w}%"></i><em style="left:100%"></em></span></div></td>
+      <td class="${r.gap<0?'dn':''}">${r.rate?(r.gap<0?'+'+nf(-r.gap):'–'):'–'}</td><td><span class="xs-st ${lab[r.stt][1]}">${lab[r.stt][0]}</span></td></tr>`}).join('');
+    const crit=act.filter(r=>r.stt==='crit');
+    return `<div class="card xk-card" id="xsoh" style="margin-top:14px"><div class="xk-hd"><h3>Stock on Hand · minimal ${MINHK} hari kerja</h3>
+      <div class="seg xs-seg">${['PV','SA'].map(p=>`<button data-sp="${p}" class="${p===sohP?'on':''}">${p}</button>`).join('')}</div></div>
+      <div class="sub">Laporan petugas ${sohP} cutoff <b>${d} Nov</b> · ${H} hari kerja berjalan (Senin–Sabtu). Laju/hari kerja = MTD ÷ ${H}. Kebutuhan = laju × ${MINHK} hari kerja.</div>
+      <div class="kpi"><div class="k"><div class="t">SF di bawah ${MINHK} HK</div><div class="v ${kurang.length?'dn':''}">${kurang.length}<small style="font-size:.5em;color:var(--mu)"> / ${act.length}</small></div><div class="s">${crit.length} kritis (&lt;7 hari kerja)</div></div>
+      <div class="k"><div class="t">Total harus ditambah</div><div class="v">${nf(tk)}</div><div class="s">${unit} supaya semua SF ≥ ${MINHK} HK</div></div>
+      <div class="k"><div class="t">Stok gudang siap distribusi</div><div class="v ${bo<tk?'dn':''}">${nf(bo)}</div><div class="s">${bo>=tk?`cukup menutup kekurangan SF (sisa ${nf(bo-tk)})`:`kurang ${nf(tk-bo)} untuk menutup SF`} · stok TAP − stok SF</div></div>
+      <div class="k"><div class="t">TAP total</div><div class="v">${Math.round(tDk)} HK</div><div class="s">stok ${nf(R.tap.stok)} · butuh ${nf(tNeed)}</div></div></div>
+      <div class="tw"><table class="xk-vt xs-t"><tr><th style="text-align:left">Petugas</th><th class="xs-h">Laju/HK</th><th>Stok SF</th><th class="xs-h">Butuh ${MINHK} HK</th><th>HK</th><th>Tambah</th><th>Status</th></tr>${tr}</table></div>
+      <div class="kpl"><span><i style="background:#0f8a52"></i>Aman ≥${MINHK} HK</span><span><i style="background:#e08a00"></i>Waspada 7–${MINHK-1} HK</span><span><i style="background:#c8102e"></i>Kritis &lt;7 HK</span><span>Garis tipis = batas ${MINHK} HK</span></div>
+      ${crit.length?`<div class="note" style="margin-top:10px">⚠️ Prioritas isi stok: ${crit.slice(0,5).map(r=>`<b>${es(tc(r.nm))}</b> (+${nf(-r.gap)})`).join(', ')}.</div>`:''}</div>`;
+  }
+  const st2=document.createElement('style');st2.textContent=`
+.xs-seg button{padding:5px 12px}.xs-s{display:none}.xs-t td,.xs-t th{white-space:nowrap}
+.xs-d{display:flex;align-items:center;gap:8px;justify-content:flex-end}.xs-d b{min-width:28px;text-align:right;font-weight:600}
+.xs-bar{position:relative;width:70px;height:6px;border-radius:3px;background:var(--soft);display:inline-block}
+.xs-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}.xs-bar em{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-2px;background:var(--tx);opacity:.45}
+.xs-bar i.k4{background:#0f8a52}.xs-bar i.k2{background:#e08a00}.xs-bar i.k1{background:#c8102e}.xs-bar i.k0{background:var(--mu)}
+.xs-st{display:inline-block;min-width:66px;text-align:center;font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:999px}
+.xs-st.k4{color:#0f8a52;background:rgba(15,138,82,.13)}.xs-st.k2{color:#b86a00;background:rgba(224,138,0,.15)}.xs-st.k1{color:#c8102e;background:rgba(200,16,46,.12)}.xs-st.k0{color:var(--mu);background:var(--soft)}
+.kpl{display:flex;flex-wrap:wrap;gap:10px;font-size:11.5px;color:var(--mu);margin-top:8px}.kpl span{display:inline-flex;align-items:center;gap:5px}.kpl i{width:9px;height:9px;border-radius:3px;display:inline-block}
+@media (max-width:560px){#xsoh .xs-d{display:block;text-align:right}#xsoh .xs-d b{min-width:0}#xsoh .xs-t td:nth-child(5),#xsoh .xs-t th:nth-child(5){width:1%}#xsoh .xs-f{display:none}#xsoh .xs-s{display:inline}#xsoh .xs-t .xs-h{display:none}#xsoh .xs-bar{display:none}#xsoh .xs-t td,#xsoh .xs-t th{padding-left:4px;padding-right:4px;font-size:12px}#xsoh .xs-t td:first-child{white-space:normal;min-width:0}#xsoh .xs-st{min-width:0;padding:2px 6px;font-size:11px}}@media (prefers-color-scheme:dark){.xs-st.k4{color:#4cd38f}.xs-st.k2{color:#ffb547}.xs-st.k1{color:#ff6b7d}}`;
+  document.head.appendChild(st2);
+  function putSoh(){const ps=document.getElementById('p-stok');if(!ps)return;const old=document.getElementById('xsoh');const h=sohCard();
+    if(old)old.outerHTML=h;else ps.insertAdjacentHTML('afterbegin',h)}
+  document.addEventListener('click',e=>{const b=e.target.closest('#xsoh [data-sp]');if(b){sohP=b.dataset.sp;putSoh()}});
   const oPet=window.rPet,oStok=window.rStok;
   if(typeof oPet==='function')window.rPet=function(){oPet.apply(this,arguments);try{if(S.prod==='PV')document.getElementById('p-pet').insertAdjacentHTML('beforeend',petTrend())}catch(e){console.error(e)}};
-  if(typeof oStok==='function')window.rStok=function(){oStok.apply(this,arguments);try{document.getElementById('p-stok').insertAdjacentHTML('beforeend',injCard())}catch(e){console.error(e)}};
+  if(typeof oStok==='function')window.rStok=function(){oStok.apply(this,arguments);try{document.getElementById('p-stok').insertAdjacentHTML('beforeend',injCard());putSoh()}catch(e){console.error(e)}};
   try{rPet()}catch(e){}
-  try{const ps=document.getElementById('p-stok');if(ps&&ps.innerHTML&&!ps.querySelector('.xk-card'))ps.insertAdjacentHTML('beforeend',injCard())}catch(e){console.error(e)}
+  try{const ps=document.getElementById('p-stok');if(ps&&ps.innerHTML&&!ps.querySelector('.xk-card')){ps.insertAdjacentHTML('beforeend',injCard());putSoh()}}catch(e){console.error(e)}
 })();
