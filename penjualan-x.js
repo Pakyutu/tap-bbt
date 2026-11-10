@@ -155,10 +155,29 @@ const X={"cut": 9, "mon": ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags
 .xs-st{display:inline-block;min-width:66px;text-align:center;font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:999px}
 .xs-st.k4{color:#0f8a52;background:rgba(15,138,82,.13)}.xs-st.k2{color:#b86a00;background:rgba(224,138,0,.15)}.xs-st.k1{color:#c8102e;background:rgba(200,16,46,.12)}.xs-st.k0{color:var(--mu);background:var(--soft)}
 .kpl{display:flex;flex-wrap:wrap;gap:10px;font-size:11.5px;color:var(--mu);margin-top:8px}.kpl span{display:inline-flex;align-items:center;gap:5px}.kpl i{width:9px;height:9px;border-radius:3px;display:inline-block}
-@media (max-width:560px){#xsoh .xs-d{display:block;text-align:right}#xsoh .xs-d b{min-width:0}#xsoh .xs-t td:nth-child(5),#xsoh .xs-t th:nth-child(5){width:1%}#xsoh .xs-f{display:none}#xsoh .xs-s{display:inline}#xsoh .xs-t .xs-h{display:none}#xsoh .xs-bar{display:none}#xsoh .xs-t td,#xsoh .xs-t th{padding-left:4px;padding-right:4px;font-size:12px}#xsoh .xs-t td:first-child{white-space:normal;min-width:0}#xsoh .xs-st{min-width:0;padding:2px 6px;font-size:11px}}@media (prefers-color-scheme:dark){.xs-st.k4{color:#4cd38f}.xs-st.k2{color:#ffb547}.xs-st.k1{color:#ff6b7d}}`;
+@media (max-width:560px){:is(#xsoh,#xsohv) .xs-d{display:block;text-align:right}:is(#xsoh,#xsohv) .xs-d b{min-width:0}:is(#xsoh,#xsohv) .xs-t td:nth-child(5),:is(#xsoh,#xsohv) .xs-t th:nth-child(5){width:1%}:is(#xsoh,#xsohv) .xs-f{display:none}:is(#xsoh,#xsohv) .xs-s{display:inline}:is(#xsoh,#xsohv) .xs-t .xs-h{display:none}:is(#xsoh,#xsohv) .xs-bar{display:none}:is(#xsoh,#xsohv) .xs-t td,:is(#xsoh,#xsohv) .xs-t th{padding-left:4px;padding-right:4px;font-size:12px}:is(#xsoh,#xsohv) .xs-t td:first-child{white-space:normal;min-width:0}:is(#xsoh,#xsohv) .xs-st{min-width:0;padding:2px 6px;font-size:11px}}@media (prefers-color-scheme:dark){.xs-st.k4{color:#4cd38f}.xs-st.k2{color:#ffb547}.xs-st.k1{color:#ff6b7d}}`;
   document.head.appendChild(st2);
+
+  function sohVal(){
+    const SK=(D.STK||[]);if(!SK.length||!X.SV)return '';const L=SK[SK.length-1],H=hk(X.SV.d);
+    const vk=(g,n)=>n==='Segel'?'SEG':/^UNLIMITED 24/.test(n)?'U24':/^UNLIMITED 48/.test(n)?'U48':(m=>m?m[1]+'D':null)(n.match(/^(\d+) hari/));
+    const st={};L.items.filter(x=>x[0]!=='SA').forEach(([g,n,q])=>{const k=vk(g,n);if(!k)return;st[k]=st[k]||{r:0,b:0};st[k][g==='Reguler'?'r':'b']+=q});
+    const ord=['1D','2D','3D','5D','7D','14D','28D','U24','U48'],nm=k=>k==='U24'?'Unl. 24 jam':k==='U48'?'Unl. 48 jam':k.replace('D',' hari');
+    const lab={ok:['Aman','k4'],warn:['Waspada','k2'],crit:['Kritis','k1'],idle:['Tidak laku','k0']};
+    const rows=ord.filter(k=>st[k]||X.SV.mtd[k]).map(k=>{const j=X.SV.mtd[k]||0,q=(st[k]||{r:0,b:0}),stok=q.r+q.b,rate=j/H,need=Math.ceil(rate*MINHK),dk=rate?stok/rate:Infinity,gap=stok-need;
+      return{k,j,q,stok,rate,need,dk,gap,stt:!rate?'idle':dk>=MINHK?'ok':dk>=7?'warn':'crit'}});
+    const seg=st.SEG||{r:0,b:0},segT=seg.r+seg.b,kur=rows.filter(r=>r.gap<0),tk=kur.reduce((t,r)=>t-r.gap,0);
+    const tr=rows.map(r=>`<tr><td style="text-align:left"><b>${nm(r.k)}</b><div class="mu" style="font-size:11px">Reg ${nf(r.q.r)} · byU ${nf(r.q.b)}</div></td><td class="xs-h">${nf(r.j)}</td><td class="xs-h">${nf(r.rate)}</td><td>${nf(r.stok)}</td>
+      <td><b>${r.dk===Infinity?'∞':r.dk<10?r.dk.toFixed(1).replace('.',','):Math.round(r.dk)}</b></td><td class="${r.gap<0?'dn':''}">${r.gap<0?'+'+nf(-r.gap):'–'}</td><td><span class="xs-st ${lab[r.stt][1]}">${lab[r.stt][0]}</span></td></tr>`).join('');
+    const crit=rows.filter(r=>r.stt==='crit');
+    return `<div class="card" id="xsohv" style="margin-top:12px"><h3>Stock on Hand per validity · VF</h3>
+      <div class="sub">Stok gudang + SF (file Stock Gudang ${L.d} Nov) dibanding laju jual per validity 1–${X.SV.d} Nov (${H} hari kerja). Kebutuhan = laju/HK × ${MINHK}.</div>
+      <div class="tw"><table class="xk-vt xs-t"><tr><th style="text-align:left">Validity</th><th class="xs-h">Jual 1–${X.SV.d}</th><th class="xs-h">Laju/HK</th><th>Stok</th><th>HK</th><th>Tambah</th><th>Status</th></tr>${tr}
+      <tr><td style="text-align:left"><b>Segel</b><div class="mu" style="font-size:11px">Reg ${nf(seg.r)} · byU ${nf(seg.b)}</div></td><td class="xs-h">–</td><td class="xs-h">–</td><td>${nf(segT)}</td><td>–</td><td>–</td><td><span class="xs-st k0">Cadangan</span></td></tr></table></div>
+      <div class="${kur.length?'note':'sub'}" style="margin-top:10px">${kur.length?`Kurang dari ${MINHK} HK: ${kur.map(r=>`<b>${nm(r.k)}</b> (+${nf(-r.gap)})`).join(', ')}. Total ${nf(tk)} pcs. Stok segel ${nf(segT)} ${segT>=tk?'<b>cukup</b> untuk di-inject menutup semuanya':`<b>kurang ${nf(tk-segT)}</b>, perlu tambah order`}.`:`✅ Di level TAP (gudang + SF) semua validity sudah ≥ ${MINHK} hari kerja. Yang kurang ada di tangan SF, lihat tabel per petugas di atas.`}${crit.length?` Prioritas inject: <b>${crit.map(r=>nm(r.k)).join(', ')}</b>.`:''}</div></div>`;
+  }
   function putSoh(){const ps=document.getElementById('p-stok');if(!ps)return;const old=document.getElementById('xsoh');const h=sohCard();
-    if(old)old.outerHTML=h;else ps.insertAdjacentHTML('afterbegin',h)}
+    if(old)old.outerHTML=h;else ps.insertAdjacentHTML('afterbegin',h);const ov=document.getElementById('xsohv');if(ov)ov.remove();if(sohP==='PV')document.getElementById('xsoh').insertAdjacentHTML('afterend',sohVal())}
   document.addEventListener('click',e=>{const b=e.target.closest('#xsoh [data-sp]');if(b){sohP=b.dataset.sp;putSoh()}});
   const oPet=window.rPet,oStok=window.rStok;
   if(typeof oPet==='function')window.rPet=function(){oPet.apply(this,arguments);try{if(S.prod==='PV')document.getElementById('p-pet').insertAdjacentHTML('beforeend',petTrend())}catch(e){console.error(e)}};
