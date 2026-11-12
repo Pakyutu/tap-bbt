@@ -8,6 +8,11 @@ const X={"cut": 12, "mon": ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ag
   const tc=s=>s.toLowerCase().replace(/(^|[\s(-])(\w)/g,(m,p,c)=>p+c.toUpperCase()).replace(/^Ds - /,'DS ').replace(/^Ds /,'DS ').replace(/^Cs /,'CS ').replace(/^Asman /,'Asman ');
   const PAL=['#c8102e','#2f6fdb','#1d9a6c','#e08a00','#7b4fd6','#0f9bb5','#d4508a','#8a8780'];
   const M=X.mon, NI=M.length-1, OK=NI-1; // index Okt
+  const X0=JSON.parse(JSON.stringify(X));
+  function bbX(){const c=(typeof BB!=='undefined')&&BB.PV;const raw=typeof bbRaw!=='undefined'&&bbRaw;
+    X.TM=X0.TM.slice();X.PM=JSON.parse(JSON.stringify(X0.PM));X.SV=JSON.parse(JSON.stringify(X0.SV));
+    if(!c||raw)return;X.TM[OK]-=c.qty;if(X.PM[c.who])X.PM[c.who][OK]-=c.qty;if(c.from&&X.SV.d>=c.from&&c.val)X.SV.m1[c.val]=Math.max(0,X.SV.m1[c.val]-c.qty)}
+  bbX();
   const st=document.createElement('style');
   st.textContent=`
 .xk-card{position:relative;overflow:hidden}
@@ -203,7 +208,9 @@ const X={"cut": 12, "mon": ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ag
     if(old)old.outerHTML=h;else ps.insertAdjacentHTML('afterbegin',h);const ov=document.getElementById('xsohv');if(ov)ov.remove();const om=document.getElementById('xsohm');if(om)om.remove();document.getElementById('xsoh').insertAdjacentHTML('afterend',sohMx()+(sohP==='PV'?sohVal():''))}
   document.addEventListener('click',e=>{const b=e.target.closest('#xsoh [data-sp]');if(b){sohP=b.dataset.sp;putSoh()}const m=e.target.closest('#xsohm [data-mb]');if(m){mxB=m.dataset.mb;const o=document.getElementById('xsohm');if(o)o.outerHTML=sohMx()}});
   const oPet=window.rPet,oStok=window.rStok;
-  if(typeof oPet==='function')window.rPet=function(){oPet.apply(this,arguments);try{if(S.prod==='PV')document.getElementById('p-pet').insertAdjacentHTML('beforeend',petTrend())}catch(e){console.error(e)}};
+  const bbBar=()=>{const c=(typeof BB!=='undefined')&&BB[S.prod];if(!c)return '';return `<div class="note" style="margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span>${bbRaw?'⚠️ Menampilkan <b>data asli SURYA</b>, termasuk buang barang':'✂️ Pembanding Okt <b>sudah dikurangi buang barang</b>'}: ${c.ket}.</span><button class="bbt" style="margin-left:auto;padding:5px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer">${bbRaw?'Keluarkan buang barang':'Lihat data asli SURYA'}</button></div>`};
+  document.addEventListener('click',e=>{if(e.target.closest('#p-pet .bbt')){bbRaw=!bbRaw;try{localStorage.setItem('bb_raw',bbRaw?'1':'0')}catch(_){}bbX();rPet();if(typeof putSoh==='function')putSoh()}});
+  if(typeof oPet==='function')window.rPet=function(){oPet.apply(this,arguments);try{const pp=document.getElementById('p-pet');pp.insertAdjacentHTML('afterbegin',bbBar());if(S.prod==='PV')pp.insertAdjacentHTML('beforeend',petTrend())}catch(e){console.error(e)}};
   if(typeof oStok==='function')window.rStok=function(){oStok.apply(this,arguments);try{document.getElementById('p-stok').insertAdjacentHTML('beforeend',injCard());putSoh()}catch(e){console.error(e)}};
   try{rPet()}catch(e){}
   try{const ps=document.getElementById('p-stok');if(ps&&ps.innerHTML&&!ps.querySelector('.xk-card')){ps.insertAdjacentHTML('beforeend',injCard());putSoh()}}catch(e){console.error(e)}
