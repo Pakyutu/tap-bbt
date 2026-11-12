@@ -11,7 +11,7 @@ const X={"cut": 12, "mon": ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ag
   const X0=JSON.parse(JSON.stringify(X));
   function bbX(){const c=(typeof BB!=='undefined')&&BB.PV;const raw=typeof bbRaw!=='undefined'&&bbRaw;
     X.TM=X0.TM.slice();X.PM=JSON.parse(JSON.stringify(X0.PM));X.SV=JSON.parse(JSON.stringify(X0.SV));
-    if(!c||raw)return;X.TM[OK]-=c.qty;if(X.PM[c.who])X.PM[c.who][OK]-=c.qty;if(c.from&&X.SV.d>=c.from&&c.val)X.SV.m1[c.val]=Math.max(0,X.SV.m1[c.val]-c.qty)}
+    if(!c||raw)return;if(X.PM[c.who]){X.PM[c.who][OK]-=c.qty;X.PM['ASMAN · PLAYER']=X.PM[c.who].map((v,i)=>i===OK?c.qty:0)}}
   bbX();
   const st=document.createElement('style');
   st.textContent=`
@@ -51,11 +51,11 @@ const X={"cut": 12, "mon": ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ag
     const full=rows.map(([n,a])=>({n,a,m:a.slice(0,OK+1)})).sort((p,q)=>q.a[OK]-p.a[OK]);
     // sorotan
     const base=r=>{const s=r.a.slice(0,7).filter(v=>v);return s.length?s.reduce((x,y)=>x+y,0)/s.length:0};
-    const ch=full.filter(r=>base(r)>3000).map(r=>({r,b:base(r),d:r.a[OK]-base(r),p:r.a[OK]/base(r)-1}));
+    const fx=full.filter(r=>!/PLAYER/.test(r.n));const ch=fx.filter(r=>base(r)>3000).map(r=>({r,b:base(r),d:r.a[OK]-base(r),p:r.a[OK]/base(r)-1}));
     const dn=[...ch].sort((p,q)=>p.p-q.p)[0],up=[...ch].sort((p,q)=>q.p-p.p)[0];
     const top=full[0],shr=top.a[OK]/X.TM[OK];
     const nov=X.PM, nRun=r=>r.a[NI]/X.cut*31;
-    const sv=full.filter(r=>r.a[OK]>3000).map(r=>({r,p:nRun(r)/r.a[OK]-1})).sort((p,q)=>p.p-q.p);
+    const sv=fx.filter(r=>r.a[OK]>3000).map(r=>({r,p:nRun(r)/r.a[OK]-1})).sort((p,q)=>p.p-q.p);
     const ins=`<div class="xk-ins">
       <div class="xk-in"><b>📉 Turun paling dalam</b><span><i>${es(tc(dn.r.n))}</i>: rata-rata Jan–Jul ${kf(dn.b)}/bln, Okt tinggal ${kf(dn.r.a[OK])} (${Math.round(dn.p*100)}%).</span></div>
       <div class="xk-in"><b>📈 Naik paling tinggi</b><span><i>${es(tc(up.r.n))}</i>: dari rata-rata ${kf(up.b)}/bln ke ${kf(up.r.a[OK])} di Okt (+${Math.round(up.p*100)}%).</span></div>
@@ -208,7 +208,7 @@ const X={"cut": 12, "mon": ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ag
     if(old)old.outerHTML=h;else ps.insertAdjacentHTML('afterbegin',h);const ov=document.getElementById('xsohv');if(ov)ov.remove();const om=document.getElementById('xsohm');if(om)om.remove();document.getElementById('xsoh').insertAdjacentHTML('afterend',sohMx()+(sohP==='PV'?sohVal():''))}
   document.addEventListener('click',e=>{const b=e.target.closest('#xsoh [data-sp]');if(b){sohP=b.dataset.sp;putSoh()}const m=e.target.closest('#xsohm [data-mb]');if(m){mxB=m.dataset.mb;const o=document.getElementById('xsohm');if(o)o.outerHTML=sohMx()}});
   const oPet=window.rPet,oStok=window.rStok;
-  const bbBar=()=>{const c=(typeof BB!=='undefined')&&BB[S.prod];if(!c)return '';return `<div class="note" style="margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span>${bbRaw?'⚠️ Menampilkan <b>data asli SURYA</b>, termasuk buang barang':'✂️ Pembanding Okt <b>sudah dikurangi buang barang</b>'}: ${c.ket}.</span><button class="bbt" style="margin-left:auto;padding:5px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer">${bbRaw?'Keluarkan buang barang':'Lihat data asli SURYA'}</button></div>`};
+  const bbBar=()=>{const c=(typeof BB!=='undefined')&&BB[S.prod];if(!c)return '';return `<div class="note" style="margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span>${bbRaw?'Asman ditampilkan <b>gabung</b> dengan player':'🎯 Penjualan <b>player</b> dipisah dari Asman (baris <b>Asman · Player</b>), total TAP tetap sama dengan SURYA'}: ${c.ket}.${(()=>{const P=(D.P||{})[S.prod]||{},d=Math.max(...Object.keys(P).map(Number));if(!isFinite(d))return'';const T=P[d].tap,m=T.m1-(c.from&&d>=c.from?c.qty:0),g=T.mtd-m;return m>0?` <br>TAP tanpa player (1–${d}): Okt ${nf(m)} → gap <b>${g>0?'+':'−'}${nf(Math.abs(g))} (${(g/m*100).toFixed(1).replace('.',',')}%)</b>`:''})()}</span><button class="bbt" style="margin-left:auto;padding:5px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer">${bbRaw?'Pisahkan player':'Gabung ke Asman'}</button></div>`};
   document.addEventListener('click',e=>{if(e.target.closest('#p-pet .bbt')){bbRaw=!bbRaw;try{localStorage.setItem('bb_raw',bbRaw?'1':'0')}catch(_){}bbX();rPet();if(typeof putSoh==='function')putSoh()}});
   if(typeof oPet==='function')window.rPet=function(){oPet.apply(this,arguments);try{const pp=document.getElementById('p-pet');pp.insertAdjacentHTML('afterbegin',bbBar());if(S.prod==='PV')pp.insertAdjacentHTML('beforeend',petTrend())}catch(e){console.error(e)}};
   if(typeof oStok==='function')window.rStok=function(){oStok.apply(this,arguments);try{document.getElementById('p-stok').insertAdjacentHTML('beforeend',injCard());putSoh()}catch(e){console.error(e)}};
