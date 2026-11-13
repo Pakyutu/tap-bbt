@@ -1,5 +1,5 @@
 // Versi cache: naikkan angka ini kalau ada perubahan besar pada file app.
-const V = "tap-bbt-v5";
+const V = "tap-bbt-v6";
 const SAME = self.location.origin;
 const SHELL = [
   "./", "index.html", "digipos.html", "penjualan.html", "manifest.json",
@@ -39,7 +39,7 @@ self.addEventListener("fetch", e => {
     // HTML: ambil dari jaringan dulu (supaya update data langsung terlihat), kalau offline pakai cache
     e.respondWith((async () => {
       try {
-        const r = await fetch(req);
+        const r = await fetch(req, { cache: "no-store" });
         if (r.ok) (await caches.open(V)).put(req, r.clone());
         return r;
       } catch {
