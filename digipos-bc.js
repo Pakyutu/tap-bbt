@@ -5,15 +5,20 @@
   const es=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const tc=s=>String(s).toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
   const code=id=>'Dgp-'+id;
-  function svg(txt,h){const v=[104];for(const ch of txt){const c=ch.charCodeAt(0)-32;if(c<0||c>94)continue;v.push(c)}
-    let sum=104;for(let i=1;i<v.length;i++)sum+=i*v[i];v.push(sum%103,106);
+  function vals(txt){const v=[];let set=0,i=0;const dg=c=>c>='0'&&c<='9';
+    while(i<txt.length){let r=0;while(i+r<txt.length&&dg(txt[i+r]))r++;
+      if(r>=4){if(set!==3)v.push(set?99:105);set=3;const k=r-(r%2);for(let j=0;j<k;j+=2)v.push(+txt.substr(i+j,2));i+=k;continue}
+      if(set!==2)v.push(set?100:104);set=2;const c=txt.charCodeAt(i)-32;if(c>=0&&c<=94)v.push(c);i++}
+    return v}
+  function svg(txt,h){const v=vals(txt);
+    let sum=v[0];for(let i=1;i<v.length;i++)sum+=i*v[i];v.push(sum%103,106);
     let x=10,r='';for(const k of v){const p=PAT[k];for(let i=0;i<p.length;i++){const w=+p[i];if(i%2===0)r+='<rect x="'+x+'" y="0" width="'+w+'" height="'+h+'"/>';x+=w}}
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+(x+10)+' '+h+'" preserveAspectRatio="none" style="width:100%;height:'+h+'px;background:#fff;display:block" shape-rendering="crispEdges"><g fill="#000">'+r+'</g></svg>'}
-  window.bcSvg=svg;
+  window.bcSvg=svg;window.bcVals=vals;
   let q='';
   const tb=document.getElementById('tabs');
   if(tb&&!tb.querySelector('[data-t="bc"]')){const b=document.createElement('button');b.dataset.t='bc';b.textContent='🏷️ Barcode';b.onclick=()=>{st.tab='bc';draw()};tb.appendChild(b)}
-  const css=document.createElement('style');css.textContent='.bc-q{width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;font-size:15px;background:var(--card);color:var(--tx)}.bc-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:10px}.bc-c{border:1px solid var(--bd);border-radius:12px;padding:10px;cursor:pointer;background:var(--card)}.bc-c b{font-size:14px}.bc-c .m{font-size:11.5px;color:var(--mu);margin-bottom:6px}.bc-w{background:#fff;padding:8px 6px 4px;border-radius:8px}.bc-t{font:600 14px ui-monospace,monospace;color:#000;text-align:center;letter-spacing:1px;margin-top:3px}#bcfs{position:fixed;inset:0;z-index:9999;background:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;color:#000}#bcfs .n{font:700 20px system-ui;margin-bottom:4px;text-align:center}#bcfs .s{font-size:13px;color:#555;margin-bottom:18px}#bcfs .x{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:14px;border:0;background:#eee;border-radius:10px;padding:8px 14px;font-size:15px}';document.head.appendChild(css);
+  const css=document.createElement('style');css.textContent='.bc-q{width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;font-size:15px;background:var(--card);color:var(--tx)}.bc-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:10px}.bc-c{border:1px solid var(--bd);border-radius:12px;padding:10px;cursor:pointer;background:var(--card)}.bc-c b{font-size:14px}.bc-c .m{font-size:11.5px;color:var(--mu);margin-bottom:6px}.bc-w{background:#fff;padding:8px 6px 4px;border-radius:8px}.bc-t{font:600 14px ui-monospace,monospace;color:#000;text-align:center;letter-spacing:1px;margin-top:3px}#bcfs{position:fixed;inset:0;z-index:9999;background:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;color:#000}#bcfs .n{font:700 20px system-ui;margin-bottom:4px;text-align:center}#bcfs .s{font-size:13px;color:#555;margin-bottom:18px}#bcfs .x{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:14px;border:1px solid #bbb;background:#e8e8e8;color:#000;font-weight:700;border-radius:10px;padding:9px 16px;font-size:16px}';document.head.appendChild(css);
   const fs=document.createElement('div');fs.id='bcfs';document.body.appendChild(fs);
   function list(){const k=q.trim().toLowerCase(),U=D.U||{};let a=sel();
     if(k)a=a.filter(o=>o.nm.toLowerCase().includes(k)||o.id.includes(k)||String(U[o.id]||'').toLowerCase().includes(k));
