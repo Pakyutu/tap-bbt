@@ -12,6 +12,28 @@ const CV={"d":11,"g":["CVM","Super Seru","Comsak","Hot Promo","Biometrik"],"v":{
   const agg=(O,i)=>O.reduce((t,o)=>{const x=CV.v[o.id][i];t[0]+=x[0];t[1]+=x[1];t[2]+=x[2];return t},[0,0,0]);
   function grp(O,key,lab){const m={};O.forEach(o=>{(m[o[key]]=m[o[key]]||[]).push(o)});const rs=Object.entries(m).map(([k,os])=>({k,n:os.length,a:agg(os,gi),ac:os.filter(o=>CV.v[o.id][gi][2]>0).length})).sort((x,y)=>(x.a[2]-x.a[1])-(y.a[2]-y.a[1]));const T=agg(O,gi);
     return `<div class="card tw cvx" style="margin-top:12px"><h3>${CV.g[gi]} per ${lab}</h3><table><tr><th style="text-align:left">${lab}</th><th>Outlet</th><th>Aktif Nov</th><th>Okt full</th><th>1–${CV.d} Okt</th><th>1–${CV.d} Nov</th><th>Gap</th><th>MoM</th></tr>${rs.map(r=>{const g=r.a[2]-r.a[1],p=pc(r.a[2],r.a[1]);return `<tr><td style="text-align:left">${es(r.k)}</td><td>${r.n}</td><td>${r.ac}</td><td>${nf(r.a[0])}</td><td>${nf(r.a[1])}</td><td>${nf(r.a[2])}</td><td class="${g<0?'dn':'up'}">${sg(g)}</td><td class="${p!=null&&p<0?'dn':'up'}">${pf(p)}</td></tr>`}).join('')}<tr class="t"><td style="text-align:left">Total</td><td>${O.length}</td><td>${O.filter(o=>CV.v[o.id][gi][2]>0).length}</td><td>${nf(T[0])}</td><td>${nf(T[1])}</td><td>${nf(T[2])}</td><td class="${T[2]-T[1]<0?'dn':'up'}">${sg(T[2]-T[1])}</td><td>${pf(pc(T[2],T[1]))}</td></tr></table></div>`}
+  let dq='',df='all',dp=0;const PER=50;
+  function detRows(){const O=list(),q=dq.trim().toLowerCase();let a=O.map(o=>({o,x:CV.v[o.id]}));
+    if(q)a=a.filter(r=>(r.o.nm+' '+r.o.id+' '+r.o.rs+' '+r.o.kec+' '+((typeof D!=='undefined'&&D.U&&D.U[r.o.id])||'')).toLowerCase().includes(q));
+    const g=r=>r.x[gi];
+    if(df==='stop')a=a.filter(r=>g(r)[1]>0&&g(r)[2]===0);else if(df==='turun')a=a.filter(r=>g(r)[2]<g(r)[1]);else if(df==='naik')a=a.filter(r=>g(r)[2]>g(r)[1]);else if(df==='nol')a=a.filter(r=>r.x.every(v=>v[0]===0&&v[2]===0));
+    a.sort((p,q2)=>(g(p)[2]-g(p)[1])-(g(q2)[2]-g(q2)[1])||g(q2)[1]-g(p)[1]);return a}
+  function detHTML(){const a=detRows(),pg=Math.min(dp,Math.max(0,Math.ceil(a.length/PER)-1)),sl=a.slice(pg*PER,pg*PER+PER),G=CV.g;
+    const cell=(v,i)=>{const gp=v[2]-v[1];return `<td class="${i===gi?'cs':''}"><b>${nf(v[2])}</b><small>${nf(v[1])}${gp?` <span class="${gp<0?'dn':'up'}">${sg(gp)}</span>`:''}</small></td>`};
+    const rows=sl.map(r=>`<tr><td style="text-align:left;white-space:normal;min-width:150px">${es(r.o.nm)}<div class="mu" style="font-size:11px">${r.o.id} · ${es(r.o.kec)}</div></td><td style="text-align:left">${es(r.o.sf.split(' ').slice(0,2).join(' '))}</td><td>${r.o.pjp.slice(0,3)}</td>${r.x.map(cell).join('')}<td class="mu">${nf(r.x[gi][0])}</td></tr>`).join('');
+    const np=Math.ceil(a.length/PER);
+    return `<div class="mu" style="margin:6px 0">${a.length} outlet · diurutkan dari gap <b>${G[gi]}</b> paling minus · angka besar = 1–${CV.d} Nov, kecil = 1–${CV.d} Okt dan gap</div>
+      <div class="tw"><table class="cvd"><tr><th style="text-align:left">Outlet</th><th style="text-align:left">SF</th><th>PJP</th>${G.map((x,i)=>`<th class="${i===gi?'cs':''}">${x}</th>`).join('')}<th>${G[gi]} Okt full</th></tr>${rows||'<tr><td colspan="9">Tidak ada outlet.</td></tr>'}</table></div>
+      ${np>1?`<div class="cpg">${Array.from({length:np},(_,i)=>`<button data-cp="${i}" class="${i===pg?'on':''}">${i+1}</button>`).join('')}</div>`:''}`}
+  function detCard(){return `<div class="card cvx" style="margin-top:12px"><h3>Detail per outlet</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px"><input type="search" id="cvq" value="${es(dq)}" placeholder="Cari nama / ID / RS / username" style="flex:1;min-width:180px">
+    <select id="cvf"><option value="all">Semua outlet</option><option value="stop">Okt ada, Nov masih 0 (${CV.g[gi]})</option><option value="turun">Turun vs Okt</option><option value="naik">Naik vs Okt</option><option value="nol">Tidak ada transaksi CVM sama sekali</option></select></div>
+    <div id="cvd">${detHTML()}</div></div>`}
+  const st3=document.createElement('style');st3.textContent='.cvd td{vertical-align:top;text-align:right}.cvd td b{display:block;font-size:13px}.cvd td small{display:block;font-size:10.5px;color:var(--mu);white-space:nowrap}.cvd .cs{background:var(--soft)}.cpg{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}.cpg button{min-width:32px;padding:5px 8px;border-radius:6px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}.cpg button.on{background:var(--ac);color:#fff;border-color:var(--ac)}';document.head.appendChild(st3);
+  const upd=()=>{const c=document.getElementById('cvd');if(c)c.innerHTML=detHTML()};
+  document.addEventListener('input',e=>{if(e.target.id==='cvq'){dq=e.target.value;dp=0;upd()}});
+  document.addEventListener('change',e=>{if(e.target.id==='cvf'){df=e.target.value;dp=0;upd()}});
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-cp]');if(b){dp=+b.dataset.cp;upd();document.getElementById('cvd').scrollIntoView({block:'start'})}});
   R.cvm=function(){const O=list(),G=CV.g,fl=st.kec||st.sf||st.pjp;
     const kp=G.map((g,i)=>{const a=agg(O,i),p=pc(a[2],a[1]);return `<div class="k"${i===gi?' style="outline:2px solid var(--ac)"':''}><div class="t">${g} 1–${CV.d} Nov</div><div class="v">${nf(a[2])}</div><div class="s"><span class="${p!=null&&p<0?'dn':'up'}">${pf(p)}</span> vs ${nf(a[1])} Okt · Okt full ${nf(a[0])}</div></div>`}).join('');
     const dr=O.map(o=>({o,x:CV.v[o.id][gi]})).filter(r=>r.x[1]>0).map(r=>({...r,g:r.x[2]-r.x[1]})).sort((a,b)=>a.g-b.g),stop=dr.filter(r=>r.x[2]===0),down=dr.filter(r=>r.g<0);
@@ -21,8 +43,8 @@ const CV={"d":11,"g":["CVM","Super Seru","Comsak","Hot Promo","Biometrik"],"v":{
       <div class="kpi">${kp}</div><div class="cg">${G.map((g,i)=>`<button data-cg="${i}" class="${i===gi?'on':''}">${g}</button>`).join('')}</div>
       <div class="note">${G[gi]}: ${nf(A[2])} vs ${nf(A[1])} → <b>${sg(gp)} (${pf(pc(A[2],A[1]))})</b>. ${down.length} outlet turun, <b>${stop.length} outlet Okt ada tapi Nov masih 0</b>.</div>
       ${grp(O,'sf','SF')}${grp(O,'kec','Kecamatan')}
-      <div class="card tw cvx" style="margin-top:12px"><h3>Outlet turun terdalam · ${G[gi]}</h3><table><tr><th style="text-align:left">Outlet</th><th style="text-align:left">SF</th><th>PJP</th><th>1–${CV.d} Okt</th><th>1–${CV.d} Nov</th><th>Gap</th></tr>${tl||'<tr><td colspan="6">Tidak ada outlet turun.</td></tr>'}</table></div>`};
-  document.addEventListener('click',e=>{const c=e.target.closest('[data-cg]');if(c){gi=+c.dataset.cg;try{localStorage.setItem('cvm_g',gi)}catch(_){}draw()}});
+      <div class="card tw cvx" style="margin-top:12px"><h3>Outlet turun terdalam · ${G[gi]}</h3><table><tr><th style="text-align:left">Outlet</th><th style="text-align:left">SF</th><th>PJP</th><th>1–${CV.d} Okt</th><th>1–${CV.d} Nov</th><th>Gap</th></tr>${tl||'<tr><td colspan="6">Tidak ada outlet turun.</td></tr>'}</table></div>`+detCard()};
+  document.addEventListener('click',e=>{const c=e.target.closest('[data-cg]');if(c){gi=+c.dataset.cg;dp=0;try{localStorage.setItem('cvm_g',gi)}catch(_){}draw();const f2=document.getElementById('cvf');if(f2)f2.value=df}});
   if(R.tem){const oT=R.tem;R.tem=function(){const h=oT.apply(this,arguments);try{const O=list(),G=CV.g,ls=G.map((g,i)=>{const a=agg(O,i);return{g,a,p:pc(a[2],a[1])}}),w=[...ls].sort((x,y)=>(x.p??0)-(y.p??0))[0];
     const sf={};O.forEach(o=>{const x=CV.v[o.id][0];sf[o.sf]=sf[o.sf]||[0,0];sf[o.sf][0]+=x[1];sf[o.sf][1]+=x[2]});const sw=Object.entries(sf).sort((a,b)=>(a[1][1]-a[1][0])-(b[1][1]-b[1][0]))[0];
     const stop=O.filter(o=>CV.v[o.id][0][1]>0&&CV.v[o.id][0][2]===0).length;
