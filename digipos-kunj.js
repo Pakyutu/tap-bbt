@@ -11,7 +11,9 @@
   const css=document.createElement('style');css.textContent='.kj-top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}.kj-top select{min-width:130px}.kj-sf{margin-top:12px}.kj-sf h3{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.kj-btn{padding:6px 12px;border-radius:8px;border:0;background:#25D366;color:#fff;font-weight:600;cursor:pointer;font-size:13px}.kj-btn.cp{background:var(--soft);color:var(--tx);border:1px solid var(--bd)}.kj-o{padding:9px 0;border-top:1px solid var(--bd)}.kj-o:first-of-type{border-top:0}.kj-o b{font-size:14px}.kj-o .m{font-size:11.5px;color:var(--mu)}.kj-t{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}.kj-t span{font-size:11.5px;padding:2px 8px;border-radius:999px;background:rgba(200,16,46,.1);color:#c8102e;font-weight:600}.kj-t span.y{background:rgba(224,138,0,.14);color:#b86a00}.kj-t span.g{background:rgba(15,138,82,.12);color:#0f8a52}.kj-ok{color:#0f8a52;font-size:12px}.kj-sum{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}.kj-sum span{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--soft)}';document.head.appendChild(css);
   function tugas(o){const t=[],K=(D.K||{})[o.id]||{},cv=(typeof CV!=='undefined'&&CV.v[o.id])?CV.v[o.id][0]:null;
     if(o.vr<20)t.push(['VF Reg '+o.vr+'/20','']);
+    if(o.vb<10)t.push(['VF By.U '+o.vb+'/10','']);
     if(o.ss<5)t.push(['SA Simpati '+o.ss+'/5','']);
+    if(o.sb<5)t.push(['SA By.U '+o.sb+'/5','']);
     if(K.r&&!(K.r[2]>0))t.push(['Klik Misi Reg','y']);
     if(K.b&&!(K.b[2]>0))t.push(['Klik Misi By.U','y']);
     if(cv&&cv[1]>0&&cv[2]===0)t.push(['CVM Nov 0 (Okt '+cv[1]+')','y']);
@@ -28,7 +30,7 @@
     const allSF=[...new Set(O.map(o=>o.sf))].sort();
     let h=`<div class="kj-top"><select id="kjh">${HR.slice(1).map(d=>`<option${d===hari?' selected':''}>${d}</option>`).join('')}</select><select id="kjs"><option value="">Semua SF</option>${allSF.map(s=>`<option value="${es(s)}"${s===ksf?' selected':''}>${es(s)}</option>`).join('')}</select></div>
       <div class="note">Rute PJP hari <b>${hari}</b>: ${all.length} outlet, <b>${need.length}</b> perlu dikejar. Data: ST ${L.sub&&/update (\d+ Nov)/.exec(L.sub)?/update (\d+ Nov)/.exec(L.sub)[1]:''}, Klik Misi, CVM 1–${typeof CV!=='undefined'?CV.d:'?'} Nov, FR Top 20.</div>
-      <div class="kj-sum"><span>VF Reg belum OA: <b>${cnt('VF Reg')}</b></span><span>SA Simpati belum OA: <b>${cnt('SA Simpati')}</b></span><span>Belum Klik Misi Reg: <b>${cnt('Klik Misi Reg')}</b></span><span>Belum Klik Misi By.U: <b>${cnt('Klik Misi By.U')}</b></span><span>CVM Nov 0: <b>${cnt('CVM Nov 0')}</b></span></div>`;
+      <div class="kj-sum"><span>VF Reg belum OA: <b>${cnt('VF Reg')}</b></span><span>VF By.U belum OA: <b>${cnt('VF By.U')}</b></span><span>SA Simpati belum OA: <b>${cnt('SA Simpati')}</b></span><span>SA By.U belum OA: <b>${cnt('SA By.U')}</b></span><span>Belum Klik Misi Reg: <b>${cnt('Klik Misi Reg')}</b></span><span>Belum Klik Misi By.U: <b>${cnt('Klik Misi By.U')}</b></span><span>CVM Nov 0: <b>${cnt('CVM Nov 0')}</b></span></div>`;
     if(!sfs.length)h+='<div class="card" style="margin-top:12px">Tidak ada outlet PJP di hari ini untuk filter yang dipilih.</div>';
     sfs.forEach((sf,ix)=>{const a=by[sf],n=a.filter(r=>r.t.length).length;
       h+=`<div class="card kj-sf"><h3><span>${es(tc(sf))} <span class="mu" style="font-weight:400;font-size:13px">· ${a.length} outlet · ${n} dikejar</span></span><span><button class="kj-btn cp" data-kc="${ix}">Salin</button> <button class="kj-btn" data-kw="${ix}">Kirim WA</button></span></h3>
