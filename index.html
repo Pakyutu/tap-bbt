@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+.st{margin-top:16px;border-radius:18px;background:var(--card);border:1px solid var(--bd);padding:14px 16px}.st .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.st .sh b{font:600 15px Archivo,sans-serif}.st .sh span{font:500 11.5px "IBM Plex Mono",monospace;color:var(--mute)}.st .gr{font:600 11px "IBM Plex Mono",monospace;color:var(--mute);letter-spacing:.06em;text-transform:uppercase;margin:10px 0 2px}.st .it{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--bd);font-size:13.5px}.st .it:first-of-type{border-top:0}.st .tg{font:600 11.5px "IBM Plex Mono",monospace;padding:2px 8px;border-radius:999px;white-space:nowrap}.st .ok{background:rgba(47,210,122,.14);color:var(--ok)}.st .wn{background:rgba(255,176,32,.15);color:var(--warn)}.st .bd{background:rgba(227,19,47,.18);color:var(--red2)}.mu{color:var(--mute);font-size:13px}
 :root{--bg:#0d0f14;--bg2:#151924;--card:rgba(255,255,255,.055);--bd:rgba(255,255,255,.09);--ink:#f2f4f8;--mute:#98a2b6;--red:#e3132f;--red2:#ff4d63;--blue:#5b8cff;--ok:#2fd27a;--warn:#ffb020}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
@@ -82,10 +83,11 @@ a.card:after{content:"";position:absolute;inset:0;border-radius:inherit;padding:
     </a>
     <a class="card wl" href="wl.html" style="--c1:#1d9a6c;--c2:#0f9bb5">
       <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
-      <div class="tx"><b>Penyusun WL</b><span>Bagi rentang SN VF / SA ke outlet satu per satu, jumlah &amp; harga bebas, total otomatis</span></div>
+      <div class="tx"><b>Penyusun WL</b><span>Bagi SN VF / SA ke outlet, harga bebas, total otomatis · riwayat Bagi rentang SN VF / SA ke outlet satu per satu, jumlah &amp; harga bebas, total otomatisamp; cari SN</span></div>
       <div class="arr">›</div>
     </a>
   </div>
+  <div class="st" id="dst"><div class="sh"><b>Status data</b><span id="dsts"></span></div><div id="dstl"><span class="mu">Memuat…</span></div></div>
   <button class="install" id="inst">＋ Pasang aplikasi di layar utama</button>
   <div class="foot">TAP Bagan Batu · v3</div>
 </div>
@@ -124,4 +126,12 @@ a.card:after{content:"";position:absolute;inset:0;border-radius:inherit;padding:
   if("serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("sw.js")});
 })();
 </script>
-</body></html>
+<script>
+(function(){const B=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+fetch("status.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{const t=new Date();t.setHours(0,0,0,0);let late=0,h="",g="";
+ j.items.forEach(x=>{const d=new Date(x.d+"T00:00:00"),a=Math.round((t-d)/864e5),c=a<=2?"ok":a<=3?"wn":"bd";if(a>2)late++;
+  if(x.g!==g){g=x.g;h+=`<div class="gr">${g}</div>`}
+  h+=`<div class="it"><span>${x.n}</span><span class="tg ${c}">${d.getDate()} ${B[d.getMonth()]}${a>2?" · "+a+" hr lalu":""}</span></div>`});
+ document.getElementById("dstl").innerHTML=h;document.getElementById("dsts").innerHTML=late?`<span style="color:var(--red2)">⚠ ${late} perlu update</span>`:"semua terbaru ✓";
+}).catch(()=>{document.getElementById("dstl").innerHTML='<span class="mu">Status data tidak bisa dimuat (offline?).</span>'})})();
+</script></body></html>

@@ -51,6 +51,7 @@ details summary{cursor:pointer;color:var(--mu);font-size:13px;margin-top:6px}.li
 </div>
 
 <div id="list"></div>
+<div class="card" id="hist"></div>
 <div class="tot" id="tot" style="display:none"></div>
 </div>
 <script>
@@ -99,7 +100,7 @@ function render(){
   else{$('stk').innerHTML='';$('bar').style.width='0'}
   $('h2').textContent=`2. Outlet ke-${S.al.length+1}`;
   const q=num($('oq').value);$('prev').innerHTML=r&&q>0?`SN: <span class="mono">${fmtP(take(r,u,Math.min(q,Math.max(0,sisa))).parts,r.L)||'-'}</span>${q>sisa?' <b style="color:var(--ac)">(melebihi sisa '+nf(sisa)+')</b>':''}${num($('oh').value)?' · Subtotal <b>'+rp(q*num($('oh').value))+'</b>':''}`:'';
-  $('list').innerHTML=A.length?`<div class="card"><h2>3. Daftar WL (${A.length} outlet)</h2><div class="row" style="margin-top:4px"><button class="btn s" id="csv">⬇️ Unduh Excel (CSV)</button><button class="btn s" id="cr">Salin ringkasan</button><button class="btn s" id="cs">Salin semua SN</button><button class="btn d" id="rs">Hapus semua</button></div>
+  $('list').innerHTML=A.length?`<div class="card"><h2>3. Daftar WL (${A.length} outlet)</h2><div class="row" style="margin-top:4px"><button class="btn s" id="csv">⬇️ Unduh Excel (CSV)</button><button class="btn s" id="cr">Salin ringkasan</button><button class="btn s" id="cs">Salin semua SN</button><button class="btn s" id="hsv">💾 Simpan ke riwayat</button><button class="btn s" id="nw">＋ WL baru</button><button class="btn d" id="rs">Hapus semua</button></div>
     ${A.map((x,i)=>`<div class="al${i===ed?' e':''}"><div class="vw"><div class="h"><b>${i+1}. ${x.n||'(tanpa nama)'}</b><span><button class="btn s" data-e="${i}">Edit</button> <button class="btn d" data-x="${i}">Hapus</button></span></div>
       <div class="rg mono">${x.rg}${x.over?' <b style="color:var(--ac)">· melebihi stok</b>':''}</div>
       <div class="m">${nf(x.q)} pcs × ${rp(x.h||0)} = <span class="sm">${rp((x.q|0)*(x.h||0))}</span></div>
@@ -137,6 +138,29 @@ document.addEventListener('click',e=>{const t=e.target,d=t.dataset;
     const csv='﻿'+rows.map(r=>r.map(v=>v&&v.t?`="${v.t}"`:`"${String(v??'').replace(/"/g,'""')}"`).join(';')).join('\r\n');
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`WL_${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove()}});
 ['on','oq','oh'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')add(num($('oq').value))}));
-render();
+let HQ='',HL;try{HL=JSON.parse(localStorage.getItem('wlh')||'[]')}catch(e){HL=[]}if(!Array.isArray(HL))HL=[];
+const saveH=()=>{try{localStorage.setItem('wlh',JSON.stringify(HL))}catch(e){alert('Penyimpanan HP penuh, hapus beberapa riwayat.')}};
+const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function withS(x,fn){const o=S;S=x;try{return fn()}finally{S=o}}
+const tglF=t=>{const d=new Date(t);return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})+' '+d.toTimeString().slice(0,5)};
+function loadRW(){RW=String(S.st||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).map(l=>{const p=l.split(/[^0-9]+/).filter(Boolean);return[p[0]||'',p[1]||'']});if(!RW.length)RW=[['','']];drawRows()}
+function drawH(){const q=HQ.trim(),qd=q.replace(/\D/g,''),isSN=qd.length>=6&&qd===q.replace(/\s/g,'');let body='';
+  if(!HL.length)body='<div style="color:var(--mu);font-size:13px">Belum ada riwayat. Setelah WL selesai, ketuk <b>💾 Simpan ke riwayat</b>.</div>';
+  else if(isSN){const hits=[];HL.forEach(h=>withS(h,()=>{alloc().forEach(x=>{const L=x.L;for(const [a,b] of x.parts){
+      if(qd.length<L){for(let c=a;c<=b;c++){const sn=pad(c,L);if(sn.endsWith(qd))hits.push({h,x,sn})}}else{const A=BigInt(qd);if(A>=a&&A<=b)hits.push({h,x,sn:pad(A,L)})}}})}));
+    body=hits.length?hits.slice(0,30).map(r=>`<div class="al"><div class="h"><b>${esc(r.x.n||'-')}</b><span class="m">${tglF(r.h.t)}</span></div><div class="rg mono">${r.sn}</div><div class="m">${esc(r.h.p||'-')} · ${rp(r.x.h||0)}/pcs</div></div>`).join(''):'<div style="color:var(--mu);font-size:13px">SN tidak ditemukan di riwayat.</div>'}
+  else{const k=q.toLowerCase();const H=HL.filter(h=>!k||(h.p||'').toLowerCase().includes(k)||h.al.some(a=>(a.n||'').toLowerCase().includes(k)));
+    body=H.length?H.map(h=>{const pcs=h.al.reduce((s,x)=>s+(x.q|0),0),tot=h.al.reduce((s,x)=>s+x.q*(x.h||0),0);
+      return `<div class="al"${S.hid===h.id?' style="border-color:var(--ac)"':''}><div class="h"><b>${tglF(h.t)}</b><span class="m">${esc(h.p||'-')}</span></div><div class="m">${h.al.length} outlet · ${nf(pcs)} pcs · <span class="sm">${rp(tot)}</span>${S.hid===h.id?' · <b style="color:var(--ac)">sedang dibuka</b>':''}</div><div class="m" style="font-size:12px;margin-top:2px">${esc(h.al.map(a=>a.n||'-').join(', ').slice(0,160))}</div><div class="row" style="margin-top:6px"><button class="btn s" data-ho="${h.id}">Buka</button><button class="btn d" data-hx="${h.id}">Hapus</button></div></div>`}).join(''):'<div style="color:var(--mu);font-size:13px">Tidak ada yang cocok.</div>'}
+  $('hist').innerHTML=`<h2>Riwayat WL (${HL.length})</h2><input id="hq" placeholder="Cari SN (boleh 6 digit terakhir), outlet, atau produk" value="${esc(HQ)}"><div id="hb">${body}</div>`;}
+document.addEventListener('input',e=>{if(e.target.id==='hq'){HQ=e.target.value;drawH();const i=$('hq');i.focus();i.setSelectionRange(HQ.length,HQ.length)}});
+document.addEventListener('click',e=>{const t=e.target,d=t.dataset;
+  if(t.id==='hsv'){if(!S.al.length){alert('Belum ada outlet.');return}const it={id:S.hid||Date.now().toString(36),t:Date.now(),p:S.p,st:S.st,al:JSON.parse(JSON.stringify(S.al))};
+    const i=HL.findIndex(h=>h.id===it.id);if(i>=0)HL[i]=it;else HL.unshift(it);S.hid=it.id;saveH();save();drawH();t.textContent='Tersimpan ✓';setTimeout(()=>{const b=$('hsv');if(b)b.textContent='💾 Simpan ke riwayat'},1500)}
+  if(t.id==='nw'){if(S.al.length&&!HL.some(h=>h.id===S.hid)&&!confirm('WL sekarang belum disimpan ke riwayat. Tetap mulai baru?'))return;S={st:'',p:S.p,al:[]};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}
+  if(d.ho){const h=HL.find(x=>x.id===d.ho);if(!h)return;if(S.al.length&&S.hid!==h.id&&!confirm('Ganti WL yang sedang dikerjakan dengan riwayat ini?'))return;
+    S={st:h.st,p:h.p,al:JSON.parse(JSON.stringify(h.al)),hid:h.id};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}
+  if(d.hx&&confirm('Hapus riwayat ini?')){HL=HL.filter(h=>h.id!==d.hx);if(S.hid===d.hx)delete S.hid;saveH();save();drawH()}});
+render();drawH();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
 </script><script src="nav.js"></script></body></html>
