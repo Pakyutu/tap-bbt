@@ -14,6 +14,7 @@ label{display:block;font-size:12px;color:var(--mu);margin:8px 0 4px}input{width:
 .btn{padding:11px 16px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-weight:600;font-size:15px;cursor:pointer}.btn.s{background:var(--soft);color:var(--tx);border:1px solid var(--bd);font-size:13px;padding:7px 12px}.btn.d{background:transparent;color:var(--ac);border:1px solid var(--bd);font-size:13px;padding:6px 10px}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}.err{color:var(--ac);font-weight:600;margin-top:8px;min-height:1em}
 .sr{display:grid;grid-template-columns:1fr 1fr 36px;gap:6px;align-items:end;margin-top:8px}.sr input{font-size:13.5px;padding:9px 7px;letter-spacing:-.2px}.sr .n{grid-column:1/-1;font-size:11.5px;color:var(--mu);margin-top:-2px}.sr .n:empty{display:none}.sr .x{border:1px solid var(--bd);background:transparent;color:var(--ac);border-radius:8px;padding:8px 10px;cursor:pointer}.sr label{margin:0 0 3px}.qk{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.qk button{border:1px solid var(--bd);background:var(--soft);color:var(--tx);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer}
+.pc{display:flex;flex-wrap:wrap;gap:6px}.pc button{border:1px solid var(--bd);background:var(--soft);color:var(--tx);border-radius:999px;padding:7px 13px;font-size:13.5px;cursor:pointer}.pc button.on{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}.pc button small{opacity:.75;margin-left:4px}.pr{display:grid;grid-template-columns:1.6fr 1fr auto;gap:6px;margin-top:6px;align-items:center}.pr input{font-size:13.5px;padding:8px 9px}.pr .x{border:1px solid var(--bd);background:transparent;color:var(--ac);border-radius:8px;padding:7px 10px;cursor:pointer}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
 .stk{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px}.stk div{background:var(--soft);border-radius:10px;padding:8px 10px}.stk small{display:block;color:var(--mu);font-size:11.5px}.stk b{font-size:17px}
 .bar{height:8px;border-radius:4px;background:var(--soft);overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;background:var(--ac)}
@@ -30,7 +31,13 @@ details summary{cursor:pointer;color:var(--mu);font-size:13px;margin-top:6px}.li
   <div id="rows"></div>
   <div class="row" style="margin-top:8px"><button class="btn s" id="addr">＋ Tambah rentang SN</button></div>
   <div id="segi" style="color:var(--mu);font-size:12.5px;margin-top:6px"></div>
-  <label>Produk (opsional)</label><input id="p" placeholder="mis. VF 7GB/3 hari" list="pl"><datalist id="pl"><option>VF 7GB/24 jam</option><option>VF 7GB/2 hari</option><option>VF 7GB/3 hari</option><option>VF 7GB/5 hari</option><option>VF 11GB/5 hari</option><option>VF 7GB/7 hari</option><option>SA 3GB</option><option>SA 5GB</option><option>SA 7GB</option><option>SA 10GB</option><option>SA 15GB</option><option>SA BYU 3GB</option><option>SA BYU 5GB</option></datalist>
+  <label style="display:flex;justify-content:space-between;align-items:center">Produk <a href="#" id="pm" style="color:var(--ac);font-size:12.5px;text-decoration:none">✏️ Kelola produk</a></label>
+  <div class="pc" id="pc"></div>
+  <div id="pe" style="display:none;margin-top:8px;border:1px dashed var(--bd);border-radius:10px;padding:10px">
+    <div id="pel"></div>
+    <div class="pr" style="margin-top:8px"><input id="pn" placeholder="Nama produk baru, mis. VF 7GB/3 hari"><input id="ph" inputmode="numeric" placeholder="Harga (opsional)"><button class="btn s" id="pa">＋ Tambah</button></div>
+    <div style="font-size:11.5px;color:var(--mu);margin-top:6px">Harga produk otomatis terisi ke kolom harga outlet saat produk dipilih (tetap bisa diubah).</div>
+  </div>
   <div class="stk" id="stk"></div><div class="bar"><i id="bar" style="width:0"></i></div>
 </div>
 
@@ -51,7 +58,17 @@ const $=i=>document.getElementById(i);
 const clean=v=>String(v||'').replace(/\D/g,''),rp=v=>'Rp '+Math.round(v).toLocaleString('id-ID'),nf=v=>Math.round(v).toLocaleString('id-ID'),num=v=>parseInt(clean(v)||'0',10);
 let S={st:'',p:'',al:[]},ed=-1;
 try{const s=JSON.parse(localStorage.getItem('wl2')||'null');if(s){S=s;if(S.st===undefined)S.st=(S['a']&&S['b'])?S['a']+' - '+S['b']:''}}catch(e){}
-$('p').value=S.p||'';
+const P0=['VF 7GB/24 jam','VF 7GB/2 hari','VF 7GB/3 hari','VF 7GB/5 hari','VF 11GB/5 hari','VF 7GB/7 hari','SA 3GB','SA 5GB','SA 7GB','SA 10GB','SA 15GB','SA BYU 3GB','SA BYU 5GB'].map(n=>({n,h:0}));
+let PL;try{PL=JSON.parse(localStorage.getItem('wlp')||'null')}catch(e){}if(!Array.isArray(PL))PL=P0;
+const saveP=()=>{try{localStorage.setItem('wlp',JSON.stringify(PL))}catch(e){}};
+function drawC(){$('pc').innerHTML=PL.map((p,i)=>`<button data-pi="${i}" class="${p.n===S.p?'on':''}">${p.n.replace(/</g,'&lt;')}${p.h?`<small>${nf(p.h)}</small>`:''}</button>`).join('')||'<span style="color:var(--mu);font-size:13px">Belum ada produk. Ketuk ✏️ Kelola produk untuk menambah.</span>'}
+function drawP(){drawC();$('pel').innerHTML=PL.map((p,i)=>`<div class="pr" data-pe="${i}"><input data-f="n" value="${p.n.replace(/"/g,'&quot;')}"><input data-f="h" inputmode="numeric" value="${p.h?nf(p.h):''}" placeholder="Harga"><button class="x">✕</button></div>`).join('')}
+drawP();
+$('pm').addEventListener('click',e=>{e.preventDefault();const o=$('pe').style.display==='none';$('pe').style.display=o?'block':'none';$('pm').textContent=o?'✓ Selesai':'✏️ Kelola produk'});
+$('pc').addEventListener('click',e=>{const b=e.target.closest('[data-pi]');if(!b)return;const p=PL[+b.dataset.pi];S.p=S.p===p.n?'':p.n;if(S.p&&p.h)$('oh').value=nf(p.h);drawC();render()});
+$('pel').addEventListener('input',e=>{const w=e.target.closest('[data-pe]');if(!w)return;const p=PL[+w.dataset.pe],f=e.target.dataset.f;if(f==='n'){const was=p.n===S.p;p.n=e.target.value.trim();if(was)S.p=p.n}else p.h=num(e.target.value);saveP();drawC();render()});
+$('pel').addEventListener('click',e=>{const x=e.target.closest('.x');if(!x)return;const i=+x.closest('[data-pe]').dataset.pe;if(PL[i].n===S.p)S.p='';PL.splice(i,1);saveP();drawP();render()});
+$('pa').addEventListener('click',()=>{const n=$('pn').value.trim();if(!n){$('pn').focus();return}if(!PL.some(p=>p.n===n))PL.push({n,h:num($('ph').value)});S.p=n;if(num($('ph').value))$('oh').value=nf(num($('ph').value));$('pn').value='';$('ph').value='';saveP();drawP();render()});
 let RW=String(S.st||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).map(l=>{const p=l.split(/[^0-9]+/).filter(Boolean);return[p[0]||'',p[1]||'']});if(!RW.length)RW=[['','']];
 const syncSt=()=>{S.st=RW.filter(r=>clean(r[0])).map(r=>clean(r[1])?clean(r[0])+' - '+clean(r[1]):clean(r[0])).join('\n')};
 function cnt(r){const a=clean(r[0]),b=clean(r[1]);if(!a)return'';if(!b)return'1 SN';if(a.length!==b.length)return'<span style="color:var(--ac)">cek</span>';const n=BigInt(b)-BigInt(a);return n<0n?'<span style="color:var(--ac)">cek</span>':nf(Number(n)+1)+' SN'}
@@ -95,7 +112,7 @@ function render(){
 function snTxt(x,i,h){return (h?`*WL ${S.p||''}*\n`:'')+`${i+1}. ${x.n||'-'}: ${x.rg} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})\n`+list(x).map((s,j)=>`   ${j+1}. ${s}`).join('\n')}
 function list(x){const out=[];for(const [a,b] of x.parts)for(let c=a;c<=b;c++)out.push(pad(c,x.L));return out}
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
-$('p').addEventListener('input',()=>{S.p=$('p').value.trim();render()});
+
 ['oq','oh'].forEach(i=>$(i).addEventListener('input',render));
 $('oh').addEventListener('blur',()=>{const v=num($('oh').value);$('oh').value=v?nf(v):''});
 function add(q){$('er').textContent='';const r=rng();if(!r){$('er').textContent='Isi daftar SN stok dulu.';return}
