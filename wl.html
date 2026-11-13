@@ -15,6 +15,7 @@ label{display:block;font-size:12px;color:var(--mu);margin:8px 0 4px}input{width:
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}.err{color:var(--ac);font-weight:600;margin-top:8px;min-height:1em}
 .sr{display:grid;grid-template-columns:1fr 1fr 36px;gap:6px;align-items:end;margin-top:8px}.sr input{font-size:13.5px;padding:9px 7px;letter-spacing:-.2px}.sr .n{grid-column:1/-1;font-size:11.5px;color:var(--mu);margin-top:-2px}.sr .n:empty{display:none}.sr .x{border:1px solid var(--bd);background:transparent;color:var(--ac);border-radius:8px;padding:8px 10px;cursor:pointer}.sr label{margin:0 0 3px}.qk{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.qk button{border:1px solid var(--bd);background:var(--soft);color:var(--tx);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer}
 .pc{display:flex;flex-wrap:wrap;gap:6px}.pc button{border:1px solid var(--bd);background:var(--soft);color:var(--tx);border-radius:999px;padding:7px 13px;font-size:13.5px;cursor:pointer}.pc button.on{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}.pc button small{opacity:.75;margin-left:4px}.pr{display:grid;grid-template-columns:1.6fr 1fr auto;gap:6px;margin-top:6px;align-items:center}.pr input{font-size:13.5px;padding:8px 9px}.pr .x{border:1px solid var(--bd);background:transparent;color:var(--ac);border-radius:8px;padding:7px 10px;cursor:pointer}
+.stg{display:inline-flex;border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-top:6px}.stg button{border:0;background:transparent;color:var(--mu);padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer}.stg button.on.y{background:var(--ok);color:#fff}.stg button.on.n{background:var(--ac);color:#fff}.al.sty{border-color:var(--ok)}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
 .stk{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px}.stk div{background:var(--soft);border-radius:10px;padding:8px 10px}.stk small{display:block;color:var(--mu);font-size:11.5px}.stk b{font-size:17px}
 .bar{height:8px;border-radius:4px;background:var(--soft);overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;background:var(--ac)}
@@ -101,12 +102,12 @@ function render(){
   $('h2').textContent=`2. Outlet ke-${S.al.length+1}`;
   const q=num($('oq').value);$('prev').innerHTML=r&&q>0?`SN: <span class="mono">${fmtP(take(r,u,Math.min(q,Math.max(0,sisa))).parts,r.L)||'-'}</span>${q>sisa?' <b style="color:var(--ac)">(melebihi sisa '+nf(sisa)+')</b>':''}${num($('oh').value)?' · Subtotal <b>'+rp(q*num($('oh').value))+'</b>':''}`:'';
   $('list').innerHTML=A.length?`<div class="card"><h2>3. Daftar WL (${A.length} outlet)</h2><div class="row" style="margin-top:4px"><button class="btn s" id="csv">⬇️ Unduh Excel (CSV)</button><button class="btn s" id="cr">Salin ringkasan</button><button class="btn s" id="cs">Salin semua SN</button><button class="btn s" id="hsv">💾 Simpan ke riwayat</button><button class="btn s" id="nw">＋ WL baru</button><button class="btn d" id="rs">Hapus semua</button></div>
-    ${A.map((x,i)=>`<div class="al${i===ed?' e':''}"><div class="vw"><div class="h"><b>${i+1}. ${x.n||'(tanpa nama)'}</b><span><button class="btn s" data-e="${i}">Edit</button> <button class="btn d" data-x="${i}">Hapus</button></span></div>
+    ${A.map((x,i)=>`<div class="al${i===ed?' e':''}${x.st?' sty':''}"><div class="vw"><div class="h"><b>${i+1}. ${x.n||'(tanpa nama)'}</b><span><button class="btn s" data-e="${i}">Edit</button> <button class="btn d" data-x="${i}">Hapus</button></span></div>
       <div class="rg mono">${x.rg}${x.over?' <b style="color:var(--ac)">· melebihi stok</b>':''}</div>
-      <div class="m">${nf(x.q)} pcs × ${rp(x.h||0)} = <span class="sm">${rp((x.q|0)*(x.h||0))}</span></div>
+      <div class="m">${nf(x.q)} pcs × ${rp(x.h||0)} = <span class="sm">${rp((x.q|0)*(x.h||0))}</span></div><div class="stg"><button class="${x.st?'on y':''}" data-stg="${i}" data-v="1">✓ Sudah ST</button><button class="${x.st?'':'on n'}" data-stg="${i}" data-v="0">Belum ST</button></div>
       <div style="margin-top:6px"><button class="btn s" data-r="${i}">Salin ringkasan</button> <button class="btn s" data-c="${i}">Salin rincian SN</button> <button class="btn s" data-bq="${i}">▦ Barcode SN</button></div><details><summary>Lihat SN</summary><div class="list mono">${list(x).map((s,j)=>`<div>${j+1}. ${s}</div>`).join('')}</div></details></div>
       <div class="ed"><div class="g3"><div class="full"><label>Nama</label><input data-f="n" value="${(x.n||'').replace(/"/g,'&quot;')}"></div><div><label>Jumlah</label><input data-f="q" type="number" value="${x.q}"></div><div><label>Harga/pcs</label><input data-f="h" inputmode="numeric" value="${x.h?nf(x.h):''}"></div></div>
-      <div class="row"><button class="btn" data-sv="${i}">Simpan</button><button class="btn s" data-cn>Batal</button></div><div class="m" style="margin-top:6px">Ubah jumlah akan menggeser SN outlet sesudahnya.</div></div></div>`).join('')}</div>`:'';
+      <div class="row"><button class="btn" data-sv="${i}">Simpan</button><button class="btn s" data-cn>Batal</button></div><div class="m" style="margin-top:6px">Ubah jumlah akan menggeser SN outlet sesudahnya.</div></div></div>`).join('')}</div>`+sisaHTML(A):'';
   const tq=u,tn=S.al.reduce((s,x)=>s+(x.q|0)*(x.h||0),0);
   $('tot').style.display=A.length?'flex':'none';$('tot').innerHTML=`<div><small>Total pcs</small><b>${nf(tq)}</b></div><div><small>Total nominal</small><b>${rp(tn)}</b></div><div><small>Sisa SN</small><b style="color:${sisa<0?'var(--ac)':'var(--ok)'}">${nf(sisa)}</b></div>`;
   save()}
@@ -115,7 +116,7 @@ function list(x){const out=[];for(const [a,b,l] of x.parts)for(let c=a;c<=b;c++)
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
 
 ['oq','oh'].forEach(i=>$(i).addEventListener('input',render));
-$('oh').addEventListener('blur',()=>{const v=num($('oh').value);$('oh').value=v?nf(v):''});
+document.addEventListener('input',e=>{const t=e.target;if(t.id==='oh'||t.id==='ph'||(t.dataset&&t.dataset.f==='h')){const v=num(t.value),o=v?nf(v):'';if(t.value!==o){t.value=o;try{t.setSelectionRange(o.length,o.length)}catch(_){}}}},true);
 function add(q){$('er').textContent='';const r=rng();if(!r){$('er').textContent='Isi daftar SN stok dulu.';return}
   const sisa=r.tot-used();if(!(q>0)){$('er').textContent='Isi jumlah pcs.';return}if(q>sisa){$('er').textContent=`Jumlah ${nf(q)} melebihi sisa SN (${nf(sisa)}).`;return}
   S.al.push({n:$('on').value.trim(),q,h:num($('oh').value)});$('on').value='';$('oq').value='';render();$('on').focus()}
@@ -127,7 +128,7 @@ document.addEventListener('click',e=>{const t=e.target,d=t.dataset;
   if(d.x!==undefined&&confirm('Hapus outlet ini? SN outlet sesudahnya akan bergeser.')){S.al.splice(+d.x,1);ed=-1;render()}
   if(d.sv!==undefined){const box=t.closest('.al'),g=f=>box.querySelector(`[data-f="${f}"]`).value;const i=+d.sv;const r=rng();const q=num(g('q'));
     const other=used()-(S.al[i].q|0);if(r&&q+other>r.tot){alert(`Jumlah melebihi stok. Maksimal ${nf(r.tot-other)} pcs.`);return}
-    S.al[i]={n:g('n').trim(),q,h:num(g('h'))};ed=-1;render()}
+    S.al[i]={...S.al[i],n:g('n').trim(),q,h:num(g('h'))};ed=-1;render()}
   if(d.c!==undefined){e.preventDefault();const A=alloc(),i=+d.c;copy(list(A[i]).map((s,j)=>`${j+1}. ${s}`).join('\n'),t)}
   if(d.r!==undefined){e.preventDefault();const A=alloc(),i=+d.r,x=A[i];copy(`*WL ${S.p||''}*\n${i+1}. ${x.n||'-'}: ${x.rg} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})`,t)}
   if(t.id==='cs'){const A=alloc();copy(`*WL ${S.p||''}*\n\n`+A.map((x,i)=>snTxt(x,i,false)).join('\n\n')+`\n\nTotal: ${nf(used())} pcs · ${rp(S.al.reduce((s,x)=>s+x.q*(x.h||0),0))}`,t)}
@@ -161,6 +162,19 @@ document.addEventListener('click',e=>{const t=e.target,d=t.dataset;
   if(d.ho){const h=HL.find(x=>x.id===d.ho);if(!h)return;if(S.al.length&&S.hid!==h.id&&!confirm('Ganti WL yang sedang dikerjakan dengan riwayat ini?'))return;
     S={st:h.st,p:h.p,al:JSON.parse(JSON.stringify(h.al)),hid:h.id};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}
   if(d.hx&&confirm('Hapus riwayat ini?')){HL=HL.filter(h=>h.id!==d.hx);if(S.hid===d.hx)delete S.hid;saveH();save();drawH()}});
+// ---- Sisa WL (belum ST) ----
+function sisaData(A){return (A||alloc()).map((x,i)=>({x,i})).filter(o=>!o.x.st&&o.x.q>0)}
+function sisaHTML(A){const B=sisaData(A),all=A.filter(x=>x.q>0).length,pcs=B.reduce((s,o)=>s+(o.x.q|0),0);
+  return `<div class="card"><h2>4. Sisa WL belum ST</h2><div class="stk"><div><small>Outlet sudah ST</small><b style="color:var(--ok)">${all-B.length}/${all}</b></div><div><small>Sisa belum ST</small><b style="color:${pcs?'var(--ac)':'var(--ok)'}">${nf(pcs)} pcs</b></div></div>
+  ${B.length?B.map(o=>`<div class="al"><div class="h"><b>${o.i+1}. ${esc(o.x.n||'(tanpa nama)')}</b><span class="m">${nf(o.x.q)} pcs</span></div><div class="rg mono">${o.x.rg}</div></div>`).join('')+`<div class="row"><button class="btn" id="kum">📋 Kumpulkan semua sisa WL</button><button class="btn s" id="kst">↩ Jadikan stok WL baru</button></div><div class="m" style="margin-top:6px;color:var(--mu);font-size:12.5px">Kumpulkan = salin daftar SN sisa per outlet. Jadikan stok = simpan WL ini ke riwayat, lalu mulai WL baru dengan stok dari SN sisa.</div>`:'<div class="m" style="margin-top:8px;color:var(--ok);font-weight:600">Semua outlet sudah ST ✓</div>'}</div>`}
+function sisaTxt(){const B=sisaData();return `*Sisa WL belum ST${S.p?' – '+S.p:''}*\n`+B.map((o,k)=>`\n${k+1}. ${o.x.n||'-'} (${nf(o.x.q)} pcs): ${o.x.rg}\n`+list(o.x).map((s,j)=>`   ${j+1}. ${s}`).join('\n')).join('\n')+`\n\nTotal sisa: ${nf(B.reduce((s,o)=>s+(o.x.q|0),0))} pcs`}
+document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{};
+  if(d.stg!==undefined){const i=+d.stg;if(d.v==='1')S.al[i].st=1;else delete S.al[i].st;render();return}
+  if(t.id==='kum'){copy(sisaTxt(),t);return}
+  if(t.id==='kst'){const B=sisaData();if(!B.length)return;if(!confirm(`Simpan WL ini ke riwayat lalu mulai WL baru dengan stok ${nf(B.reduce((s,o)=>s+(o.x.q|0),0))} SN sisa?`))return;
+    const it={id:S.hid||Date.now().toString(36),t:Date.now(),p:S.p,st:S.st,al:JSON.parse(JSON.stringify(S.al))};const k=HL.findIndex(h=>h.id===it.id);if(k>=0)HL[k]=it;else HL.unshift(it);saveH();
+    const lines=[];B.forEach(o=>o.x.parts.forEach(([a,b,l])=>{const L=l||o.x.L;lines.push(a===b?pad(a,L):pad(a,L)+' - '+pad(b,L))}));
+    S={st:lines.join('\n'),p:S.p,al:[]};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}});
 // ---- Barcode SN awal & akhir per outlet ----
 const BQ=document.createElement('div');BQ.style.cssText='position:fixed;inset:0;z-index:9999;background:#fff;color:#000;display:none;overflow:auto;padding:calc(64px + env(safe-area-inset-top,0px)) 16px 30px;text-align:center';document.body.appendChild(BQ);
 let BF='fisik';try{BF=localStorage.getItem('wlbf')||'fisik'}catch(e){}
@@ -169,21 +183,28 @@ function codeOf(sn){if(BF==='sn')return{t:'bc',v:sn};if(sn.length===12)return{t:
 function codeHTML(sn,lab){const c=codeOf(sn);return `<div style="margin:0 auto 22px;max-width:520px"><div style="font:700 13px system-ui;color:#c8102e;letter-spacing:.08em">${lab}</div>
   <div style="margin:8px auto 6px;${c.t==='qr'?'width:min(62vw,250px)':'width:100%'}">${c.t==='qr'?QR.svg(c.v,'100%'):bcSvg(c.v,110)}</div>
   <div style="font:700 20px ui-monospace,monospace;letter-spacing:1px">${sn}</div>${c.v!==sn?`<div style="font-size:11px;color:#777;word-break:break-all">${esc(c.v)}</div>`:''}</div>`}
-let BI=-1;
-function showBQ(i){BI=i;const x=alloc()[i];if(!x)return;
-  const btn='border:1px solid #bbb;background:#e8e8e8;color:#000;font-weight:700;border-radius:10px;padding:9px 14px;font-size:15px';
+let BI=-1,BS=0;
+function steps(x){const o=[];x.parts.forEach(([a,b,l],k)=>{const L=l||x.L,n=Number(b-a)+1,rg=x.parts.length>1?`Rentang ${k+1} · `:'';if(a===b)o.push({sn:pad(a,L),lab:'SN (1 pcs)',sub:rg+'1 pcs'});else{o.push({sn:pad(a,L),lab:'SN AWAL',sub:rg+nf(n)+' pcs'});o.push({sn:pad(b,L),lab:'SN AKHIR',sub:rg+nf(n)+' pcs'})}});return o}
+function showBQ(i,k){const A=alloc(),x=A[i];if(!x)return;BI=i;const St=steps(x);BS=Math.max(0,Math.min(k||0,St.length-1));const c=St[BS];
+  const btn='border:1px solid #bbb;background:#e8e8e8;color:#000;font-weight:700;border-radius:12px;padding:12px 16px;font-size:16px';
+  const last=BS===St.length-1,first=BS===0,nxO=last&&i<A.length-1,pvO=first&&i>0;
   BQ.innerHTML=`<div style="position:fixed;left:0;right:0;top:0;background:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 8px;display:flex;gap:8px;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;z-index:2">
-     <button data-bqx style="${btn}">✕ Tutup</button>
-     <span style="display:flex;gap:6px"><button data-bqn="-1" style="${btn}">‹</button><button data-bqn="1" style="${btn}">›</button></span></div>
-   <div style="font:700 20px system-ui">${i+1}. ${esc(x.n||'(tanpa nama)')}</div>
-   <div style="font-size:13px;color:#555;margin:2px 0 6px">${esc(S.p||'')}${S.p?' · ':''}${nf(x.q)} pcs</div>
-   <div style="display:inline-flex;border:1px solid #ccc;border-radius:10px;overflow:hidden;margin-bottom:18px">${[['fisik','Seperti fisik'],['sn','Angka SN saja']].map(([k,t])=>`<button data-bqf="${k}" style="border:0;padding:7px 12px;font-size:13px;font-weight:700;background:${BF===k?'#c8102e':'#fff'};color:${BF===k?'#fff':'#000'}">${t}</button>`).join('')}</div>
-   ${x.parts.map(([a,b,l],k)=>{const L=l||x.L,A=pad(a,L),B=pad(b,L),n=Number(b-a)+1;return `${x.parts.length>1?`<div style="font:600 13px system-ui;color:#555;margin:4px 0 10px;border-top:1px dashed #ccc;padding-top:12px">Rentang ${k+1} · ${nf(n)} pcs</div>`:''}${a===b?codeHTML(A,'SN (1 pcs)'):codeHTML(A,'SN AWAL')+codeHTML(B,'SN AKHIR')}`}).join('')}`;
-  BQ.style.display='block';BQ.scrollTop=0;try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(w=>BQ._w=w).catch(()=>{})}catch(_){}}
+     <button data-bqx style="${btn};padding:9px 14px;font-size:15px">✕ Tutup</button>
+     <div style="display:inline-flex;border:1px solid #ccc;border-radius:10px;overflow:hidden">${[['fisik','Seperti fisik'],['sn','SN saja']].map(([k,t])=>`<button data-bqf="${k}" style="border:0;padding:8px 10px;font-size:12.5px;font-weight:700;background:${BF===k?'#c8102e':'#fff'};color:${BF===k?'#fff':'#000'}">${t}</button>`).join('')}</div></div>
+   <div style="font:700 19px system-ui">${i+1}. ${esc(x.n||'(tanpa nama)')}</div>
+   <div style="font-size:13px;color:#555;margin:2px 0 4px">${esc(S.p||'')}${S.p?' · ':''}${c.sub} · langkah ${BS+1}/${St.length}</div>
+   <div style="display:flex;justify-content:center;gap:6px;margin:6px 0 14px">${St.map((_,k)=>`<i style="width:${k===BS?22:8}px;height:8px;border-radius:4px;background:${k===BS?'#c8102e':'#ddd'};display:block"></i>`).join('')}</div>
+   ${codeHTML(c.sn,c.lab)}
+   <div style="display:flex;gap:10px;justify-content:center;margin-top:4px">
+     <button data-bqs="-1" style="${btn};${first&&!pvO?'opacity:.35':''}">‹ ${pvO?'Outlet sebelumnya':'Kembali'}</button>
+     <button data-bqs="1" style="${btn};background:#c8102e;color:#fff;border-color:#c8102e;${last&&!nxO?'opacity:.35':''}">${last?(nxO?'Outlet berikutnya ›':'Selesai'):'Lanjut ke '+St[BS+1].lab.replace('SN ','SN ')+' ›'}</button></div>`;
+  BQ.style.display='block';BQ.scrollTop=0;if(!BQ._w)try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(w=>BQ._w=w).catch(()=>{})}catch(_){}}
+const closeBQ=()=>{BQ.style.display='none';try{BQ._w&&BQ._w.release();BQ._w=null}catch(_){}};
 BQ.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
-  if(d.bqx!==undefined){BQ.style.display='none';try{BQ._w&&BQ._w.release()}catch(_){}return}
-  if(d.bqf){BF=d.bqf;try{localStorage.setItem('wlbf',BF)}catch(_){}showBQ(BI);return}
-  if(d.bqn){const n=alloc().length,j=BI+(+d.bqn);if(j>=0&&j<n)showBQ(j)}});
+  if(d.bqx!==undefined){closeBQ();return}
+  if(d.bqf){BF=d.bqf;try{localStorage.setItem('wlbf',BF)}catch(_){}showBQ(BI,BS);return}
+  if(d.bqs){const A=alloc(),St=steps(A[BI]),k=BS+(+d.bqs);
+    if(k>=0&&k<St.length)showBQ(BI,k);else if(k<0&&BI>0)showBQ(BI-1,steps(A[BI-1]).length-1);else if(k>=St.length){if(BI<A.length-1)showBQ(BI+1,0);else closeBQ()}}});
 document.addEventListener('click',e=>{const t=e.target;if(t.dataset&&t.dataset.bq!==undefined)showBQ(+t.dataset.bq)});
 render();drawH();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
