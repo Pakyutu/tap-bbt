@@ -84,12 +84,12 @@ let ERR='';
 function rng(){ERR='';const seg=[];const lines=String(S.st||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);let L=0;
   for(const ln of lines){const p=ln.split(/[^0-9]+/).filter(Boolean);if(!p.length)continue;const a=p[0],b=p[1]||p[0];
     if(a.length!==b.length){ERR=`Baris "${ln}": panjang SN awal & akhir beda.`;continue}
-    let A=BigInt(a),B=BigInt(b);if(B<A){const t=A;A=B;B=t}if(B-A>200000n){ERR=`Baris "${ln}": rentang terlalu besar.`;continue}L=Math.max(L,a.length);seg.push({A,B,n:Number(B-A)+1})}
+    let A=BigInt(a),B=BigInt(b);if(B<A){const t=A;A=B;B=t}if(B-A>200000n){ERR=`Baris "${ln}": rentang terlalu besar.`;continue}L=Math.max(L,a.length);seg.push({A,B,n:Number(B-A)+1,L:a.length})}
   for(let i=0;i<seg.length;i++)for(let j=i+1;j<seg.length;j++){if(seg[i].A<=seg[j].B&&seg[j].A<=seg[i].B)ERR='Ada rentang yang tumpang tindih / SN dobel. Cek lagi.'}
   if(!seg.length)return null;return{seg,L,tot:seg.reduce((s,x)=>s+x.n,0)}}
-function take(r,off,q){const out=[];let o=off,left=q;for(const g of r.seg){if(left<=0)break;if(o>=g.n){o-=g.n;continue}const st=g.A+BigInt(o),k=Math.min(g.n-o,left),en=st+BigInt(k)-1n;out.push([st,en]);left-=k;o=0}return{parts:out,short:left}}
-const fmtP=(parts,L)=>parts.map(([a,b])=>a===b?pad(a,L):pad(a,L)+' – '+pad(b,L)).join(', ');
-function nextSN(r,off){const t=take(r,off,1);return t.parts.length?pad(t.parts[0][0],r.L):'-'}
+function take(r,off,q){const out=[];let o=off,left=q;for(const g of r.seg){if(left<=0)break;if(o>=g.n){o-=g.n;continue}const st=g.A+BigInt(o),k=Math.min(g.n-o,left),en=st+BigInt(k)-1n;out.push([st,en,g.L]);left-=k;o=0}return{parts:out,short:left}}
+const fmtP=(parts,L)=>parts.map(([a,b,l])=>a===b?pad(a,l||L):pad(a,l||L)+' – '+pad(b,l||L)).join(', ');
+function nextSN(r,off){const t=take(r,off,1);return t.parts.length?pad(t.parts[0][0],t.parts[0][2]||r.L):'-'}
 const pad=(x,L)=>x.toString().padStart(L,'0');
 function alloc(){const r=rng();if(!r)return[];let off=0;return S.al.map(x=>{const q=Math.max(0,x.q|0),t=take(r,off,q);off+=q;return{...x,parts:t.parts,L:r.L,rg:fmtP(t.parts,r.L),over:t.short>0}})}
 function used(){return S.al.reduce((s,x)=>s+(x.q|0),0)}
@@ -111,7 +111,7 @@ function render(){
   $('tot').style.display=A.length?'flex':'none';$('tot').innerHTML=`<div><small>Total pcs</small><b>${nf(tq)}</b></div><div><small>Total nominal</small><b>${rp(tn)}</b></div><div><small>Sisa SN</small><b style="color:${sisa<0?'var(--ac)':'var(--ok)'}">${nf(sisa)}</b></div>`;
   save()}
 function snTxt(x,i,h){return (h?`*WL ${S.p||''}*\n`:'')+`${i+1}. ${x.n||'-'}: ${x.rg} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})\n`+list(x).map((s,j)=>`   ${j+1}. ${s}`).join('\n')}
-function list(x){const out=[];for(const [a,b] of x.parts)for(let c=a;c<=b;c++)out.push(pad(c,x.L));return out}
+function list(x){const out=[];for(const [a,b,l] of x.parts)for(let c=a;c<=b;c++)out.push(pad(c,l||x.L));return out}
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
 
 ['oq','oh'].forEach(i=>$(i).addEventListener('input',render));
@@ -146,7 +146,7 @@ const tglF=t=>{const d=new Date(t);return d.toLocaleDateString('id-ID',{day:'num
 function loadRW(){RW=String(S.st||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).map(l=>{const p=l.split(/[^0-9]+/).filter(Boolean);return[p[0]||'',p[1]||'']});if(!RW.length)RW=[['','']];drawRows()}
 function drawH(){const q=HQ.trim(),qd=q.replace(/\D/g,''),isSN=qd.length>=6&&qd===q.replace(/\s/g,'');let body='';
   if(!HL.length)body='<div style="color:var(--mu);font-size:13px">Belum ada riwayat. Setelah WL selesai, ketuk <b>💾 Simpan ke riwayat</b>.</div>';
-  else if(isSN){const hits=[];HL.forEach(h=>withS(h,()=>{alloc().forEach(x=>{const L=x.L;for(const [a,b] of x.parts){
+  else if(isSN){const hits=[];HL.forEach(h=>withS(h,()=>{alloc().forEach(x=>{for(const [a,b,l] of x.parts){const L=l||x.L;
       if(qd.length<L){for(let c=a;c<=b;c++){const sn=pad(c,L);if(sn.endsWith(qd))hits.push({h,x,sn})}}else{const A=BigInt(qd);if(A>=a&&A<=b)hits.push({h,x,sn:pad(A,L)})}}})}));
     body=hits.length?hits.slice(0,30).map(r=>`<div class="al"><div class="h"><b>${esc(r.x.n||'-')}</b><span class="m">${tglF(r.h.t)}</span></div><div class="rg mono">${r.sn}</div><div class="m">${esc(r.h.p||'-')} · ${rp(r.x.h||0)}/pcs</div></div>`).join(''):'<div style="color:var(--mu);font-size:13px">SN tidak ditemukan di riwayat.</div>'}
   else{const k=q.toLowerCase();const H=HL.filter(h=>!k||(h.p||'').toLowerCase().includes(k)||h.al.some(a=>(a.n||'').toLowerCase().includes(k)));
@@ -155,12 +155,12 @@ function drawH(){const q=HQ.trim(),qd=q.replace(/\D/g,''),isSN=qd.length>=6&&qd=
   $('hist').innerHTML=`<h2>Riwayat WL (${HL.length})</h2><input id="hq" placeholder="Cari SN (boleh 6 digit terakhir), outlet, atau produk" value="${esc(HQ)}"><div id="hb">${body}</div>`;}
 document.addEventListener('input',e=>{if(e.target.id==='hq'){HQ=e.target.value;drawH();const i=$('hq');i.focus();i.setSelectionRange(HQ.length,HQ.length)}});
 document.addEventListener('click',e=>{const t=e.target,d=t.dataset;
-  if(t.id==='hsv'){if(!S.al.length){alert('Belum ada outlet.');return}const it={id:S.hid||Date.now().toString(36),t:Date.now(),p:S.p,st:S.st,al:JSON.parse(JSON.stringify(S.al))};
+  if(t.id==='hsv'){if(!S.al.length){alert('Belum ada outlet.');return}const it={id:S.hid||Date.now().toString(36),t:Date.now(),p:S.p,st:S.st,al:JSON.parse(JSON.stringify(S.al)),stx:Object.assign({},S.stx||{})};
     const i=HL.findIndex(h=>h.id===it.id);if(i>=0)HL[i]=it;else HL.unshift(it);S.hid=it.id;saveH();save();drawH();t.textContent='Tersimpan ✓';setTimeout(()=>{const b=$('hsv');if(b)b.textContent='💾 Simpan ke riwayat'},1500)}
   if(t.id==='nw'){if(S.al.length&&!HL.some(h=>h.id===S.hid)&&!confirm('WL sekarang belum disimpan ke riwayat. Tetap mulai baru?'))return;S={st:'',p:S.p,al:[]};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}
   if(d.ho){const h=HL.find(x=>x.id===d.ho);if(!h)return;if(S.al.length&&S.hid!==h.id&&!confirm('Ganti WL yang sedang dikerjakan dengan riwayat ini?'))return;
-    S={st:h.st,p:h.p,al:JSON.parse(JSON.stringify(h.al)),hid:h.id};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}
+    S={st:h.st,p:h.p,al:JSON.parse(JSON.stringify(h.al)),stx:Object.assign({},h.stx||{}),hid:h.id};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}
   if(d.hx&&confirm('Hapus riwayat ini?')){HL=HL.filter(h=>h.id!==d.hx);if(S.hid===d.hx)delete S.hid;saveH();save();drawH()}});
 render();drawH();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
-</script><script src="nav.js"></script></body></html>
+</script><script src="wl-scan.js"></script><script src="nav.js"></script></body></html>
