@@ -26,8 +26,9 @@ details summary{cursor:pointer;color:var(--mu);font-size:13px;margin-top:6px}.li
 <h1>Penyusun WL</h1><div class="sub">Isi rentang SN, lalu bagi ke outlet satu per satu dengan jumlah & harga bebas. SN otomatis berurutan. Semua bisa diedit.</div>
 
 <div class="card"><h2>1. Stok SN</h2>
-  <div class="g2"><div><label>SN awal</label><input id="a" class="mono" inputmode="numeric" placeholder="600089897777"></div>
-  <div><label>SN akhir</label><input id="b" class="mono" inputmode="numeric" placeholder="600089897876"></div></div>
+  <label>Daftar SN stok — satu baris satu rentang (awal - akhir) atau satu SN</label>
+  <textarea id="st" class="mono" rows="4" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);font-size:14px" placeholder="600089897777 - 600089897876&#10;600089898001 - 600089898037&#10;600089899150"></textarea>
+  <div id="segi" style="color:var(--mu);font-size:12.5px;margin-top:6px"></div>
   <label>Produk (opsional)</label><input id="p" placeholder="mis. VF 7GB/3 hari" list="pl"><datalist id="pl"><option>VF 7GB/24 jam</option><option>VF 7GB/2 hari</option><option>VF 7GB/3 hari</option><option>VF 7GB/5 hari</option><option>VF 11GB/5 hari</option><option>VF 7GB/7 hari</option><option>SA 3GB</option><option>SA 5GB</option><option>SA 7GB</option><option>SA 10GB</option><option>SA 15GB</option><option>SA BYU 3GB</option><option>SA BYU 5GB</option></datalist>
   <div class="stk" id="stk"></div><div class="bar"><i id="bar" style="width:0"></i></div>
 </div>
@@ -47,23 +48,33 @@ details summary{cursor:pointer;color:var(--mu);font-size:13px;margin-top:6px}.li
 <script>
 const $=i=>document.getElementById(i);
 const clean=v=>String(v||'').replace(/\D/g,''),rp=v=>'Rp '+Math.round(v).toLocaleString('id-ID'),nf=v=>Math.round(v).toLocaleString('id-ID'),num=v=>parseInt(clean(v)||'0',10);
-let S={a:'',b:'',p:'',al:[]},ed=-1;
-try{const s=JSON.parse(localStorage.getItem('wl2')||'null');if(s)S=s}catch(e){}
-$('a').value=S.a;$('b').value=S.b;$('p').value=S.p;
+let S={st:'',p:'',al:[]},ed=-1;
+try{const s=JSON.parse(localStorage.getItem('wl2')||'null');if(s){S=s;if(S.st===undefined)S.st=(S['a']&&S['b'])?S['a']+' - '+S['b']:''}}catch(e){}
+$('st').value=S.st;$('p').value=S.p||'';
 const save=()=>{try{localStorage.setItem('wl2',JSON.stringify(S))}catch(e){}};
-function rng(){const a=clean(S.a),b=clean(S.b);if(!a||!b||a.length!==b.length)return null;const A=BigInt(a),B=BigInt(b);if(B<A)return null;return{A,B,L:a.length,tot:Number(B-A)+1}}
+let ERR='';
+function rng(){ERR='';const seg=[];const lines=String(S.st||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);let L=0;
+  for(const ln of lines){const p=ln.split(/[^0-9]+/).filter(Boolean);if(!p.length)continue;const a=p[0],b=p[1]||p[0];
+    if(a.length!==b.length){ERR=`Baris "${ln}": panjang SN awal & akhir beda.`;continue}
+    let A=BigInt(a),B=BigInt(b);if(B<A){const t=A;A=B;B=t}if(B-A>200000n){ERR=`Baris "${ln}": rentang terlalu besar.`;continue}L=Math.max(L,a.length);seg.push({A,B,n:Number(B-A)+1})}
+  for(let i=0;i<seg.length;i++)for(let j=i+1;j<seg.length;j++){if(seg[i].A<=seg[j].B&&seg[j].A<=seg[i].B)ERR='Ada rentang yang tumpang tindih / SN dobel. Cek lagi.'}
+  if(!seg.length)return null;return{seg,L,tot:seg.reduce((s,x)=>s+x.n,0)}}
+function take(r,off,q){const out=[];let o=off,left=q;for(const g of r.seg){if(left<=0)break;if(o>=g.n){o-=g.n;continue}const st=g.A+BigInt(o),k=Math.min(g.n-o,left),en=st+BigInt(k)-1n;out.push([st,en]);left-=k;o=0}return{parts:out,short:left}}
+const fmtP=(parts,L)=>parts.map(([a,b])=>a===b?pad(a,L):pad(a,L)+' – '+pad(b,L)).join(', ');
+function nextSN(r,off){const t=take(r,off,1);return t.parts.length?pad(t.parts[0][0],r.L):'-'}
 const pad=(x,L)=>x.toString().padStart(L,'0');
-function alloc(){const r=rng();if(!r)return[];let cur=r.A;return S.al.map(x=>{const q=Math.max(0,x.q|0),end=cur+BigInt(q)-1n,o={...x,a:pad(cur,r.L),b:pad(end,r.L),over:end>r.B};cur=end+1n;return o})}
+function alloc(){const r=rng();if(!r)return[];let off=0;return S.al.map(x=>{const q=Math.max(0,x.q|0),t=take(r,off,q);off+=q;return{...x,parts:t.parts,L:r.L,rg:fmtP(t.parts,r.L),over:t.short>0}})}
 function used(){return S.al.reduce((s,x)=>s+(x.q|0),0)}
 function render(){
   const r=rng(),u=used(),A=alloc(),sisa=r?r.tot-u:0;
-  if(r){const nx=r.A+BigInt(u);$('stk').innerHTML=`<div><small>Total SN</small><b>${nf(r.tot)}</b></div><div><small>Terpakai</small><b>${nf(u)}</b></div><div><small>Sisa</small><b style="color:${sisa<0?'var(--ac)':'var(--ok)'}">${nf(sisa)}</b></div><div><small>SN berikutnya</small><b class="mono" style="font-size:14px">${sisa>0?pad(nx,r.L):'-'}</b></div>`;$('bar').style.width=Math.min(100,u/r.tot*100)+'%'}
-  else{$('stk').innerHTML=S.a||S.b?'<div style="grid-column:1/-1;color:var(--ac)">Cek SN awal & akhir (panjang harus sama, akhir ≥ awal).</div>':'';$('bar').style.width='0'}
+  $('segi').innerHTML=(r?`${r.seg.length} rentang: ${r.seg.slice(0,8).map(g=>nf(g.n)).join(' + ')}${r.seg.length>8?' + …':''} = <b>${nf(r.tot)}</b> SN`:'')+(ERR?` <b style="color:var(--ac)">${ERR}</b>`:'');
+  if(r){$('stk').innerHTML=`<div><small>Total SN</small><b>${nf(r.tot)}</b></div><div><small>Terpakai</small><b>${nf(u)}</b></div><div><small>Sisa</small><b style="color:${sisa<0?'var(--ac)':'var(--ok)'}">${nf(sisa)}</b></div><div><small>SN berikutnya</small><b class="mono" style="font-size:14px">${sisa>0?nextSN(r,u):'-'}</b></div>`;$('bar').style.width=Math.min(100,u/r.tot*100)+'%'}
+  else{$('stk').innerHTML='';$('bar').style.width='0'}
   $('h2').textContent=`2. Outlet ke-${S.al.length+1}`;
-  const q=num($('oq').value);$('prev').innerHTML=r&&q>0?`SN: <span class="mono">${pad(r.A+BigInt(u),r.L)} – ${pad(r.A+BigInt(u+q-1),r.L)}</span>${q>sisa?' <b style="color:var(--ac)">(melebihi sisa '+nf(sisa)+')</b>':''}${num($('oh').value)?' · Subtotal <b>'+rp(q*num($('oh').value))+'</b>':''}`:'';
+  const q=num($('oq').value);$('prev').innerHTML=r&&q>0?`SN: <span class="mono">${fmtP(take(r,u,Math.min(q,Math.max(0,sisa))).parts,r.L)||'-'}</span>${q>sisa?' <b style="color:var(--ac)">(melebihi sisa '+nf(sisa)+')</b>':''}${num($('oh').value)?' · Subtotal <b>'+rp(q*num($('oh').value))+'</b>':''}`:'';
   $('list').innerHTML=A.length?`<div class="card"><h2>3. Daftar WL (${A.length} outlet)</h2><div class="row" style="margin-top:4px"><button class="btn s" id="csv">⬇️ Unduh Excel (CSV)</button><button class="btn s" id="cr">Salin ringkasan</button><button class="btn d" id="rs">Hapus semua</button></div>
     ${A.map((x,i)=>`<div class="al${i===ed?' e':''}"><div class="vw"><div class="h"><b>${i+1}. ${x.n||'(tanpa nama)'}</b><span><button class="btn s" data-e="${i}">Edit</button> <button class="btn d" data-x="${i}">Hapus</button></span></div>
-      <div class="rg mono">${x.a} – ${x.b}${x.over?' <b style="color:var(--ac)">· melebihi stok</b>':''}</div>
+      <div class="rg mono">${x.rg}${x.over?' <b style="color:var(--ac)">· melebihi stok</b>':''}</div>
       <div class="m">${nf(x.q)} pcs × ${rp(x.h||0)} = <span class="sm">${rp((x.q|0)*(x.h||0))}</span></div>
       <details><summary>Lihat SN · <a href="#" data-c="${i}">salin SN</a></summary><div class="list mono">${list(x).map((s,j)=>`<div>${j+1}. ${s}</div>`).join('')}</div></details></div>
       <div class="ed"><div class="g3"><div class="full"><label>Nama</label><input data-f="n" value="${(x.n||'').replace(/"/g,'&quot;')}"></div><div><label>Jumlah</label><input data-f="q" type="number" value="${x.q}"></div><div><label>Harga/pcs</label><input data-f="h" inputmode="numeric" value="${x.h?nf(x.h):''}"></div></div>
@@ -71,12 +82,12 @@ function render(){
   const tq=u,tn=S.al.reduce((s,x)=>s+(x.q|0)*(x.h||0),0);
   $('tot').style.display=A.length?'flex':'none';$('tot').innerHTML=`<div><small>Total pcs</small><b>${nf(tq)}</b></div><div><small>Total nominal</small><b>${rp(tn)}</b></div><div><small>Sisa SN</small><b style="color:${sisa<0?'var(--ac)':'var(--ok)'}">${nf(sisa)}</b></div>`;
   save()}
-function list(x){const out=[];let c=BigInt(x.a);const e=BigInt(x.b),L=x.a.length;for(;c<=e;c++)out.push(pad(c,L));return out}
+function list(x){const out=[];for(const [a,b] of x.parts)for(let c=a;c<=b;c++)out.push(pad(c,x.L));return out}
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
-['a','b','p'].forEach(i=>$(i).addEventListener('input',()=>{S[i]=$(i).value.trim();render()}));
+$('st').addEventListener('input',()=>{S.st=$('st').value;render()});$('p').addEventListener('input',()=>{S.p=$('p').value.trim();render()});
 ['oq','oh'].forEach(i=>$(i).addEventListener('input',render));
 $('oh').addEventListener('blur',()=>{const v=num($('oh').value);$('oh').value=v?nf(v):''});
-function add(q){$('er').textContent='';const r=rng();if(!r){$('er').textContent='Isi stok SN awal & akhir dulu.';return}
+function add(q){$('er').textContent='';const r=rng();if(!r){$('er').textContent='Isi daftar SN stok dulu.';return}
   const sisa=r.tot-used();if(!(q>0)){$('er').textContent='Isi jumlah pcs.';return}if(q>sisa){$('er').textContent=`Jumlah ${nf(q)} melebihi sisa SN (${nf(sisa)}).`;return}
   S.al.push({n:$('on').value.trim(),q,h:num($('oh').value)});$('on').value='';$('oq').value='';render();$('on').focus()}
 document.addEventListener('click',e=>{const t=e.target,d=t.dataset;
@@ -90,11 +101,11 @@ document.addEventListener('click',e=>{const t=e.target,d=t.dataset;
     S.al[i]={n:g('n').trim(),q,h:num(g('h'))};ed=-1;render()}
   if(d.c!==undefined){e.preventDefault();copy(list(alloc()[+d.c]).join('\n'),t)}
   if(t.id==='rs'&&confirm('Hapus semua daftar outlet?')){S.al=[];ed=-1;render()}
-  if(t.id==='cr'){const A=alloc();copy(`*WL ${S.p||''}*\n`+A.map((x,i)=>`${i+1}. ${x.n||'-'}: ${x.a} - ${x.b} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})`).join('\n')+`\n\nTotal: ${nf(used())} pcs · ${rp(S.al.reduce((s,x)=>s+x.q*(x.h||0),0))}`,t)}
+  if(t.id==='cr'){const A=alloc();copy(`*WL ${S.p||''}*\n`+A.map((x,i)=>`${i+1}. ${x.n||'-'}: ${x.rg} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})`).join('\n')+`\n\nTotal: ${nf(used())} pcs · ${rp(S.al.reduce((s,x)=>s+x.q*(x.h||0),0))}`,t)}
   if(t.id==='csv'){const rows=[['No','Outlet','SN','Produk','Harga']];let n=1;alloc().forEach(x=>list(x).forEach(s=>rows.push([n++,x.n,{t:s},S.p,x.h||0])));
     rows.push([]);rows.push(['','TOTAL',used()+' pcs','',S.al.reduce((s,x)=>s+x.q*(x.h||0),0)]);
     const csv='﻿'+rows.map(r=>r.map(v=>v&&v.t?`="${v.t}"`:`"${String(v??'').replace(/"/g,'""')}"`).join(';')).join('\r\n');
-    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`WL_${clean(S.a)}_${clean(S.b)}.csv`;document.body.appendChild(a);a.click();a.remove()}});
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`WL_${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove()}});
 ['on','oq','oh'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')add(num($('oq').value))}));
 render();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
