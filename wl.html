@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Penyusun WL</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0d0f14"><link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--tx:#14213d;--mu:#5b6b85;--bd:#e3e8f0;--soft:#eef2f8;--ac:#c8102e}
+@media (prefers-color-scheme:dark){:root{--bg:#0d0f14;--card:#171b25;--tx:#eef1f6;--mu:#98a2b6;--bd:#283041;--soft:#1f2533}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:max(16px,env(safe-area-inset-top)) 16px 40px}
+.w{max-width:720px;margin:0 auto}h1{font-size:22px;margin:6px 60px 4px 0}.sub{color:var(--mu);font-size:13px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:12px;color:var(--mu);margin:8px 0 4px}input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);font-size:15px;font-family:inherit}
+textarea{min-height:70px;font-size:14px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{padding:11px 16px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-weight:600;font-size:15px;cursor:pointer}.btn.s{background:var(--soft);color:var(--tx);border:1px solid var(--bd);font-size:13px;padding:7px 12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.err{color:var(--ac);font-weight:600;margin-top:8px}
+.sum{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.sum span{background:var(--soft);padding:5px 10px;border-radius:999px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{padding:7px 6px;border-bottom:1px solid var(--bd);text-align:left}th{color:var(--mu);font-weight:500;font-size:12px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace}.grp{border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin-top:10px}
+.grp h3{margin:0 0 6px;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+details summary{cursor:pointer;color:var(--mu);font-size:13px;margin-top:4px}.list{column-width:150px;column-gap:16px;font-size:13px;margin-top:6px}
+</style></head><body><div class="w">
+<h1>Penyusun WL</h1><div class="sub">Masukkan SN awal & akhir, isi per kelompok (ST), lalu daftar SN tersusun otomatis. Bisa disalin atau diunduh ke Excel (CSV).</div>
+<div class="card">
+  <div class="g2"><div><label>SN awal</label><input id="a" class="mono" inputmode="numeric" placeholder="600089897777"></div>
+  <div><label>SN akhir</label><input id="b" class="mono" inputmode="numeric" placeholder="600089897876"></div></div>
+  <div class="g2"><div><label>Isi per kelompok (ST)</label><input id="n" type="number" min="1" value="50"></div>
+  <div><label>Produk (opsional)</label><input id="p" placeholder="mis. VF 7GB/3 hari / SA 5GB" list="pl"><datalist id="pl"><option>VF 7GB/24 jam</option><option>VF 7GB/2 hari</option><option>VF 7GB/3 hari</option><option>VF 7GB/5 hari</option><option>VF 11GB/5 hari</option><option>VF 7GB/7 hari</option><option>SA 3GB</option><option>SA 5GB</option><option>SA 7GB</option><option>SA 10GB</option><option>SA 15GB</option><option>SA BYU 3GB</option><option>SA BYU 5GB</option></datalist></div></div>
+  <label>Nama outlet / SF per kelompok (opsional, satu baris satu kelompok)</label>
+  <textarea id="t" placeholder="Kelompok 1: Toko A&#10;Kelompok 2: Toko B&#10;..."></textarea>
+  <label><input type="checkbox" id="sisa" checked style="width:auto"> Sisa SN yang kurang dari 1 kelompok tetap dibuat kelompok terakhir</label>
+  <div class="row"><button class="btn" id="go">Susun WL</button><button class="btn s" id="cl">Bersihkan</button></div>
+  <div class="err" id="er"></div>
+</div>
+<div id="out"></div>
+</div>
+<script>
+const $=i=>document.getElementById(i);let G=[];
+const clean=v=>String(v||'').replace(/\D/g,'');
+try{const s=JSON.parse(localStorage.getItem('wl_last')||'null');if(s){$('a').value=s.a;$('b').value=s.b;$('n').value=s.n;$('p').value=s.p||'';$('t').value=s.t||''}}catch(e){}
+function build(){
+  $('er').textContent='';const a=clean($('a').value),b=clean($('b').value),n=parseInt($('n').value,10);
+  if(!a||!b){$('er').textContent='Isi SN awal dan SN akhir.';return}
+  if(a.length!==b.length){$('er').textContent=`Panjang SN beda (${a.length} vs ${b.length} digit). Cek lagi.`;return}
+  const A=BigInt(a),B=BigInt(b);if(B<A){$('er').textContent='SN akhir lebih kecil dari SN awal.';return}
+  if(!(n>0)){$('er').textContent='Isi per kelompok harus lebih dari 0.';return}
+  const tot=Number(B-A)+1;if(tot>100000){$('er').textContent=`Rentang terlalu besar (${tot.toLocaleString('id-ID')} SN). Maksimal 100.000.`;return}
+  const L=a.length,nm=$('t').value.split('\n').map(s=>s.trim()),pad=x=>x.toString().padStart(L,'0');
+  G=[];let cur=A,k=0;
+  while(cur<=B){const end=cur+BigInt(n)-1n<=B?cur+BigInt(n)-1n:B;const cnt=Number(end-cur)+1;if(cnt<n&&!$('sisa').checked)break;
+    const sns=[];for(let x=cur;x<=end;x++)sns.push(pad(x));G.push({no:k+1,nama:nm[k]||'',a:pad(cur),b:pad(end),sns});cur=end+1n;k++}
+  try{localStorage.setItem('wl_last',JSON.stringify({a,b,n,p:$('p').value,t:$('t').value}))}catch(e){}
+  render(tot,n)}
+function render(tot,n){const used=G.reduce((s,g)=>s+g.sns.length,0),p=$('p').value.trim();
+  let h=`<div class="card"><div class="sum"><span>Total rentang: <b>${tot.toLocaleString('id-ID')}</b> SN</span><span>Kelompok: <b>${G.length}</b> × ${n}</span><span>Terpakai: <b>${used.toLocaleString('id-ID')}</b></span>${tot>used?`<span>Tidak dipakai: <b>${(tot-used).toLocaleString('id-ID')}</b></span>`:''}${p?`<span>${p}</span>`:''}</div>
+  <table><tr><th>#</th><th>Nama</th><th>SN awal</th><th>SN akhir</th><th>Qty</th></tr>${G.map(g=>`<tr><td>${g.no}</td><td>${g.nama||'-'}</td><td class="mono">${g.a}</td><td class="mono">${g.b}</td><td>${g.sns.length}</td></tr>`).join('')}</table>
+  <div class="row"><button class="btn" id="csv">⬇️ Unduh Excel (CSV)</button><button class="btn s" id="ca">Salin ringkasan</button><button class="btn s" id="cs">Salin semua SN</button></div></div>`;
+  h+=G.map((g,i)=>`<div class="grp"><h3><span>Kelompok ${g.no}${g.nama?' · '+g.nama:''} <span style="color:var(--mu);font-weight:400;font-size:13px">(${g.sns.length} SN)</span></span><button class="btn s" data-g="${i}">Salin SN</button></h3><div class="mono" style="font-size:13px">${g.a} – ${g.b}</div><details><summary>Lihat daftar SN</summary><div class="list mono">${g.sns.map((s,j)=>`<div>${j+1}. ${s}</div>`).join('')}</div></details></div>`).join('');
+  $('out').innerHTML=h}
+async function copy(txt,btn){try{await navigator.clipboard.writeText(txt)}catch(e){const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
+document.addEventListener('click',e=>{const t=e.target;const p=$('p').value.trim();
+  if(t.id==='go')build();
+  if(t.id==='cl'){['a','b','p','t'].forEach(i=>$(i).value='');$('n').value=50;$('out').innerHTML='';G=[];try{localStorage.removeItem('wl_last')}catch(_){}}
+  if(t.id==='ca')copy(G.map(g=>`${g.no}. ${g.nama?g.nama+' · ':''}${g.a} - ${g.b} (${g.sns.length})`).join('\n'),t);
+  if(t.id==='cs')copy(G.flatMap(g=>g.sns).join('\n'),t);
+  if(t.dataset.g!==undefined)copy(G[+t.dataset.g].sns.join('\n'),t);
+  if(t.id==='csv'){const rows=[['No','Kelompok','Nama','SN','Produk']];let i=1;G.forEach(g=>g.sns.forEach(s=>rows.push([i++,g.no,g.nama,{t:s},p])));
+    const csv='﻿'+rows.map(r=>r.map(v=>v&&v.t?`="${v.t}"`:`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\r\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`WL_${G[0].a}_${G[G.length-1].b}.csv`;document.body.appendChild(a);a.click();a.remove()}});
+['a','b','n'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')build()}));
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+</script><script src="nav.js"></script></body></html>

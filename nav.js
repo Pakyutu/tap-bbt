@@ -4,7 +4,8 @@
   var items = [
     ["index.html","Menu utama"],
     ["digipos.html","Dashboard DIGIPOS"],
-    ["penjualan.html","Dashboard Penjualan"]
+    ["penjualan.html","Dashboard Penjualan"],
+    ["wl.html","Penyusun WL"]
   ];
   var css = ''
    +'#bbtnav{position:fixed;right:12px;top:calc(10px + env(safe-area-inset-top,0px));z-index:30;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}'

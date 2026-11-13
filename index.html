@@ -33,7 +33,7 @@ body:before{content:"";position:fixed;inset:-30% -40% auto;height:80vh;z-index:-
 a.card{position:relative;display:flex;gap:14px;align-items:center;padding:18px;border-radius:20px;text-decoration:none;color:inherit;
   background:var(--card);border:1px solid var(--bd);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:hidden;
   opacity:0;transform:translateY(14px);animation:rise .55s cubic-bezier(.2,.8,.2,1) forwards;transition:transform .15s}
-a.card:nth-child(2){animation-delay:.08s}
+a.card:nth-child(2){animation-delay:.08s}a.card:nth-child(3){animation-delay:.16s}
 a.card:active{transform:scale(.98)}
 @keyframes rise{to{opacity:1;transform:none}}
 a.card:after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
@@ -78,6 +78,11 @@ a.card:after{content:"";position:absolute;inset:0;border-radius:inherit;padding:
     <a class="card pj" href="penjualan.html">
       <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M6 16V11M11 16V6M16 16v-3M20 16V8"/></svg></div>
       <div class="tx"><b>Penjualan</b><span>PV / SA / NGRS · Kunjungan · Tren · Petugas · Stok</span><small id="u-penjualan">Memuat…</small></div>
+      <div class="arr">›</div>
+    </a>
+    <a class="card wl" href="wl.html" style="--c1:#1d9a6c;--c2:#0f9bb5">
+      <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+      <div class="tx"><b>Penyusun WL</b><span>Susun daftar SN VF / SA dari rentang awal–akhir, dibagi per ST</span></div>
       <div class="arr">›</div>
     </a>
   </div>

@@ -2,7 +2,7 @@
 const V = "tap-bbt-v6";
 const SAME = self.location.origin;
 const SHELL = [
-  "./", "index.html", "digipos.html", "penjualan.html", "manifest.json",
+  "./", "index.html", "digipos.html", "penjualan.html", "wl.html", "manifest.json",
   "icon-192.png", "icon-512.png", "nav.js", "penjualan-x.js", "digipos-cvm.js", "digipos-kunj.js", "digipos-x.js", "icon-maskable.png",
   "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
   "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
