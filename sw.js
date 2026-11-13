@@ -1,8 +1,8 @@
 // Versi cache: naikkan angka ini kalau ada perubahan besar pada file app.
-const V = "tap-bbt-v19";
+const V = "tap-bbt-v20";
 const SAME = self.location.origin;
 const SHELL = [
-  "./", "index.html", "digipos.html", "penjualan.html", "wl.html","wl-scan.js", "manifest.json",
+  "./", "index.html", "digipos.html", "penjualan.html", "wl.html","c128.js", "manifest.json",
   "icon-192.png", "icon-512.png", "nav.js", "penjualan-x.js", "digipos-cvm.js", "digipos-kunj.js","digipos-bc.js","qr.js","digipos-so.js","status.json", "digipos-x.js", "icon-maskable.png",
   "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
   "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",

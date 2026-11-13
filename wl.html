@@ -104,7 +104,7 @@ function render(){
     ${A.map((x,i)=>`<div class="al${i===ed?' e':''}"><div class="vw"><div class="h"><b>${i+1}. ${x.n||'(tanpa nama)'}</b><span><button class="btn s" data-e="${i}">Edit</button> <button class="btn d" data-x="${i}">Hapus</button></span></div>
       <div class="rg mono">${x.rg}${x.over?' <b style="color:var(--ac)">· melebihi stok</b>':''}</div>
       <div class="m">${nf(x.q)} pcs × ${rp(x.h||0)} = <span class="sm">${rp((x.q|0)*(x.h||0))}</span></div>
-      <div style="margin-top:6px"><button class="btn s" data-r="${i}">Salin ringkasan</button> <button class="btn s" data-c="${i}">Salin rincian SN</button></div><details><summary>Lihat SN</summary><div class="list mono">${list(x).map((s,j)=>`<div>${j+1}. ${s}</div>`).join('')}</div></details></div>
+      <div style="margin-top:6px"><button class="btn s" data-r="${i}">Salin ringkasan</button> <button class="btn s" data-c="${i}">Salin rincian SN</button> <button class="btn s" data-bq="${i}">▦ Barcode SN</button></div><details><summary>Lihat SN</summary><div class="list mono">${list(x).map((s,j)=>`<div>${j+1}. ${s}</div>`).join('')}</div></details></div>
       <div class="ed"><div class="g3"><div class="full"><label>Nama</label><input data-f="n" value="${(x.n||'').replace(/"/g,'&quot;')}"></div><div><label>Jumlah</label><input data-f="q" type="number" value="${x.q}"></div><div><label>Harga/pcs</label><input data-f="h" inputmode="numeric" value="${x.h?nf(x.h):''}"></div></div>
       <div class="row"><button class="btn" data-sv="${i}">Simpan</button><button class="btn s" data-cn>Batal</button></div><div class="m" style="margin-top:6px">Ubah jumlah akan menggeser SN outlet sesudahnya.</div></div></div>`).join('')}</div>`:'';
   const tq=u,tn=S.al.reduce((s,x)=>s+(x.q|0)*(x.h||0),0);
@@ -155,12 +155,36 @@ function drawH(){const q=HQ.trim(),qd=q.replace(/\D/g,''),isSN=qd.length>=6&&qd=
   $('hist').innerHTML=`<h2>Riwayat WL (${HL.length})</h2><input id="hq" placeholder="Cari SN (boleh 6 digit terakhir), outlet, atau produk" value="${esc(HQ)}"><div id="hb">${body}</div>`;}
 document.addEventListener('input',e=>{if(e.target.id==='hq'){HQ=e.target.value;drawH();const i=$('hq');i.focus();i.setSelectionRange(HQ.length,HQ.length)}});
 document.addEventListener('click',e=>{const t=e.target,d=t.dataset;
-  if(t.id==='hsv'){if(!S.al.length){alert('Belum ada outlet.');return}const it={id:S.hid||Date.now().toString(36),t:Date.now(),p:S.p,st:S.st,al:JSON.parse(JSON.stringify(S.al)),stx:Object.assign({},S.stx||{})};
+  if(t.id==='hsv'){if(!S.al.length){alert('Belum ada outlet.');return}const it={id:S.hid||Date.now().toString(36),t:Date.now(),p:S.p,st:S.st,al:JSON.parse(JSON.stringify(S.al))};
     const i=HL.findIndex(h=>h.id===it.id);if(i>=0)HL[i]=it;else HL.unshift(it);S.hid=it.id;saveH();save();drawH();t.textContent='Tersimpan ✓';setTimeout(()=>{const b=$('hsv');if(b)b.textContent='💾 Simpan ke riwayat'},1500)}
   if(t.id==='nw'){if(S.al.length&&!HL.some(h=>h.id===S.hid)&&!confirm('WL sekarang belum disimpan ke riwayat. Tetap mulai baru?'))return;S={st:'',p:S.p,al:[]};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}
   if(d.ho){const h=HL.find(x=>x.id===d.ho);if(!h)return;if(S.al.length&&S.hid!==h.id&&!confirm('Ganti WL yang sedang dikerjakan dengan riwayat ini?'))return;
-    S={st:h.st,p:h.p,al:JSON.parse(JSON.stringify(h.al)),stx:Object.assign({},h.stx||{}),hid:h.id};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}
+    S={st:h.st,p:h.p,al:JSON.parse(JSON.stringify(h.al)),hid:h.id};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}
   if(d.hx&&confirm('Hapus riwayat ini?')){HL=HL.filter(h=>h.id!==d.hx);if(S.hid===d.hx)delete S.hid;saveH();save();drawH()}});
+// ---- Barcode SN awal & akhir per outlet ----
+const BQ=document.createElement('div');BQ.style.cssText='position:fixed;inset:0;z-index:9999;background:#fff;color:#000;display:none;overflow:auto;padding:calc(64px + env(safe-area-inset-top,0px)) 16px 30px;text-align:center';document.body.appendChild(BQ);
+let BF='fisik';try{BF=localStorage.getItem('wlbf')||'fisik'}catch(e){}
+function saPS(){let o={pre:'S236x',suf:'00000823'};try{const x=JSON.parse(localStorage.getItem('so_sa1')||'null');if(x){if(x.pre!==undefined)o.pre=x.pre;if(x.suf!==undefined)o.suf=x.suf}}catch(e){}return o}
+function codeOf(sn){if(BF==='sn')return{t:'bc',v:sn};if(sn.length===12)return{t:'qr',v:'https://tsel.id/cekvoucher?sn='+sn};if(sn.length===16){const p=saPS();return{t:'bc',v:p.pre+sn+p.suf}}return{t:'bc',v:sn}}
+function codeHTML(sn,lab){const c=codeOf(sn);return `<div style="margin:0 auto 22px;max-width:520px"><div style="font:700 13px system-ui;color:#c8102e;letter-spacing:.08em">${lab}</div>
+  <div style="margin:8px auto 6px;${c.t==='qr'?'width:min(62vw,250px)':'width:100%'}">${c.t==='qr'?QR.svg(c.v,'100%'):bcSvg(c.v,110)}</div>
+  <div style="font:700 20px ui-monospace,monospace;letter-spacing:1px">${sn}</div>${c.v!==sn?`<div style="font-size:11px;color:#777;word-break:break-all">${esc(c.v)}</div>`:''}</div>`}
+let BI=-1;
+function showBQ(i){BI=i;const x=alloc()[i];if(!x)return;
+  const btn='border:1px solid #bbb;background:#e8e8e8;color:#000;font-weight:700;border-radius:10px;padding:9px 14px;font-size:15px';
+  BQ.innerHTML=`<div style="position:fixed;left:0;right:0;top:0;background:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 8px;display:flex;gap:8px;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;z-index:2">
+     <button data-bqx style="${btn}">✕ Tutup</button>
+     <span style="display:flex;gap:6px"><button data-bqn="-1" style="${btn}">‹</button><button data-bqn="1" style="${btn}">›</button></span></div>
+   <div style="font:700 20px system-ui">${i+1}. ${esc(x.n||'(tanpa nama)')}</div>
+   <div style="font-size:13px;color:#555;margin:2px 0 6px">${esc(S.p||'')}${S.p?' · ':''}${nf(x.q)} pcs</div>
+   <div style="display:inline-flex;border:1px solid #ccc;border-radius:10px;overflow:hidden;margin-bottom:18px">${[['fisik','Seperti fisik'],['sn','Angka SN saja']].map(([k,t])=>`<button data-bqf="${k}" style="border:0;padding:7px 12px;font-size:13px;font-weight:700;background:${BF===k?'#c8102e':'#fff'};color:${BF===k?'#fff':'#000'}">${t}</button>`).join('')}</div>
+   ${x.parts.map(([a,b,l],k)=>{const L=l||x.L,A=pad(a,L),B=pad(b,L),n=Number(b-a)+1;return `${x.parts.length>1?`<div style="font:600 13px system-ui;color:#555;margin:4px 0 10px;border-top:1px dashed #ccc;padding-top:12px">Rentang ${k+1} · ${nf(n)} pcs</div>`:''}${a===b?codeHTML(A,'SN (1 pcs)'):codeHTML(A,'SN AWAL')+codeHTML(B,'SN AKHIR')}`}).join('')}`;
+  BQ.style.display='block';BQ.scrollTop=0;try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(w=>BQ._w=w).catch(()=>{})}catch(_){}}
+BQ.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
+  if(d.bqx!==undefined){BQ.style.display='none';try{BQ._w&&BQ._w.release()}catch(_){}return}
+  if(d.bqf){BF=d.bqf;try{localStorage.setItem('wlbf',BF)}catch(_){}showBQ(BI);return}
+  if(d.bqn){const n=alloc().length,j=BI+(+d.bqn);if(j>=0&&j<n)showBQ(j)}});
+document.addEventListener('click',e=>{const t=e.target;if(t.dataset&&t.dataset.bq!==undefined)showBQ(+t.dataset.bq)});
 render();drawH();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
-</script><script src="wl-scan.js"></script><script src="nav.js"></script></body></html>
+</script><script src="qr.js"></script><script src="c128.js"></script><script src="nav.js"></script></body></html>
