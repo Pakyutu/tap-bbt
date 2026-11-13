@@ -76,7 +76,7 @@ function render(){
     ${A.map((x,i)=>`<div class="al${i===ed?' e':''}"><div class="vw"><div class="h"><b>${i+1}. ${x.n||'(tanpa nama)'}</b><span><button class="btn s" data-e="${i}">Edit</button> <button class="btn d" data-x="${i}">Hapus</button></span></div>
       <div class="rg mono">${x.rg}${x.over?' <b style="color:var(--ac)">· melebihi stok</b>':''}</div>
       <div class="m">${nf(x.q)} pcs × ${rp(x.h||0)} = <span class="sm">${rp((x.q|0)*(x.h||0))}</span></div>
-      <details><summary>Lihat SN · <a href="#" data-c="${i}">salin SN</a></summary><div class="list mono">${list(x).map((s,j)=>`<div>${j+1}. ${s}</div>`).join('')}</div></details></div>
+      <div style="margin-top:6px"><button class="btn s" data-c="${i}">Salin SN</button></div><details><summary>Lihat SN</summary><div class="list mono">${list(x).map((s,j)=>`<div>${j+1}. ${s}</div>`).join('')}</div></details></div>
       <div class="ed"><div class="g3"><div class="full"><label>Nama</label><input data-f="n" value="${(x.n||'').replace(/"/g,'&quot;')}"></div><div><label>Jumlah</label><input data-f="q" type="number" value="${x.q}"></div><div><label>Harga/pcs</label><input data-f="h" inputmode="numeric" value="${x.h?nf(x.h):''}"></div></div>
       <div class="row"><button class="btn" data-sv="${i}">Simpan</button><button class="btn s" data-cn>Batal</button></div><div class="m" style="margin-top:6px">Ubah jumlah akan menggeser SN outlet sesudahnya.</div></div></div>`).join('')}</div>`:'';
   const tq=u,tn=S.al.reduce((s,x)=>s+(x.q|0)*(x.h||0),0);
