@@ -13,6 +13,7 @@ label{display:block;font-size:12px;color:var(--mu);margin:8px 0 4px}input{width:
 @media (max-width:520px){.g3{grid-template-columns:1fr 1fr}.g3 .full{grid-column:1/-1}}
 .btn{padding:11px 16px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-weight:600;font-size:15px;cursor:pointer}.btn.s{background:var(--soft);color:var(--tx);border:1px solid var(--bd);font-size:13px;padding:7px 12px}.btn.d{background:transparent;color:var(--ac);border:1px solid var(--bd);font-size:13px;padding:6px 10px}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}.err{color:var(--ac);font-weight:600;margin-top:8px;min-height:1em}
+.sr{display:grid;grid-template-columns:1fr 1fr 36px;gap:6px;align-items:end;margin-top:8px}.sr input{font-size:13.5px;padding:9px 7px;letter-spacing:-.2px}.sr .n{grid-column:1/-1;font-size:11.5px;color:var(--mu);margin-top:-2px}.sr .n:empty{display:none}.sr .x{border:1px solid var(--bd);background:transparent;color:var(--ac);border-radius:8px;padding:8px 10px;cursor:pointer}.sr label{margin:0 0 3px}.qk{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.qk button{border:1px solid var(--bd);background:var(--soft);color:var(--tx);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
 .stk{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px}.stk div{background:var(--soft);border-radius:10px;padding:8px 10px}.stk small{display:block;color:var(--mu);font-size:11.5px}.stk b{font-size:17px}
 .bar{height:8px;border-radius:4px;background:var(--soft);overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;background:var(--ac)}
@@ -23,11 +24,11 @@ details summary{cursor:pointer;color:var(--mu);font-size:13px;margin-top:6px}.li
 .tot{position:sticky;bottom:0;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
 .tot b{font-size:18px}.tot small{color:var(--mu);display:block;font-size:11.5px}
 </style></head><body><div class="w">
-<h1>Penyusun WL</h1><div class="sub">Isi rentang SN, lalu bagi ke outlet satu per satu dengan jumlah & harga bebas. SN otomatis berurutan. Semua bisa diedit.</div>
+<h1>Penyusun WL</h1><div class="sub">Isi rentang SN (bisa lebih dari satu), lalu bagi ke outlet satu per satu dengan jumlah & harga bebas. SN otomatis berurutan. Semua bisa diedit.</div>
 
 <div class="card"><h2>1. Stok SN</h2>
-  <label>Daftar SN stok — satu baris satu rentang (awal - akhir) atau satu SN</label>
-  <textarea id="st" class="mono" rows="4" style="width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);font-size:14px" placeholder="600089897777 - 600089897876&#10;600089898001 - 600089898037&#10;600089899150"></textarea>
+  <div id="rows"></div>
+  <div class="row" style="margin-top:8px"><button class="btn s" id="addr">＋ Tambah rentang SN</button></div>
   <div id="segi" style="color:var(--mu);font-size:12.5px;margin-top:6px"></div>
   <label>Produk (opsional)</label><input id="p" placeholder="mis. VF 7GB/3 hari" list="pl"><datalist id="pl"><option>VF 7GB/24 jam</option><option>VF 7GB/2 hari</option><option>VF 7GB/3 hari</option><option>VF 7GB/5 hari</option><option>VF 11GB/5 hari</option><option>VF 7GB/7 hari</option><option>SA 3GB</option><option>SA 5GB</option><option>SA 7GB</option><option>SA 10GB</option><option>SA 15GB</option><option>SA BYU 3GB</option><option>SA BYU 5GB</option></datalist>
   <div class="stk" id="stk"></div><div class="bar"><i id="bar" style="width:0"></i></div>
@@ -35,7 +36,7 @@ details summary{cursor:pointer;color:var(--mu);font-size:13px;margin-top:6px}.li
 
 <div class="card"><h2 id="h2">2. Outlet ke-1</h2>
   <div class="g3"><div class="full"><label>Nama outlet / SF</label><input id="on" placeholder="mis. Toko A"></div>
-  <div><label>Jumlah (pcs)</label><input id="oq" type="number" min="1" inputmode="numeric" placeholder="50"></div>
+  <div><label>Jumlah (pcs)</label><input id="oq" type="number" min="1" inputmode="numeric" placeholder="50"><div class="qk" id="qk"><button>10</button><button>20</button><button>25</button><button>50</button><button>100</button></div></div>
   <div><label>Harga per pcs (Rp)</label><input id="oh" type="text" inputmode="numeric" placeholder="mis. 16.500"></div></div>
   <div class="m" id="prev" style="margin-top:8px;color:var(--mu);font-size:13px"></div>
   <div class="row"><button class="btn" id="add">Submit outlet</button><button class="btn s" id="all">Pakai semua sisa</button></div>
@@ -50,7 +51,16 @@ const $=i=>document.getElementById(i);
 const clean=v=>String(v||'').replace(/\D/g,''),rp=v=>'Rp '+Math.round(v).toLocaleString('id-ID'),nf=v=>Math.round(v).toLocaleString('id-ID'),num=v=>parseInt(clean(v)||'0',10);
 let S={st:'',p:'',al:[]},ed=-1;
 try{const s=JSON.parse(localStorage.getItem('wl2')||'null');if(s){S=s;if(S.st===undefined)S.st=(S['a']&&S['b'])?S['a']+' - '+S['b']:''}}catch(e){}
-$('st').value=S.st;$('p').value=S.p||'';
+$('p').value=S.p||'';
+let RW=String(S.st||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).map(l=>{const p=l.split(/[^0-9]+/).filter(Boolean);return[p[0]||'',p[1]||'']});if(!RW.length)RW=[['','']];
+const syncSt=()=>{S.st=RW.filter(r=>clean(r[0])).map(r=>clean(r[1])?clean(r[0])+' - '+clean(r[1]):clean(r[0])).join('\n')};
+function cnt(r){const a=clean(r[0]),b=clean(r[1]);if(!a)return'';if(!b)return'1 SN';if(a.length!==b.length)return'<span style="color:var(--ac)">cek</span>';const n=BigInt(b)-BigInt(a);return n<0n?'<span style="color:var(--ac)">cek</span>':nf(Number(n)+1)+' SN'}
+function drawRows(){$('rows').innerHTML=RW.map((r,i)=>`<div class="sr" data-i="${i}"><div>${i?'':'<label>SN awal</label>'}<input class="mono" inputmode="numeric" data-k="0" value="${r[0]}" placeholder="600089897777"></div><div>${i?'':'<label>SN akhir (opsional)</label>'}<input class="mono" inputmode="numeric" data-k="1" value="${r[1]}" placeholder="600089897876"></div><button class="x" title="Hapus">✕</button><div class="n">${cnt(r)}</div></div>`).join('')}
+drawRows();
+$('rows').addEventListener('input',e=>{const t=e.target,w=t.closest('.sr');if(!w)return;RW[+w.dataset.i][+t.dataset.k]=t.value;w.querySelector('.n').innerHTML=cnt(RW[+w.dataset.i]);syncSt();render()});
+$('rows').addEventListener('click',e=>{const x=e.target.closest('.x');if(!x)return;const i=+x.closest('.sr').dataset.i;RW.splice(i,1);if(!RW.length)RW=[['','']];drawRows();syncSt();render()});
+$('addr').addEventListener('click',()=>{RW.push(['','']);drawRows();const ins=$('rows').querySelectorAll('.sr:last-child input');ins[0].focus()});
+$('qk').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;e.preventDefault();$('oq').value=e.target.textContent;render()});
 const save=()=>{try{localStorage.setItem('wl2',JSON.stringify(S))}catch(e){}};
 let ERR='';
 function rng(){ERR='';const seg=[];const lines=String(S.st||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);let L=0;
@@ -85,7 +95,7 @@ function render(){
 function snTxt(x,i,h){return (h?`*WL ${S.p||''}*\n`:'')+`${i+1}. ${x.n||'-'}: ${x.rg} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})\n`+list(x).map((s,j)=>`   ${j+1}. ${s}`).join('\n')}
 function list(x){const out=[];for(const [a,b] of x.parts)for(let c=a;c<=b;c++)out.push(pad(c,x.L));return out}
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
-$('st').addEventListener('input',()=>{S.st=$('st').value;render()});$('p').addEventListener('input',()=>{S.p=$('p').value.trim();render()});
+$('p').addEventListener('input',()=>{S.p=$('p').value.trim();render()});
 ['oq','oh'].forEach(i=>$(i).addEventListener('input',render));
 $('oh').addEventListener('blur',()=>{const v=num($('oh').value);$('oh').value=v?nf(v):''});
 function add(q){$('er').textContent='';const r=rng();if(!r){$('er').textContent='Isi daftar SN stok dulu.';return}
