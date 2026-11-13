@@ -72,7 +72,7 @@ function render(){
   else{$('stk').innerHTML='';$('bar').style.width='0'}
   $('h2').textContent=`2. Outlet ke-${S.al.length+1}`;
   const q=num($('oq').value);$('prev').innerHTML=r&&q>0?`SN: <span class="mono">${fmtP(take(r,u,Math.min(q,Math.max(0,sisa))).parts,r.L)||'-'}</span>${q>sisa?' <b style="color:var(--ac)">(melebihi sisa '+nf(sisa)+')</b>':''}${num($('oh').value)?' · Subtotal <b>'+rp(q*num($('oh').value))+'</b>':''}`:'';
-  $('list').innerHTML=A.length?`<div class="card"><h2>3. Daftar WL (${A.length} outlet)</h2><div class="row" style="margin-top:4px"><button class="btn s" id="csv">⬇️ Unduh Excel (CSV)</button><button class="btn s" id="cr">Salin ringkasan</button><button class="btn d" id="rs">Hapus semua</button></div>
+  $('list').innerHTML=A.length?`<div class="card"><h2>3. Daftar WL (${A.length} outlet)</h2><div class="row" style="margin-top:4px"><button class="btn s" id="csv">⬇️ Unduh Excel (CSV)</button><button class="btn s" id="cr">Salin ringkasan</button><button class="btn s" id="cs">Salin semua SN</button><button class="btn d" id="rs">Hapus semua</button></div>
     ${A.map((x,i)=>`<div class="al${i===ed?' e':''}"><div class="vw"><div class="h"><b>${i+1}. ${x.n||'(tanpa nama)'}</b><span><button class="btn s" data-e="${i}">Edit</button> <button class="btn d" data-x="${i}">Hapus</button></span></div>
       <div class="rg mono">${x.rg}${x.over?' <b style="color:var(--ac)">· melebihi stok</b>':''}</div>
       <div class="m">${nf(x.q)} pcs × ${rp(x.h||0)} = <span class="sm">${rp((x.q|0)*(x.h||0))}</span></div>
@@ -82,6 +82,7 @@ function render(){
   const tq=u,tn=S.al.reduce((s,x)=>s+(x.q|0)*(x.h||0),0);
   $('tot').style.display=A.length?'flex':'none';$('tot').innerHTML=`<div><small>Total pcs</small><b>${nf(tq)}</b></div><div><small>Total nominal</small><b>${rp(tn)}</b></div><div><small>Sisa SN</small><b style="color:${sisa<0?'var(--ac)':'var(--ok)'}">${nf(sisa)}</b></div>`;
   save()}
+function snTxt(x,i,h){return (h?`*WL ${S.p||''}*\n`:'')+`${i+1}. ${x.n||'-'}: ${x.rg} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})\n`+list(x).map((s,j)=>`   ${j+1}. ${s}`).join('\n')}
 function list(x){const out=[];for(const [a,b] of x.parts)for(let c=a;c<=b;c++)out.push(pad(c,x.L));return out}
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
 $('st').addEventListener('input',()=>{S.st=$('st').value;render()});$('p').addEventListener('input',()=>{S.p=$('p').value.trim();render()});
@@ -99,7 +100,8 @@ document.addEventListener('click',e=>{const t=e.target,d=t.dataset;
   if(d.sv!==undefined){const box=t.closest('.al'),g=f=>box.querySelector(`[data-f="${f}"]`).value;const i=+d.sv;const r=rng();const q=num(g('q'));
     const other=used()-(S.al[i].q|0);if(r&&q+other>r.tot){alert(`Jumlah melebihi stok. Maksimal ${nf(r.tot-other)} pcs.`);return}
     S.al[i]={n:g('n').trim(),q,h:num(g('h'))};ed=-1;render()}
-  if(d.c!==undefined){e.preventDefault();copy(list(alloc()[+d.c]).join('\n'),t)}
+  if(d.c!==undefined){e.preventDefault();const A=alloc(),i=+d.c;copy(snTxt(A[i],i,true),t)}
+  if(t.id==='cs'){const A=alloc();copy(`*WL ${S.p||''}*\n\n`+A.map((x,i)=>snTxt(x,i,false)).join('\n\n')+`\n\nTotal: ${nf(used())} pcs · ${rp(S.al.reduce((s,x)=>s+x.q*(x.h||0),0))}`,t)}
   if(t.id==='rs'&&confirm('Hapus semua daftar outlet?')){S.al=[];ed=-1;render()}
   if(t.id==='cr'){const A=alloc();copy(`*WL ${S.p||''}*\n`+A.map((x,i)=>`${i+1}. ${x.n||'-'}: ${x.rg} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})`).join('\n')+`\n\nTotal: ${nf(used())} pcs · ${rp(S.al.reduce((s,x)=>s+x.q*(x.h||0),0))}`,t)}
   if(t.id==='csv'){const rows=[['No','Outlet','SN','Produk','Harga']];let n=1;alloc().forEach(x=>list(x).forEach(s=>rows.push([n++,x.n,{t:s},S.p,x.h||0])));
