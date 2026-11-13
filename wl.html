@@ -111,7 +111,7 @@ function render(){
   const tq=u,tn=S.al.reduce((s,x)=>s+(x.q|0)*(x.h||0),0);
   $('tot').style.display=A.length?'flex':'none';$('tot').innerHTML=`<div><small>Total pcs</small><b>${nf(tq)}</b></div><div><small>Total nominal</small><b>${rp(tn)}</b></div><div><small>Sisa SN</small><b style="color:${sisa<0?'var(--ac)':'var(--ok)'}">${nf(sisa)}</b></div>`;
   save()}
-function snTxt(x,i,h){return (h?`*WL ${S.p||''}*\n`:'')+`${i+1}. ${x.n||'-'}: ${x.rg} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})\n`+list(x).map((s,j)=>`   ${j+1}. ${s}`).join('\n')}
+function snTxt(x,i,h){return (h?`*WL ${S.p||''}*\n`:'')+`${i+1}. ${x.n||'-'} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})\n${x.rg.split(', ').join('\n')}\n`+list(x).map((s,j)=>`   ${j+1}. ${s}`).join('\n')}
 function list(x){const out=[];for(const [a,b,l] of x.parts)for(let c=a;c<=b;c++)out.push(pad(c,l||x.L));return out}
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
 
@@ -130,10 +130,10 @@ document.addEventListener('click',e=>{const t=e.target,d=t.dataset;
     const other=used()-(S.al[i].q|0);if(r&&q+other>r.tot){alert(`Jumlah melebihi stok. Maksimal ${nf(r.tot-other)} pcs.`);return}
     S.al[i]={...S.al[i],n:g('n').trim(),q,h:num(g('h'))};ed=-1;render()}
   if(d.c!==undefined){e.preventDefault();const A=alloc(),i=+d.c;copy(list(A[i]).map((s,j)=>`${j+1}. ${s}`).join('\n'),t)}
-  if(d.r!==undefined){e.preventDefault();const A=alloc(),i=+d.r,x=A[i];copy(`*WL ${S.p||''}*\n${i+1}. ${x.n||'-'}: ${x.rg} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})`,t)}
+  if(d.r!==undefined){e.preventDefault();const A=alloc(),i=+d.r,x=A[i];copy(`*WL ${S.p||''}*\n${i+1}. ${x.n||'-'} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})\n${x.rg.split(', ').join('\n')}`,t)}
   if(t.id==='cs'){const A=alloc();copy(`*WL ${S.p||''}*\n\n`+A.map((x,i)=>snTxt(x,i,false)).join('\n\n')+`\n\nTotal: ${nf(used())} pcs · ${rp(S.al.reduce((s,x)=>s+x.q*(x.h||0),0))}`,t)}
   if(t.id==='rs'&&confirm('Hapus semua daftar outlet?')){S.al=[];ed=-1;render()}
-  if(t.id==='cr'){const A=alloc();copy(`*WL ${S.p||''}*\n`+A.map((x,i)=>`${i+1}. ${x.n||'-'}: ${x.rg} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})`).join('\n')+`\n\nTotal: ${nf(used())} pcs · ${rp(S.al.reduce((s,x)=>s+x.q*(x.h||0),0))}`,t)}
+  if(t.id==='cr'){const A=alloc();copy(`*WL ${S.p||''}*\n`+A.map((x,i)=>`${i+1}. ${x.n||'-'} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})\n${x.rg.split(', ').join('\n')}`).join('\n\n')+`\n\nTotal: ${nf(used())} pcs · ${rp(S.al.reduce((s,x)=>s+x.q*(x.h||0),0))}`,t)}
   if(t.id==='csv'){const rows=[['No','Outlet','SN','Produk','Harga']];let n=1;alloc().forEach(x=>list(x).forEach(s=>rows.push([n++,x.n,{t:s},S.p,x.h||0])));
     rows.push([]);rows.push(['','TOTAL',used()+' pcs','',S.al.reduce((s,x)=>s+x.q*(x.h||0),0)]);
     const csv='﻿'+rows.map(r=>r.map(v=>v&&v.t?`="${v.t}"`:`"${String(v??'').replace(/"/g,'""')}"`).join(';')).join('\r\n');
