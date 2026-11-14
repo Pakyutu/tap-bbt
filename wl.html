@@ -25,29 +25,28 @@ label{display:block;font-size:12px;color:var(--mu);margin:8px 0 4px}input{width:
 details summary{cursor:pointer;color:var(--mu);font-size:13px;margin-top:6px}.list{column-width:150px;column-gap:16px;font-size:13px;margin-top:6px}
 .tot{position:sticky;bottom:0;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
 .tot b{font-size:18px}.tot small{color:var(--mu);display:block;font-size:11.5px}
+.sri{border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin-top:10px}.sri .sh{display:flex;gap:8px;align-items:center}.sri .sh b{white-space:nowrap;color:var(--ac)}.sri select,.sel{flex:1;min-width:0;padding:8px 9px;border:1px solid var(--bd);border-radius:9px;background:var(--card);color:var(--tx);font-size:14px}.sri .sh .x,.sri .xs{border:1px solid var(--bd);background:transparent;color:var(--ac);border-radius:8px;padding:7px 10px;cursor:pointer}
+.sst{color:var(--mu);font-size:12.5px;margin-top:6px}.sst b{color:var(--tx)}
+.of{border:1px solid var(--bd);border-radius:12px;padding:9px 11px;margin-top:8px}.of .ol{display:flex;justify-content:space-between;gap:8px;font-size:13.5px}.of .ol span{color:var(--mu);font-size:12.5px;white-space:nowrap}.of .g2{margin-top:6px;gap:8px}.of input{padding:9px 10px;font-size:14.5px}.opv{font-size:12.5px;color:var(--mu);margin-top:4px}.opv:empty{display:none}
+.it{margin-top:6px;padding-top:6px;border-top:1px dashed var(--bd)}.it:first-of-type{border-top:0;padding-top:0}.ip{font-size:13px;font-weight:700}
 </style></head><body><div class="w">
-<h1>Penyusun WL</h1><div class="sub">Isi rentang SN (bisa lebih dari satu), lalu bagi ke outlet satu per satu dengan jumlah & harga bebas. SN otomatis berurutan. Semua bisa diedit.</div>
+<h1>Penyusun WL</h1><div class="sub">Isi stok per seri (produk & rentang SN masing-masing), lalu bagi ke outlet. Satu outlet bisa ambil dari beberapa seri sekaligus. SN otomatis berurutan per seri. Semua bisa diedit.</div>
 
-<div class="card"><h2>1. Stok SN</h2>
-  <div id="rows"></div>
-  <div class="row" style="margin-top:8px"><button class="btn s" id="addr">＋ Tambah rentang SN</button></div>
-  <div id="segi" style="color:var(--mu);font-size:12.5px;margin-top:6px"></div>
-  <label style="display:flex;justify-content:space-between;align-items:center">Produk <a href="#" id="pm" style="color:var(--ac);font-size:12.5px;text-decoration:none">✏️ Kelola produk</a></label>
-  <div class="pc" id="pc"></div>
+<div class="card"><h2>1. Stok SN per seri</h2>
+  <div id="srl"></div>
+  <div class="row" style="margin-top:10px"><button class="btn s" id="adds">＋ Tambah seri</button><a href="#" id="pm" style="color:var(--ac);font-size:13px;text-decoration:none;margin-left:auto">✏️ Kelola produk</a></div>
   <div id="pe" style="display:none;margin-top:8px;border:1px dashed var(--bd);border-radius:10px;padding:10px">
     <div id="pel"></div>
     <div class="pr" style="margin-top:8px"><input id="pn" placeholder="Nama produk baru, mis. VF 7GB/3 hari"><input id="ph" inputmode="numeric" placeholder="Harga (opsional)"><button class="btn s" id="pa">＋ Tambah</button></div>
-    <div style="font-size:11.5px;color:var(--mu);margin-top:6px">Harga produk otomatis terisi ke kolom harga outlet saat produk dipilih (tetap bisa diubah).</div>
+    <div style="font-size:11.5px;color:var(--mu);margin-top:6px">Harga produk otomatis jadi harga awal seri saat produk dipilih (tetap bisa diubah per outlet).</div>
   </div>
-  <div class="stk" id="stk"></div><div class="bar"><i id="bar" style="width:0"></i></div>
 </div>
 
 <div class="card"><h2 id="h2">2. Outlet ke-1</h2>
-  <div class="g3"><div class="full"><label>Nama outlet / SF</label><input id="on" placeholder="mis. Toko A"></div>
-  <div><label>Jumlah (pcs)</label><input id="oq" type="number" min="1" inputmode="numeric" placeholder="50"><div class="qk" id="qk"><button>10</button><button>20</button><button>25</button><button>50</button><button>100</button></div></div>
-  <div><label>Harga per pcs (Rp)</label><input id="oh" type="text" inputmode="numeric" placeholder="mis. 16.500"></div></div>
+  <label>Nama outlet / SF</label><input id="on" placeholder="mis. Toko A">
+  <div id="ofs"></div>
   <div class="m" id="prev" style="margin-top:8px;color:var(--mu);font-size:13px"></div>
-  <div class="row"><button class="btn" id="add">Submit outlet</button><button class="btn s" id="all">Pakai semua sisa</button></div>
+  <div class="row"><button class="btn" id="add">Submit outlet</button></div>
   <div class="err" id="er"></div>
 </div>
 
@@ -58,124 +57,179 @@ details summary{cursor:pointer;color:var(--mu);font-size:13px;margin-top:6px}.li
 <script>
 const $=i=>document.getElementById(i);
 const clean=v=>String(v||'').replace(/\D/g,''),rp=v=>'Rp '+Math.round(v).toLocaleString('id-ID'),nf=v=>Math.round(v).toLocaleString('id-ID'),num=v=>parseInt(clean(v)||'0',10);
-let S={st:'',p:'',al:[]},ed=-1;
-try{const s=JSON.parse(localStorage.getItem('wl2')||'null');if(s){S=s;if(S.st===undefined)S.st=(S['a']&&S['b'])?S['a']+' - '+S['b']:''}}catch(e){}
+const pad=(x,L)=>x.toString().padStart(L,'0');
+const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
+
+// ---------- produk ----------
 const P0=['VF 7GB/24 jam','VF 7GB/2 hari','VF 7GB/3 hari','VF 7GB/5 hari','VF 11GB/5 hari','VF 7GB/7 hari','SA 3GB','SA 5GB','SA 7GB','SA 10GB','SA 15GB','SA BYU 3GB','SA BYU 5GB'].map(n=>({n,h:0}));
 let PL;try{PL=JSON.parse(localStorage.getItem('wlp')||'null')}catch(e){}if(!Array.isArray(PL))PL=P0;
 const saveP=()=>{try{localStorage.setItem('wlp',JSON.stringify(PL))}catch(e){}};
-function drawC(){$('pc').innerHTML=PL.map((p,i)=>`<button data-pi="${i}" class="${p.n===S.p?'on':''}">${p.n.replace(/</g,'&lt;')}${p.h?`<small>${nf(p.h)}</small>`:''}</button>`).join('')||'<span style="color:var(--mu);font-size:13px">Belum ada produk. Ketuk ✏️ Kelola produk untuk menambah.</span>'}
-function drawP(){drawC();$('pel').innerHTML=PL.map((p,i)=>`<div class="pr" data-pe="${i}"><input data-f="n" value="${p.n.replace(/"/g,'&quot;')}"><input data-f="h" inputmode="numeric" value="${p.h?nf(p.h):''}" placeholder="Harga"><button class="x">✕</button></div>`).join('')}
-drawP();
-$('pm').addEventListener('click',e=>{e.preventDefault();const o=$('pe').style.display==='none';$('pe').style.display=o?'block':'none';$('pm').textContent=o?'✓ Selesai':'✏️ Kelola produk'});
-$('pc').addEventListener('click',e=>{const b=e.target.closest('[data-pi]');if(!b)return;const p=PL[+b.dataset.pi];S.p=S.p===p.n?'':p.n;if(S.p&&p.h)$('oh').value=nf(p.h);drawC();render()});
-$('pel').addEventListener('input',e=>{const w=e.target.closest('[data-pe]');if(!w)return;const p=PL[+w.dataset.pe],f=e.target.dataset.f;if(f==='n'){const was=p.n===S.p;p.n=e.target.value.trim();if(was)S.p=p.n}else p.h=num(e.target.value);saveP();drawC();render()});
-$('pel').addEventListener('click',e=>{const x=e.target.closest('.x');if(!x)return;const i=+x.closest('[data-pe]').dataset.pe;if(PL[i].n===S.p)S.p='';PL.splice(i,1);saveP();drawP();render()});
-$('pa').addEventListener('click',()=>{const n=$('pn').value.trim();if(!n){$('pn').focus();return}if(!PL.some(p=>p.n===n))PL.push({n,h:num($('ph').value)});S.p=n;if(num($('ph').value))$('oh').value=nf(num($('ph').value));$('pn').value='';$('ph').value='';saveP();drawP();render()});
-let RW=String(S.st||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).map(l=>{const p=l.split(/[^0-9]+/).filter(Boolean);return[p[0]||'',p[1]||'']});if(!RW.length)RW=[['','']];
-const syncSt=()=>{S.st=RW.filter(r=>clean(r[0])).map(r=>clean(r[1])?clean(r[0])+' - '+clean(r[1]):clean(r[0])).join('\n')};
-function cnt(r){const a=clean(r[0]),b=clean(r[1]);if(!a)return'';if(!b)return'1 SN';if(a.length!==b.length)return'<span style="color:var(--ac)">cek</span>';const n=BigInt(b)-BigInt(a);return n<0n?'<span style="color:var(--ac)">cek</span>':nf(Number(n)+1)+' SN'}
-function drawRows(){$('rows').innerHTML=RW.map((r,i)=>`<div class="sr" data-i="${i}"><div>${i?'':'<label>SN awal</label>'}<input class="mono" inputmode="numeric" data-k="0" value="${r[0]}" placeholder="600089897777"></div><div>${i?'':'<label>SN akhir (opsional)</label>'}<input class="mono" inputmode="numeric" data-k="1" value="${r[1]}" placeholder="600089897876"></div><button class="x" title="Hapus">✕</button><div class="n">${cnt(r)}</div></div>`).join('')}
-drawRows();
-$('rows').addEventListener('input',e=>{const t=e.target,w=t.closest('.sr');if(!w)return;RW[+w.dataset.i][+t.dataset.k]=t.value;w.querySelector('.n').innerHTML=cnt(RW[+w.dataset.i]);syncSt();render()});
-$('rows').addEventListener('click',e=>{const x=e.target.closest('.x');if(!x)return;const i=+x.closest('.sr').dataset.i;RW.splice(i,1);if(!RW.length)RW=[['','']];drawRows();syncSt();render()});
-$('addr').addEventListener('click',()=>{RW.push(['','']);drawRows();const ins=$('rows').querySelectorAll('.sr:last-child input');ins[0].focus()});
-$('qk').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;e.preventDefault();$('oq').value=e.target.textContent;render()});
-const save=()=>{try{localStorage.setItem('wl2',JSON.stringify(S))}catch(e){}};
-let ERR='';
-function rng(){ERR='';const seg=[];const lines=String(S.st||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);let L=0;
-  for(const ln of lines){const p=ln.split(/[^0-9]+/).filter(Boolean);if(!p.length)continue;const a=p[0],b=p[1]||p[0];
-    if(a.length!==b.length){ERR=`Baris "${ln}": panjang SN awal & akhir beda.`;continue}
-    let A=BigInt(a),B=BigInt(b);if(B<A){const t=A;A=B;B=t}if(B-A>200000n){ERR=`Baris "${ln}": rentang terlalu besar.`;continue}L=Math.max(L,a.length);seg.push({A,B,n:Number(B-A)+1,L:a.length})}
-  for(let i=0;i<seg.length;i++)for(let j=i+1;j<seg.length;j++){if(seg[i].A<=seg[j].B&&seg[j].A<=seg[i].B)ERR='Ada rentang yang tumpang tindih / SN dobel. Cek lagi.'}
-  if(!seg.length)return null;return{seg,L,tot:seg.reduce((s,x)=>s+x.n,0)}}
-function take(r,off,q){const out=[];let o=off,left=q;for(const g of r.seg){if(left<=0)break;if(o>=g.n){o-=g.n;continue}const st=g.A+BigInt(o),k=Math.min(g.n-o,left),en=st+BigInt(k)-1n;out.push([st,en,g.L]);left-=k;o=0}return{parts:out,short:left}}
-const fmtP=(parts,L)=>parts.map(([a,b,l])=>a===b?pad(a,l||L):pad(a,l||L)+' – '+pad(b,l||L)).join(', ');
-function nextSN(r,off){const t=take(r,off,1);return t.parts.length?pad(t.parts[0][0],t.parts[0][2]||r.L):'-'}
-const pad=(x,L)=>x.toString().padStart(L,'0');
-function alloc(){const r=rng();if(!r)return[];let off=0;return S.al.map(x=>{const q=Math.max(0,x.q|0),t=take(r,off,q);off+=q;return{...x,parts:t.parts,L:r.L,rg:fmtP(t.parts,r.L),over:t.short>0}})}
-function used(){return S.al.reduce((s,x)=>s+(x.q|0),0)}
-function render(){
-  const r=rng(),u=used(),A=alloc(),sisa=r?r.tot-u:0;
-  $('segi').innerHTML=(r?`${r.seg.length} rentang: ${r.seg.slice(0,8).map(g=>nf(g.n)).join(' + ')}${r.seg.length>8?' + …':''} = <b>${nf(r.tot)}</b> SN`:'')+(ERR?` <b style="color:var(--ac)">${ERR}</b>`:'');
-  if(r){$('stk').innerHTML=`<div><small>Total SN</small><b>${nf(r.tot)}</b></div><div><small>Terpakai</small><b>${nf(u)}</b></div><div><small>Sisa</small><b style="color:${sisa<0?'var(--ac)':'var(--ok)'}">${nf(sisa)}</b></div><div><small>SN berikutnya</small><b class="mono" style="font-size:14px">${sisa>0?nextSN(r,u):'-'}</b></div>`;$('bar').style.width=Math.min(100,u/r.tot*100)+'%'}
-  else{$('stk').innerHTML='';$('bar').style.width='0'}
-  $('h2').textContent=`2. Outlet ke-${S.al.length+1}`;
-  const q=num($('oq').value);$('prev').innerHTML=r&&q>0?`SN: <span class="mono">${fmtP(take(r,u,Math.min(q,Math.max(0,sisa))).parts,r.L)||'-'}</span>${q>sisa?' <b style="color:var(--ac)">(melebihi sisa '+nf(sisa)+')</b>':''}${num($('oh').value)?' · Subtotal <b>'+rp(q*num($('oh').value))+'</b>':''}`:'';
-  $('list').innerHTML=A.length?`<div class="card"><h2>3. Daftar WL (${A.length} outlet)</h2><div class="row" style="margin-top:4px"><button class="btn s" id="csv">⬇️ Unduh Excel (CSV)</button><button class="btn s" id="cr">Salin ringkasan</button><button class="btn s" id="cs">Salin semua SN</button><button class="btn s" id="hsv">💾 Simpan ke riwayat</button><button class="btn s" id="nw">＋ WL baru</button><button class="btn d" id="rs">Hapus semua</button></div>
-    ${A.map((x,i)=>`<div class="al${i===ed?' e':''}${x.st?' sty':''}"><div class="vw"><div class="h"><b>${i+1}. ${x.n||'(tanpa nama)'}</b><span><button class="btn s" data-e="${i}">Edit</button> <button class="btn d" data-x="${i}">Hapus</button></span></div>
-      <div class="rg mono">${x.rg}${x.over?' <b style="color:var(--ac)">· melebihi stok</b>':''}</div>
-      <div class="m">${nf(x.q)} pcs × ${rp(x.h||0)} = <span class="sm">${rp((x.q|0)*(x.h||0))}</span></div><div class="stg"><button class="${x.st?'on y':''}" data-stg="${i}" data-v="1">✓ Sudah ST</button><button class="${x.st?'':'on n'}" data-stg="${i}" data-v="0">Belum ST</button></div>
-      <div style="margin-top:6px"><button class="btn s" data-r="${i}">Salin ringkasan</button> <button class="btn s" data-c="${i}">Salin rincian SN</button> <button class="btn s" data-bq="${i}">▦ Barcode SN</button></div><details><summary>Lihat SN</summary><div class="list mono">${list(x).map((s,j)=>`<div>${j+1}. ${s}</div>`).join('')}</div></details></div>
-      <div class="ed"><div class="g3"><div class="full"><label>Nama</label><input data-f="n" value="${(x.n||'').replace(/"/g,'&quot;')}"></div><div><label>Jumlah</label><input data-f="q" type="number" value="${x.q}"></div><div><label>Harga/pcs</label><input data-f="h" inputmode="numeric" value="${x.h?nf(x.h):''}"></div></div>
-      <div class="row"><button class="btn" data-sv="${i}">Simpan</button><button class="btn s" data-cn>Batal</button></div><div class="m" style="margin-top:6px">Ubah jumlah akan menggeser SN outlet sesudahnya.</div></div></div>`).join('')}</div>`+sisaHTML(A):'';
-  const tq=u,tn=S.al.reduce((s,x)=>s+(x.q|0)*(x.h||0),0);
-  $('tot').style.display=A.length?'flex':'none';$('tot').innerHTML=`<div><small>Total pcs</small><b>${nf(tq)}</b></div><div><small>Total nominal</small><b>${rp(tn)}</b></div><div><small>Sisa SN</small><b style="color:${sisa<0?'var(--ac)':'var(--ok)'}">${nf(sisa)}</b></div>`;
-  save()}
-function snTxt(x,i,h){return (h?`*WL ${S.p||''}*\n`:'')+`${i+1}. ${x.n||'-'} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})\n${x.rg.split(', ').join('\n')}\n`+list(x).map((s,j)=>`   ${j+1}. ${s}`).join('\n')}
-function list(x){const out=[];for(const [a,b,l] of x.parts)for(let c=a;c<=b;c++)out.push(pad(c,l||x.L));return out}
-async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
+const prc=n=>{const p=PL.find(x=>x.n===n);return p?p.h||0:0};
 
-['oq','oh'].forEach(i=>$(i).addEventListener('input',render));
-document.addEventListener('input',e=>{const t=e.target;if(t.id==='oh'||t.id==='ph'||(t.dataset&&t.dataset.f==='h')){const v=num(t.value),o=v?nf(v):'';if(t.value!==o){t.value=o;try{t.setSelectionRange(o.length,o.length)}catch(_){}}}},true);
-function add(q){$('er').textContent='';const r=rng();if(!r){$('er').textContent='Isi daftar SN stok dulu.';return}
-  const sisa=r.tot-used();if(!(q>0)){$('er').textContent='Isi jumlah pcs.';return}if(q>sisa){$('er').textContent=`Jumlah ${nf(q)} melebihi sisa SN (${nf(sisa)}).`;return}
-  S.al.push({n:$('on').value.trim(),q,h:num($('oh').value)});$('on').value='';$('oq').value='';render();$('on').focus()}
-document.addEventListener('click',e=>{const t=e.target,d=t.dataset;
-  if(t.id==='add')add(num($('oq').value));
-  if(t.id==='all'){const r=rng();if(r){$('oq').value=r.tot-used();add(r.tot-used())}}
+// ---------- state ----------
+const parseRW=str=>{const r=String(str||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).map(l=>{const p=l.split(/[^0-9]+/).filter(Boolean);return[p[0]||'',p[1]||'']});return r.length?r:[['','']]};
+const blankSr=()=>({p:'',h:0,rw:[['','']]});
+function mig(s){if(!s)return{sr:[blankSr()],al:[]};if(Array.isArray(s.sr))return s;
+  const st=s.st!==undefined?s.st:((s.a&&s.b)?s.a+' - '+s.b:'');
+  return{sr:[{p:s.p||'',h:prc(s.p),rw:parseRW(st)}],al:(s.al||[]).map(x=>{const o={n:x.n||'',it:[{s:0,q:x.q|0,h:x.h||0}]};if(x.st)o.st=1;return o}),hid:s.hid}}
+let S;try{S=mig(JSON.parse(localStorage.getItem('wl2')||'null'))}catch(e){S=mig(null)}if(!S.sr.length)S.sr=[blankSr()];
+let ed=-1;const F={q:[],h:[]};
+const save=()=>{try{localStorage.setItem('wl2',JSON.stringify(S))}catch(e){}};
+const sName=k=>{const r=S.sr[k];return r&&r.p?r.p:'Seri '+(k+1)};
+const prods=()=>[...new Set(S.sr.map((r,k)=>sName(k)))].join(' + ');
+const multi=()=>S.sr.length>1;
+
+// ---------- hitung SN ----------
+function rng(sr){const seg=[];let err='',L=0;
+  for(const [a0,b0] of sr.rw){const a=clean(a0),b=clean(b0)||a;if(!a)continue;
+    if(a.length!==b.length){err=`Rentang ${a}: panjang SN awal & akhir beda.`;continue}
+    let A=BigInt(a),B=BigInt(b);if(B<A){const t=A;A=B;B=t}if(B-A>200000n){err=`Rentang ${a}: terlalu besar.`;continue}L=Math.max(L,a.length);seg.push({A,B,n:Number(B-A)+1,L:a.length})}
+  for(let i=0;i<seg.length;i++)for(let j=i+1;j<seg.length;j++)if(seg[i].A<=seg[j].B&&seg[j].A<=seg[i].B)err='Ada rentang tumpang tindih / SN dobel.';
+  return{seg,L,tot:seg.reduce((s,x)=>s+x.n,0),err}}
+function take(r,off,q){const out=[];let o=off,left=q;for(const g of r.seg){if(left<=0)break;if(o>=g.n){o-=g.n;continue}const st=g.A+BigInt(o),k=Math.min(g.n-o,left),en=st+BigInt(k)-1n;out.push([st,en,g.L]);left-=k;o=0}return{parts:out,short:left}}
+const fmtP=parts=>parts.map(([a,b,l])=>a===b?pad(a,l):pad(a,l)+' – '+pad(b,l)).join(', ');
+const rgL=y=>y.parts.map(([a,b,l])=>a===b?pad(a,l):pad(a,l)+' – '+pad(b,l)).join('\n')||'-';
+const usedS=k=>S.al.reduce((s,o)=>s+o.it.filter(x=>x.s===k).reduce((t,x)=>t+(x.q|0),0),0);
+const used=()=>S.al.reduce((s,o)=>s+o.it.reduce((t,x)=>t+(x.q|0),0),0);
+const nominal=()=>S.al.reduce((s,o)=>s+o.it.reduce((t,x)=>t+(x.q|0)*(x.h||0),0),0);
+function alloc(){const R=S.sr.map(rng),off=S.sr.map(()=>0);
+  return S.al.map((o,i)=>{const it=o.it.filter(x=>S.sr[x.s]&&(x.q|0)>0).sort((a,b)=>a.s-b.s).map(x=>{const q=x.q|0,t=take(R[x.s],off[x.s],q);off[x.s]+=q;return{...x,q,p:sName(x.s),parts:t.parts,rg:fmtP(t.parts)||'-',over:t.short>0}});
+    return{...o,i,it,q:it.reduce((s,x)=>s+x.q,0),tot:it.reduce((s,x)=>s+x.q*(x.h||0),0)}})}
+function list(y){const out=[];for(const [a,b,l] of y.parts)for(let c=a;c<=b;c++)out.push(pad(c,l));return out}
+function nextSN(k){const r=rng(S.sr[k]);const t=take(r,usedS(k),1);return t.parts.length?pad(t.parts[0][0],t.parts[0][2]):'-'}
+
+// ---------- seri (stok) ----------
+function cnt(r){const a=clean(r[0]),b=clean(r[1]);if(!a)return'';if(!b)return'1 SN';if(a.length!==b.length)return'<span style="color:var(--ac)">cek</span>';const n=BigInt(b)-BigInt(a);return n<0n?'<span style="color:var(--ac)">cek</span>':nf(Number(n)+1)+' SN'}
+const opts=sel=>`<option value="">— pilih produk —</option>`+PL.map(p=>`<option${p.n===sel?' selected':''}>${esc(p.n)}</option>`).join('')+(sel&&!PL.some(p=>p.n===sel)?`<option selected>${esc(sel)}</option>`:'');
+function drawSeri(){$('srl').innerHTML=S.sr.map((r,k)=>`<div class="sri" data-s="${k}"><div class="sh"><b>Seri ${k+1}</b><select data-ps>${opts(r.p)}</select>${S.sr.length>1?'<button class="x" data-sx title="Hapus seri">✕</button>':''}</div>
+  <div class="rws">${r.rw.map((w,i)=>`<div class="sr" data-i="${i}"><div>${i?'':'<label>SN awal</label>'}<input class="mono" inputmode="numeric" data-k="0" value="${esc(w[0])}" placeholder="600089897777"></div><div>${i?'':'<label>SN akhir (opsional)</label>'}<input class="mono" inputmode="numeric" data-k="1" value="${esc(w[1])}" placeholder="600089897876"></div><button class="xs" data-rx title="Hapus">✕</button><div class="n">${cnt(w)}</div></div>`).join('')}</div>
+  <div class="row" style="margin-top:8px"><button class="btn s" data-ar>＋ Tambah rentang</button></div><div class="sst" id="sst${k}"></div></div>`).join('');updSeri()}
+function updSeri(){S.sr.forEach((r,k)=>{const R=rng(r),u=usedS(k),sisa=R.tot-u,e=$('sst'+k);if(!e)return;
+  e.innerHTML=(R.tot?`${R.seg.length} rentang = <b>${nf(R.tot)}</b> SN · terpakai <b>${nf(u)}</b> · sisa <b style="color:${sisa<0?'var(--ac)':'var(--ok)'}">${nf(sisa)}</b>${sisa>0?` · berikutnya <span class="mono">${nextSN(k)}</span>`:''}`:'Isi rentang SN seri ini.')+(R.err?` <b style="color:var(--ac)">${R.err}</b>`:'')})}
+$('srl').addEventListener('input',e=>{const t=e.target,c=t.closest('.sri');if(!c)return;const k=+c.dataset.s,w=t.closest('.sr');
+  if(w){S.sr[k].rw[+w.dataset.i][+t.dataset.k]=t.value;w.querySelector('.n').innerHTML=cnt(S.sr[k].rw[+w.dataset.i]);render()}});
+$('srl').addEventListener('change',e=>{const t=e.target,c=t.closest('.sri');if(!c||t.dataset.ps===undefined)return;const k=+c.dataset.s;S.sr[k].p=t.value;const h=prc(t.value);if(h){S.sr[k].h=h;F.h[k]=h}drawForm();render()});
+$('srl').addEventListener('click',e=>{const t=e.target,c=t.closest('.sri');if(!c)return;const k=+c.dataset.s,d=t.dataset;
+  if(d.ar!==undefined){S.sr[k].rw.push(['','']);drawSeri();const ins=c.parentNode.children[k].querySelectorAll('.sr:last-child input');ins[0]&&ins[0].focus();return}
+  if(d.rx!==undefined){const i=+t.closest('.sr').dataset.i;S.sr[k].rw.splice(i,1);if(!S.sr[k].rw.length)S.sr[k].rw=[['','']];drawSeri();render();return}
+  if(d.sx!==undefined){const u=usedS(k);if(!confirm(u?`Seri ${k+1} sudah dipakai ${nf(u)} pcs di outlet. Hapus seri & jatahnya di semua outlet?`:`Hapus seri ${k+1}?`))return;
+    S.sr.splice(k,1);S.al.forEach(o=>{o.it=o.it.filter(x=>x.s!==k).map(x=>x.s>k?{...x,s:x.s-1}:x)});S.al=S.al.filter(o=>o.it.length);F.q.splice(k,1);F.h.splice(k,1);drawSeri();drawForm();render()}});
+$('adds').addEventListener('click',()=>{S.sr.push(blankSr());drawSeri();drawForm();render();const c=$('srl').lastElementChild;c&&c.scrollIntoView({behavior:'smooth',block:'center'})});
+
+// kelola produk
+function drawP(){$('pel').innerHTML=PL.map((p,i)=>`<div class="pr" data-pe="${i}"><input data-f="n" value="${esc(p.n)}"><input data-f="h" inputmode="numeric" value="${p.h?nf(p.h):''}" placeholder="Harga"><button class="x">✕</button></div>`).join('')}
+drawP();
+$('pm').addEventListener('click',e=>{e.preventDefault();const o=$('pe').style.display==='none';$('pe').style.display=o?'block':'none';$('pm').textContent=o?'✓ Selesai':'✏️ Kelola produk';if(!o){drawSeri();drawForm();render()}});
+$('pel').addEventListener('input',e=>{const w=e.target.closest('[data-pe]');if(!w)return;const p=PL[+w.dataset.pe],f=e.target.dataset.f;if(f==='n'){const old=p.n;p.n=e.target.value.trim();S.sr.forEach(r=>{if(r.p===old)r.p=p.n})}else p.h=num(e.target.value);saveP()});
+$('pel').addEventListener('click',e=>{const x=e.target.closest('.x');if(!x)return;PL.splice(+x.closest('[data-pe]').dataset.pe,1);saveP();drawP()});
+$('pa').addEventListener('click',()=>{const n=$('pn').value.trim();if(!n){$('pn').focus();return}if(!PL.some(p=>p.n===n))PL.push({n,h:num($('ph').value)});$('pn').value='';$('ph').value='';saveP();drawP()});
+
+// ---------- form outlet ----------
+function drawForm(){$('ofs').innerHTML=S.sr.map((r,k)=>`<div class="of" data-s="${k}"><div class="ol"><b>${multi()?`Seri ${k+1} · `:''}${esc(r.p||'(produk belum dipilih)')}</b><span id="osi${k}"></span></div>
+  <div class="g2"><div><input data-oq inputmode="numeric" type="number" min="0" placeholder="Jumlah pcs" value="${F.q[k]||''}"></div><div><input data-oh inputmode="numeric" placeholder="Harga/pcs" value="${(F.h[k]??r.h)?nf(F.h[k]??r.h):''}"></div></div>
+  <div class="qk"><button data-qq="10">10</button><button data-qq="20">20</button><button data-qq="25">25</button><button data-qq="50">50</button><button data-qq="100">100</button><button data-qq="all">Semua sisa</button></div><div class="opv" id="opv${k}"></div></div>`).join('');updForm()}
+function updForm(){let tq=0,tn=0;S.sr.forEach((r,k)=>{const R=rng(r),u=usedS(k),sisa=R.tot-u,q=F.q[k]|0,h=F.h[k]??r.h??0;
+    const a=$('osi'+k);if(a)a.innerHTML=`sisa <b style="color:${sisa>0?'var(--ok)':'var(--ac)'}">${nf(Math.max(0,sisa))}</b>`;
+    const p=$('opv'+k);if(p)p.innerHTML=q>0&&R.tot?`SN: <span class="mono">${fmtP(take(R,u,Math.min(q,Math.max(0,sisa))).parts)||'-'}</span>${q>sisa?' <b style="color:var(--ac)">(melebihi sisa '+nf(Math.max(0,sisa))+')</b>':''}${h?' · '+rp(q*h):''}`:'';
+    if(q>0){tq+=q;tn+=q*h}});
+  $('h2').textContent=`2. Outlet ke-${S.al.length+1}`;$('prev').innerHTML=tq?`Total outlet ini: <b>${nf(tq)} pcs</b>${tn?' · <b>'+rp(tn)+'</b>':''}`:''}
+$('ofs').addEventListener('input',e=>{const t=e.target,c=t.closest('.of');if(!c)return;const k=+c.dataset.s;
+  if(t.dataset.oq!==undefined)F.q[k]=num(t.value);if(t.dataset.oh!==undefined){const v=num(t.value);F.h[k]=v;const o=v?nf(v):'';if(t.value!==o){t.value=o;try{t.setSelectionRange(o.length,o.length)}catch(_){}}}updForm()});
+$('ofs').addEventListener('click',e=>{const t=e.target,c=t.closest('.of');if(!c||!t.dataset.qq)return;e.preventDefault();const k=+c.dataset.s;
+  const v=t.dataset.qq==='all'?Math.max(0,rng(S.sr[k]).tot-usedS(k)):+t.dataset.qq;F.q[k]=v;c.querySelector('[data-oq]').value=v||'';updForm()});
+function add(){$('er').textContent='';const it=[];
+  for(let k=0;k<S.sr.length;k++){const q=F.q[k]|0;if(!q)continue;const R=rng(S.sr[k]),sisa=R.tot-usedS(k);
+    if(!R.tot){$('er').textContent=`Seri ${k+1}: isi rentang SN dulu.`;return}
+    if(q>sisa){$('er').textContent=`${sName(k)}: jumlah ${nf(q)} melebihi sisa (${nf(Math.max(0,sisa))}).`;return}
+    it.push({s:k,q,h:F.h[k]??S.sr[k].h??0})}
+  if(!it.length){$('er').textContent='Isi jumlah pcs minimal di satu seri.';return}
+  S.al.push({n:$('on').value.trim(),it});$('on').value='';F.q=[];drawForm();render();$('on').focus()}
+$('add').addEventListener('click',add);
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.target.id==='on'||e.target.closest&&e.target.closest('#ofs')))add()});
+
+// ---------- teks salin ----------
+function outHead(x,n){return S.sr.length===1&&x.it.length===1?`${n}. ${x.n||'-'} (${nf(x.q)} pcs × ${rp(x.it[0].h||0)} = ${rp(x.tot)})`:`${n}. ${x.n||'-'} (${nf(x.q)} pcs · ${rp(x.tot)})`}
+function outTxt(x,n,sn){if(S.sr.length===1&&x.it.length===1){const y=x.it[0];return outHead(x,n)+'\n'+rgL(y)+(sn?'\n'+list(y).map((s,j)=>`   ${j+1}. ${s}`).join('\n'):'')}
+  return outHead(x,n)+'\n'+x.it.map(y=>`${y.p}: ${nf(y.q)} pcs × ${rp(y.h||0)}\n${rgL(y)}`+(sn?'\n'+list(y).map((s,j)=>`   ${j+1}. ${s}`).join('\n'):'')).join('\n')}
+const totLine=()=>{const A=alloc();let t=`Total: ${nf(used())} pcs · ${rp(nominal())}`;if(multi())t+='\n'+S.sr.map((r,k)=>`${sName(k)}: ${nf(usedS(k))} pcs`).join('\n');return t};
+
+// ---------- render ----------
+function render(){
+  updSeri();updForm();
+  const A=alloc(),u=used(),sisa=S.sr.reduce((s,r,k)=>s+rng(r).tot-usedS(k),0);
+  $('list').innerHTML=A.length?`<div class="card"><h2>3. Daftar WL (${A.length} outlet)</h2><div class="row" style="margin-top:4px"><button class="btn s" id="csv">⬇️ Unduh Excel (CSV)</button><button class="btn s" id="cr">Salin ringkasan</button><button class="btn s" id="cs">Salin semua SN</button><button class="btn s" id="hsv">💾 Simpan ke riwayat</button><button class="btn s" id="nw">＋ WL baru</button><button class="btn d" id="rs">Hapus semua</button></div>
+    ${A.map((x,i)=>`<div class="al${i===ed?' e':''}${x.st?' sty':''}"><div class="vw"><div class="h"><b>${i+1}. ${esc(x.n||'(tanpa nama)')}</b><span><button class="btn s" data-e="${i}">Edit</button> <button class="btn d" data-x="${i}">Hapus</button></span></div>
+      ${x.it.map(y=>`<div class="it">${multi()?`<div class="ip">${esc(y.p)}</div>`:''}<div class="rg mono">${rgL(y).replace(/\n/g,'<br>')}${y.over?' <b style="color:var(--ac)">· melebihi stok</b>':''}</div><div class="m">${nf(y.q)} pcs × ${rp(y.h||0)} = <span class="sm">${rp(y.q*(y.h||0))}</span></div></div>`).join('')}
+      ${x.it.length>1?`<div class="m" style="margin-top:4px">Total outlet: <b>${nf(x.q)} pcs</b> · <span class="sm">${rp(x.tot)}</span></div>`:''}
+      <div class="stg"><button class="${x.st?'on y':''}" data-stg="${i}" data-v="1">✓ Sudah ST</button><button class="${x.st?'':'on n'}" data-stg="${i}" data-v="0">Belum ST</button></div>
+      <div style="margin-top:6px"><button class="btn s" data-r="${i}">Salin ringkasan</button> <button class="btn s" data-c="${i}">Salin rincian SN</button> <button class="btn s" data-bq="${i}">▦ Barcode SN</button></div><details><summary>Lihat SN</summary>${x.it.map(y=>`${multi()?`<div class="ip" style="margin-top:6px">${esc(y.p)}</div>`:''}<div class="list mono">${list(y).map((s,j)=>`<div>${j+1}. ${s}</div>`).join('')}</div>`).join('')}</details></div>
+      <div class="ed"><label>Nama</label><input data-f="n" value="${esc(x.n||'')}">
+        ${S.sr.map((r,k)=>{const y=S.al[i].it.find(z=>z.s===k)||{q:0,h:r.h||0};return `<div class="g2" style="margin-top:8px;align-items:end"><div><label>${multi()?`Seri ${k+1} · `:''}${esc(r.p||'Jumlah')} (pcs)</label><input data-eq="${k}" type="number" min="0" value="${y.q||''}" placeholder="0"></div><div><label>Harga/pcs</label><input data-f="h" data-eh="${k}" inputmode="numeric" value="${y.h?nf(y.h):''}"></div></div>`}).join('')}
+      <div class="row"><button class="btn" data-sv="${i}">Simpan</button><button class="btn s" data-cn>Batal</button></div><div class="m" style="margin-top:6px">Ubah jumlah akan menggeser SN outlet sesudahnya (di seri yang sama).</div></div></div>`).join('')}</div>`+sisaHTML(A):'';
+  $('tot').style.display=A.length?'flex':'none';$('tot').innerHTML=`<div><small>Total pcs</small><b>${nf(u)}</b></div><div><small>Total nominal</small><b>${rp(nominal())}</b></div><div><small>Sisa SN</small><b style="color:${sisa<0?'var(--ac)':'var(--ok)'}">${nf(sisa)}</b></div>`;
+  save()}
+document.addEventListener('input',e=>{const t=e.target;if(t.id==='ph'||(t.dataset&&t.dataset.f==='h')){const v=num(t.value),o=v?nf(v):'';if(t.value!==o){t.value=o;try{t.setSelectionRange(o.length,o.length)}catch(_){}}}},true);
+
+document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{};
   if(d.e!==undefined){ed=+d.e;render()}
   if(d.cn!==undefined){ed=-1;render()}
   if(d.x!==undefined&&confirm('Hapus outlet ini? SN outlet sesudahnya akan bergeser.')){S.al.splice(+d.x,1);ed=-1;render()}
-  if(d.sv!==undefined){const box=t.closest('.al'),g=f=>box.querySelector(`[data-f="${f}"]`).value;const i=+d.sv;const r=rng();const q=num(g('q'));
-    const other=used()-(S.al[i].q|0);if(r&&q+other>r.tot){alert(`Jumlah melebihi stok. Maksimal ${nf(r.tot-other)} pcs.`);return}
-    S.al[i]={...S.al[i],n:g('n').trim(),q,h:num(g('h'))};ed=-1;render()}
-  if(d.c!==undefined){e.preventDefault();const A=alloc(),i=+d.c;copy(list(A[i]).map((s,j)=>`${j+1}. ${s}`).join('\n'),t)}
-  if(d.r!==undefined){e.preventDefault();const A=alloc(),i=+d.r,x=A[i];copy(`*WL ${S.p||''}*\n${i+1}. ${x.n||'-'} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})\n${x.rg.split(', ').join('\n')}`,t)}
-  if(t.id==='cs'){const A=alloc();copy(`*WL ${S.p||''}*\n\n`+A.map((x,i)=>snTxt(x,i,false)).join('\n\n')+`\n\nTotal: ${nf(used())} pcs · ${rp(S.al.reduce((s,x)=>s+x.q*(x.h||0),0))}`,t)}
+  if(d.sv!==undefined){const i=+d.sv,box=t.closest('.al');const it=[];
+    for(let k=0;k<S.sr.length;k++){const q=num(box.querySelector(`[data-eq="${k}"]`).value),h=num(box.querySelector(`[data-eh="${k}"]`).value);if(!q)continue;
+      const old=(S.al[i].it.find(z=>z.s===k)||{q:0}).q|0,mx=rng(S.sr[k]).tot-(usedS(k)-old);if(q>mx){alert(`${sName(k)}: maksimal ${nf(Math.max(0,mx))} pcs.`);return}it.push({s:k,q,h})}
+    if(!it.length){alert('Isi jumlah minimal di satu seri, atau hapus outlet.');return}
+    S.al[i]={...S.al[i],n:box.querySelector('[data-f="n"]').value.trim(),it};ed=-1;render()}
+  if(d.stg!==undefined){const i=+d.stg;if(d.v==='1')S.al[i].st=1;else delete S.al[i].st;render();return}
+  if(d.c!==undefined){const x=alloc()[+d.c];copy(x.it.map(y=>(x.it.length>1||multi()?y.p+'\n':'')+list(y).map((s,j)=>`${j+1}. ${s}`).join('\n')).join('\n\n'),t)}
+  if(d.r!==undefined){const x=alloc()[+d.r];copy(`*WL ${[...new Set(x.it.map(y=>y.p))].join(' + ')}*\n`+outTxt(x,x.i+1),t)}
+  if(t.id==='cr'){const A=alloc();copy(`*WL ${prods()}*\n`+A.map(x=>outTxt(x,x.i+1)).join('\n\n')+'\n\n'+totLine(),t)}
+  if(t.id==='cs'){const A=alloc();copy(`*WL ${prods()}*\n\n`+A.map(x=>outTxt(x,x.i+1,true)).join('\n\n')+'\n\n'+totLine(),t)}
   if(t.id==='rs'&&confirm('Hapus semua daftar outlet?')){S.al=[];ed=-1;render()}
-  if(t.id==='cr'){const A=alloc();copy(`*WL ${S.p||''}*\n`+A.map((x,i)=>`${i+1}. ${x.n||'-'} (${nf(x.q)} pcs × ${rp(x.h||0)} = ${rp(x.q*(x.h||0))})\n${x.rg.split(', ').join('\n')}`).join('\n\n')+`\n\nTotal: ${nf(used())} pcs · ${rp(S.al.reduce((s,x)=>s+x.q*(x.h||0),0))}`,t)}
-  if(t.id==='csv'){const rows=[['No','Outlet','SN','Produk','Harga']];let n=1;alloc().forEach(x=>list(x).forEach(s=>rows.push([n++,x.n,{t:s},S.p,x.h||0])));
-    rows.push([]);rows.push(['','TOTAL',used()+' pcs','',S.al.reduce((s,x)=>s+x.q*(x.h||0),0)]);
+  if(t.id==='csv'){const rows=[['No','Outlet','Produk','SN','Harga']];let n=1;alloc().forEach(x=>x.it.forEach(y=>list(y).forEach(s=>rows.push([n++,x.n,y.p,{t:s},y.h||0]))));
+    rows.push([]);rows.push(['','TOTAL','',used()+' pcs',nominal()]);
     const csv='﻿'+rows.map(r=>r.map(v=>v&&v.t?`="${v.t}"`:`"${String(v??'').replace(/"/g,'""')}"`).join(';')).join('\r\n');
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`WL_${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove()}});
-['on','oq','oh'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')add(num($('oq').value))}));
+
+// ---------- riwayat ----------
 let HQ='',HL;try{HL=JSON.parse(localStorage.getItem('wlh')||'[]')}catch(e){HL=[]}if(!Array.isArray(HL))HL=[];
 const saveH=()=>{try{localStorage.setItem('wlh',JSON.stringify(HL))}catch(e){alert('Penyimpanan HP penuh, hapus beberapa riwayat.')}};
-const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function withS(x,fn){const o=S;S=x;try{return fn()}finally{S=o}}
+function withS(x,fn){const o=S;S=mig(JSON.parse(JSON.stringify(x)));try{return fn()}finally{S=o}}
 const tglF=t=>{const d=new Date(t);return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})+' '+d.toTimeString().slice(0,5)};
-function loadRW(){RW=String(S.st||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).map(l=>{const p=l.split(/[^0-9]+/).filter(Boolean);return[p[0]||'',p[1]||'']});if(!RW.length)RW=[['','']];drawRows()}
+const snap=()=>({id:S.hid||Date.now().toString(36),t:Date.now(),sr:JSON.parse(JSON.stringify(S.sr)),al:JSON.parse(JSON.stringify(S.al))});
+function putH(it){const i=HL.findIndex(h=>h.id===it.id);if(i>=0)HL[i]=it;else HL.unshift(it);saveH()}
 function drawH(){const q=HQ.trim(),qd=q.replace(/\D/g,''),isSN=qd.length>=6&&qd===q.replace(/\s/g,'');let body='';
   if(!HL.length)body='<div style="color:var(--mu);font-size:13px">Belum ada riwayat. Setelah WL selesai, ketuk <b>💾 Simpan ke riwayat</b>.</div>';
-  else if(isSN){const hits=[];HL.forEach(h=>withS(h,()=>{alloc().forEach(x=>{for(const [a,b,l] of x.parts){const L=l||x.L;
-      if(qd.length<L){for(let c=a;c<=b;c++){const sn=pad(c,L);if(sn.endsWith(qd))hits.push({h,x,sn})}}else{const A=BigInt(qd);if(A>=a&&A<=b)hits.push({h,x,sn:pad(A,L)})}}})}));
-    body=hits.length?hits.slice(0,30).map(r=>`<div class="al"><div class="h"><b>${esc(r.x.n||'-')}</b><span class="m">${tglF(r.h.t)}</span></div><div class="rg mono">${r.sn}</div><div class="m">${esc(r.h.p||'-')} · ${rp(r.x.h||0)}/pcs</div></div>`).join(''):'<div style="color:var(--mu);font-size:13px">SN tidak ditemukan di riwayat.</div>'}
-  else{const k=q.toLowerCase();const H=HL.filter(h=>!k||(h.p||'').toLowerCase().includes(k)||h.al.some(a=>(a.n||'').toLowerCase().includes(k)));
-    body=H.length?H.map(h=>{const pcs=h.al.reduce((s,x)=>s+(x.q|0),0),tot=h.al.reduce((s,x)=>s+x.q*(x.h||0),0);
-      return `<div class="al"${S.hid===h.id?' style="border-color:var(--ac)"':''}><div class="h"><b>${tglF(h.t)}</b><span class="m">${esc(h.p||'-')}</span></div><div class="m">${h.al.length} outlet · ${nf(pcs)} pcs · <span class="sm">${rp(tot)}</span>${S.hid===h.id?' · <b style="color:var(--ac)">sedang dibuka</b>':''}</div><div class="m" style="font-size:12px;margin-top:2px">${esc(h.al.map(a=>a.n||'-').join(', ').slice(0,160))}</div><div class="row" style="margin-top:6px"><button class="btn s" data-ho="${h.id}">Buka</button><button class="btn d" data-hx="${h.id}">Hapus</button></div></div>`}).join(''):'<div style="color:var(--mu);font-size:13px">Tidak ada yang cocok.</div>'}
+  else if(isSN){const hits=[];HL.forEach(h=>withS(h,()=>{alloc().forEach(x=>x.it.forEach(y=>{for(const [a,b,L] of y.parts){
+      if(qd.length<L){for(let c=a;c<=b;c++){const sn=pad(c,L);if(sn.endsWith(qd))hits.push({h,x,y,sn})}}else{const A=BigInt(qd);if(A>=a&&A<=b)hits.push({h,x,y,sn:pad(A,L)})}}}))}));
+    body=hits.length?hits.slice(0,30).map(r=>`<div class="al"><div class="h"><b>${esc(r.x.n||'-')}</b><span class="m">${tglF(r.h.t)}</span></div><div class="rg mono">${r.sn}</div><div class="m">${esc(r.y.p)} · ${rp(r.y.h||0)}/pcs</div></div>`).join(''):'<div style="color:var(--mu);font-size:13px">SN tidak ditemukan di riwayat.</div>'}
+  else{const k=q.toLowerCase();const H=HL.map(h=>({h,m:mig(JSON.parse(JSON.stringify(h)))})).filter(({m})=>!k||m.sr.some(r=>(r.p||'').toLowerCase().includes(k))||m.al.some(a=>(a.n||'').toLowerCase().includes(k)));
+    body=H.length?H.map(({h,m})=>{const pcs=m.al.reduce((s,o)=>s+o.it.reduce((t,x)=>t+(x.q|0),0),0),tot=m.al.reduce((s,o)=>s+o.it.reduce((t,x)=>t+(x.q|0)*(x.h||0),0),0),pr=[...new Set(m.sr.map((r,i)=>r.p||'Seri '+(i+1)))].join(', ');
+      return `<div class="al"${S.hid===h.id?' style="border-color:var(--ac)"':''}><div class="h"><b>${tglF(h.t)}</b><span class="m">${esc(pr)}</span></div><div class="m">${m.al.length} outlet · ${nf(pcs)} pcs · <span class="sm">${rp(tot)}</span>${S.hid===h.id?' · <b style="color:var(--ac)">sedang dibuka</b>':''}</div><div class="m" style="font-size:12px;margin-top:2px">${esc(m.al.map(a=>a.n||'-').join(', ').slice(0,160))}</div><div class="row" style="margin-top:6px"><button class="btn s" data-ho="${h.id}">Buka</button><button class="btn d" data-hx="${h.id}">Hapus</button></div></div>`}).join(''):'<div style="color:var(--mu);font-size:13px">Tidak ada yang cocok.</div>'}
   $('hist').innerHTML=`<h2>Riwayat WL (${HL.length})</h2><input id="hq" placeholder="Cari SN (boleh 6 digit terakhir), outlet, atau produk" value="${esc(HQ)}"><div id="hb">${body}</div>`;}
+function reload(){ed=-1;F.q=[];F.h=[];drawSeri();drawForm();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}
 document.addEventListener('input',e=>{if(e.target.id==='hq'){HQ=e.target.value;drawH();const i=$('hq');i.focus();i.setSelectionRange(HQ.length,HQ.length)}});
-document.addEventListener('click',e=>{const t=e.target,d=t.dataset;
-  if(t.id==='hsv'){if(!S.al.length){alert('Belum ada outlet.');return}const it={id:S.hid||Date.now().toString(36),t:Date.now(),p:S.p,st:S.st,al:JSON.parse(JSON.stringify(S.al))};
-    const i=HL.findIndex(h=>h.id===it.id);if(i>=0)HL[i]=it;else HL.unshift(it);S.hid=it.id;saveH();save();drawH();t.textContent='Tersimpan ✓';setTimeout(()=>{const b=$('hsv');if(b)b.textContent='💾 Simpan ke riwayat'},1500)}
-  if(t.id==='nw'){if(S.al.length&&!HL.some(h=>h.id===S.hid)&&!confirm('WL sekarang belum disimpan ke riwayat. Tetap mulai baru?'))return;S={st:'',p:S.p,al:[]};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}
-  if(d.ho){const h=HL.find(x=>x.id===d.ho);if(!h)return;if(S.al.length&&S.hid!==h.id&&!confirm('Ganti WL yang sedang dikerjakan dengan riwayat ini?'))return;
-    S={st:h.st,p:h.p,al:JSON.parse(JSON.stringify(h.al)),hid:h.id};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}
-  if(d.hx&&confirm('Hapus riwayat ini?')){HL=HL.filter(h=>h.id!==d.hx);if(S.hid===d.hx)delete S.hid;saveH();save();drawH()}});
-// ---- Sisa WL (belum ST) ----
-function sisaData(A){return (A||alloc()).map((x,i)=>({x,i})).filter(o=>!o.x.st&&o.x.q>0)}
-function sisaHTML(A){const B=sisaData(A),all=A.filter(x=>x.q>0).length,pcs=B.reduce((s,o)=>s+(o.x.q|0),0);
-  return `<div class="card"><h2>4. Sisa WL belum ST</h2><div class="stk"><div><small>Outlet sudah ST</small><b style="color:var(--ok)">${all-B.length}/${all}</b></div><div><small>Sisa belum ST</small><b style="color:${pcs?'var(--ac)':'var(--ok)'}">${nf(pcs)} pcs</b></div></div>
-  ${B.length?B.map(o=>`<div class="al"><div class="h"><b>${o.i+1}. ${esc(o.x.n||'(tanpa nama)')}</b><span class="m">${nf(o.x.q)} pcs</span></div><div class="rg mono">${o.x.rg}</div></div>`).join('')+`<div class="row"><button class="btn" id="kum">📋 Kumpulkan semua sisa WL</button><button class="btn s" id="kst">↩ Jadikan stok WL baru</button></div><div class="m" style="margin-top:6px;color:var(--mu);font-size:12.5px">Kumpulkan = salin rentang SN sisa per outlet. Jadikan stok = simpan WL ini ke riwayat, lalu mulai WL baru dengan stok dari SN sisa.</div>`:'<div class="m" style="margin-top:8px;color:var(--ok);font-weight:600">Semua outlet sudah ST ✓</div>'}</div>`}
-function sisaTxt(){const B=sisaData();return `*Sisa WL belum ST${S.p?' – '+S.p:''}*\n`+B.map((o,k)=>`${k+1}. ${o.x.n||'-'} (${nf(o.x.q)} pcs)\n`+o.x.rg.split(', ').join('\n')).join('\n\n')+`\n\nTotal sisa: ${nf(B.reduce((s,o)=>s+(o.x.q|0),0))} pcs`}
 document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{};
-  if(d.stg!==undefined){const i=+d.stg;if(d.v==='1')S.al[i].st=1;else delete S.al[i].st;render();return}
+  if(t.id==='hsv'){if(!S.al.length){alert('Belum ada outlet.');return}const it=snap();putH(it);S.hid=it.id;save();drawH();t.textContent='Tersimpan ✓';setTimeout(()=>{const b=$('hsv');if(b)b.textContent='💾 Simpan ke riwayat'},1500)}
+  if(t.id==='nw'){if(S.al.length&&!HL.some(h=>h.id===S.hid)&&!confirm('WL sekarang belum disimpan ke riwayat. Tetap mulai baru?'))return;S={sr:S.sr.map(r=>({p:r.p,h:r.h,rw:[['','']]})),al:[]};reload()}
+  if(d.ho){const h=HL.find(x=>x.id===d.ho);if(!h)return;if(S.al.length&&S.hid!==h.id&&!confirm('Ganti WL yang sedang dikerjakan dengan riwayat ini?'))return;
+    S=mig(JSON.parse(JSON.stringify(h)));S.hid=h.id;delete S.t;delete S.id;reload()}
+  if(d.hx&&confirm('Hapus riwayat ini?')){HL=HL.filter(h=>h.id!==d.hx);if(S.hid===d.hx)delete S.hid;saveH();save();drawH()}});
+
+// ---------- sisa WL (belum ST) ----------
+function sisaData(A){return (A||alloc()).filter(x=>!x.st&&x.q>0)}
+function sisaHTML(A){const B=sisaData(A),all=A.filter(x=>x.q>0).length,pcs=B.reduce((s,x)=>s+x.q,0);
+  return `<div class="card"><h2>4. Sisa WL belum ST</h2><div class="stk"><div><small>Outlet sudah ST</small><b style="color:var(--ok)">${all-B.length}/${all}</b></div><div><small>Sisa belum ST</small><b style="color:${pcs?'var(--ac)':'var(--ok)'}">${nf(pcs)} pcs</b></div></div>
+  ${B.length?B.map(x=>`<div class="al"><div class="h"><b>${x.i+1}. ${esc(x.n||'(tanpa nama)')}</b><span class="m">${nf(x.q)} pcs</span></div>${x.it.map(y=>`<div class="it">${multi()?`<div class="ip">${esc(y.p)} · ${nf(y.q)} pcs</div>`:''}<div class="rg mono">${rgL(y).replace(/\n/g,'<br>')}</div></div>`).join('')}</div>`).join('')+`<div class="row"><button class="btn" id="kum">📋 Kumpulkan semua sisa WL</button><button class="btn s" id="kst">↩ Jadikan stok WL baru</button></div><div class="m" style="margin-top:6px;color:var(--mu);font-size:12.5px">Kumpulkan = salin rentang SN sisa per outlet. Jadikan stok = simpan WL ini ke riwayat, lalu mulai WL baru dengan stok dari SN sisa (per seri).</div>`:'<div class="m" style="margin-top:8px;color:var(--ok);font-weight:600">Semua outlet sudah ST ✓</div>'}</div>`}
+function sisaTxt(){const B=sisaData();const per={};B.forEach(x=>x.it.forEach(y=>per[y.p]=(per[y.p]||0)+y.q));
+  return `*Sisa WL belum ST – ${prods()}*\n`+B.map((x,k)=>`${k+1}. ${x.n||'-'} (${nf(x.q)} pcs)\n`+x.it.map(y=>(multi()?`${y.p} (${nf(y.q)} pcs)\n`:'')+rgL(y)).join('\n')).join('\n\n')+`\n\nTotal sisa: ${nf(B.reduce((s,x)=>s+x.q,0))} pcs`+(multi()?'\n'+Object.entries(per).map(([p,q])=>`${p}: ${nf(q)} pcs`).join('\n'):'')}
+document.addEventListener('click',e=>{const t=e.target;
   if(t.id==='kum'){copy(sisaTxt(),t);return}
-  if(t.id==='kst'){const B=sisaData();if(!B.length)return;if(!confirm(`Simpan WL ini ke riwayat lalu mulai WL baru dengan stok ${nf(B.reduce((s,o)=>s+(o.x.q|0),0))} SN sisa?`))return;
-    const it={id:S.hid||Date.now().toString(36),t:Date.now(),p:S.p,st:S.st,al:JSON.parse(JSON.stringify(S.al))};const k=HL.findIndex(h=>h.id===it.id);if(k>=0)HL[k]=it;else HL.unshift(it);saveH();
-    const lines=[];B.forEach(o=>o.x.parts.forEach(([a,b,l])=>{const L=l||o.x.L;lines.push(a===b?pad(a,L):pad(a,L)+' - '+pad(b,L))}));
-    S={st:lines.join('\n'),p:S.p,al:[]};loadRW();drawC();render();drawH();window.scrollTo({top:0,behavior:'smooth'})}});
-// ---- Barcode SN awal & akhir per outlet ----
+  if(t.id==='kst'){const B=sisaData();if(!B.length)return;if(!confirm(`Simpan WL ini ke riwayat lalu mulai WL baru dengan stok ${nf(B.reduce((s,x)=>s+x.q,0))} SN sisa?`))return;
+    putH(snap());const rw=S.sr.map(()=>[]);B.forEach(x=>x.it.forEach(y=>y.parts.forEach(([a,b,l])=>rw[y.s].push([pad(a,l),a===b?'':pad(b,l)]))));
+    S={sr:S.sr.map((r,k)=>({p:r.p,h:r.h,rw:rw[k]})).filter(r=>r.rw.length),al:[]};if(!S.sr.length)S.sr=[blankSr()];reload()}});
+
+// ---------- barcode SN awal & akhir ----------
 const BQ=document.createElement('div');BQ.style.cssText='position:fixed;inset:0;z-index:9999;background:#fff;color:#000;display:none;overflow:auto;padding:calc(64px + env(safe-area-inset-top,0px)) 16px 30px;text-align:center';document.body.appendChild(BQ);
 let BF='fisik';try{BF=localStorage.getItem('wlbf')||'fisik'}catch(e){}
 function saPS(){let o={pre:'S236x',suf:'00000823'};try{const x=JSON.parse(localStorage.getItem('so_sa1')||'null');if(x){if(x.pre!==undefined)o.pre=x.pre;if(x.suf!==undefined)o.suf=x.suf}}catch(e){}return o}
@@ -184,20 +238,21 @@ function codeHTML(sn,lab){const c=codeOf(sn);return `<div style="margin:0 auto 2
   <div style="margin:8px auto 6px;${c.t==='qr'?'width:min(62vw,250px)':'width:100%'}">${c.t==='qr'?QR.svg(c.v,'100%'):bcSvg(c.v,110)}</div>
   <div style="font:700 20px ui-monospace,monospace;letter-spacing:1px">${sn}</div>${c.v!==sn?`<div style="font-size:11px;color:#777;word-break:break-all">${esc(c.v)}</div>`:''}</div>`}
 let BI=-1,BS=0;
-function steps(x){const o=[];x.parts.forEach(([a,b,l],k)=>{const L=l||x.L,n=Number(b-a)+1,rg=x.parts.length>1?`Rentang ${k+1} · `:'';if(a===b)o.push({sn:pad(a,L),lab:'SN (1 pcs)',sub:rg+'1 pcs'});else{o.push({sn:pad(a,L),lab:'SN AWAL',sub:rg+nf(n)+' pcs'});o.push({sn:pad(b,L),lab:'SN AKHIR',sub:rg+nf(n)+' pcs'})}});return o}
-function showBQ(i,k){const A=alloc(),x=A[i];if(!x)return;BI=i;const St=steps(x);BS=Math.max(0,Math.min(k||0,St.length-1));const c=St[BS];
+function steps(x){const o=[],nP=x.it.reduce((s,y)=>s+y.parts.length,0);x.it.forEach(y=>y.parts.forEach(([a,b,L],k)=>{const n=Number(b-a)+1,pre=(x.it.length>1||multi()?y.p+' · ':'')+(y.parts.length>1?`Rentang ${k+1} · `:'');
+  if(a===b)o.push({sn:pad(a,L),lab:'SN (1 pcs)',sub:pre+'1 pcs'});else{o.push({sn:pad(a,L),lab:'SN AWAL',sub:pre+nf(n)+' pcs'});o.push({sn:pad(b,L),lab:'SN AKHIR',sub:pre+nf(n)+' pcs'})}}));return o}
+function showBQ(i,k){const A=alloc(),x=A[i];if(!x)return;BI=i;const St=steps(x);if(!St.length)return;BS=Math.max(0,Math.min(k||0,St.length-1));const c=St[BS];
   const btn='border:1px solid #bbb;background:#e8e8e8;color:#000;font-weight:700;border-radius:12px;padding:12px 16px;font-size:16px';
   const last=BS===St.length-1,first=BS===0,nxO=last&&i<A.length-1,pvO=first&&i>0;
   BQ.innerHTML=`<div style="position:fixed;left:0;right:0;top:0;background:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 8px;display:flex;gap:8px;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;z-index:2">
      <button data-bqx style="${btn};padding:9px 14px;font-size:15px">✕ Tutup</button>
      <div style="display:inline-flex;border:1px solid #ccc;border-radius:10px;overflow:hidden">${[['fisik','Seperti fisik'],['sn','SN saja']].map(([k,t])=>`<button data-bqf="${k}" style="border:0;padding:8px 10px;font-size:12.5px;font-weight:700;background:${BF===k?'#c8102e':'#fff'};color:${BF===k?'#fff':'#000'}">${t}</button>`).join('')}</div></div>
    <div style="font:700 19px system-ui">${i+1}. ${esc(x.n||'(tanpa nama)')}</div>
-   <div style="font-size:13px;color:#555;margin:2px 0 4px">${esc(S.p||'')}${S.p?' · ':''}${c.sub} · langkah ${BS+1}/${St.length}</div>
-   <div style="display:flex;justify-content:center;gap:6px;margin:6px 0 14px">${St.map((_,k)=>`<i style="width:${k===BS?22:8}px;height:8px;border-radius:4px;background:${k===BS?'#c8102e':'#ddd'};display:block"></i>`).join('')}</div>
+   <div style="font-size:13px;color:#555;margin:2px 0 4px">${esc(c.sub)} · langkah ${BS+1}/${St.length}</div>
+   <div style="display:flex;justify-content:center;gap:6px;margin:6px 0 14px;flex-wrap:wrap">${St.map((_,k)=>`<i style="width:${k===BS?22:8}px;height:8px;border-radius:4px;background:${k===BS?'#c8102e':'#ddd'};display:block"></i>`).join('')}</div>
    ${codeHTML(c.sn,c.lab)}
    <div style="display:flex;gap:10px;justify-content:center;margin-top:4px">
      <button data-bqs="-1" style="${btn};${first&&!pvO?'opacity:.35':''}">‹ ${pvO?'Outlet sebelumnya':'Kembali'}</button>
-     <button data-bqs="1" style="${btn};background:#c8102e;color:#fff;border-color:#c8102e;${last&&!nxO?'opacity:.35':''}">${last?(nxO?'Outlet berikutnya ›':'Selesai'):'Lanjut ke '+St[BS+1].lab.replace('SN ','SN ')+' ›'}</button></div>`;
+     <button data-bqs="1" style="${btn};background:#c8102e;color:#fff;border-color:#c8102e;${last&&!nxO?'opacity:.35':''}">${last?(nxO?'Outlet berikutnya ›':'Selesai'):'Lanjut ke '+St[BS+1].lab+' ›'}</button></div>`;
   BQ.style.display='block';BQ.scrollTop=0;if(!BQ._w)try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(w=>BQ._w=w).catch(()=>{})}catch(_){}}
 const closeBQ=()=>{BQ.style.display='none';try{BQ._w&&BQ._w.release();BQ._w=null}catch(_){}};
 BQ.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
@@ -206,6 +261,7 @@ BQ.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
   if(d.bqs){const A=alloc(),St=steps(A[BI]),k=BS+(+d.bqs);
     if(k>=0&&k<St.length)showBQ(BI,k);else if(k<0&&BI>0)showBQ(BI-1,steps(A[BI-1]).length-1);else if(k>=St.length){if(BI<A.length-1)showBQ(BI+1,0);else closeBQ()}}});
 document.addEventListener('click',e=>{const t=e.target;if(t.dataset&&t.dataset.bq!==undefined)showBQ(+t.dataset.bq)});
-render();drawH();
+
+drawSeri();drawForm();render();drawH();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
 </script><script src="qr.js"></script><script src="c128.js"></script><script src="nav.js"></script></body></html>
