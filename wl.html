@@ -151,8 +151,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.target.id==='on'|
 // ---------- teks salin ----------
 function outHead(x,n){return S.sr.length===1&&x.it.length===1?`${n}. ${x.n||'-'} (${nf(x.q)} pcs × ${rp(x.it[0].h||0)} = ${rp(x.tot)})`:`${n}. ${x.n||'-'} (${nf(x.q)} pcs · ${rp(x.tot)})`}
 function outTxt(x,n,sn){if(S.sr.length===1&&x.it.length===1){const y=x.it[0];return outHead(x,n)+'\n'+rgL(y)+(sn?'\n'+list(y).map((s,j)=>`   ${j+1}. ${s}`).join('\n'):'')}
-  return outHead(x,n)+'\n'+x.it.map(y=>`${y.p}: ${nf(y.q)} pcs × ${rp(y.h||0)}\n${rgL(y)}`+(sn?'\n'+list(y).map((s,j)=>`   ${j+1}. ${s}`).join('\n'):'')).join('\n')}
-const totLine=()=>{const A=alloc();let t=`Total: ${nf(used())} pcs · ${rp(nominal())}`;if(multi())t+='\n'+S.sr.map((r,k)=>`${sName(k)}: ${nf(usedS(k))} pcs`).join('\n');return t};
+  return outHead(x,n)+'\n\n'+x.it.map(y=>`${y.p}: ${nf(y.q)} pcs × ${rp(y.h||0)}\n${rgL(y)}`+(sn?'\n'+list(y).map((s,j)=>`   ${j+1}. ${s}`).join('\n'):'')).join('\n\n')}
+const totLine=()=>{const A=alloc();let t=`Total: ${nf(used())} pcs · ${rp(nominal())}`;if(multi())t+='\n\n'+S.sr.map((r,k)=>`${sName(k)}: ${nf(usedS(k))} pcs`).join('\n');return t};
 
 // ---------- render ----------
 function render(){
@@ -183,8 +183,8 @@ document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{};
   if(d.stg!==undefined){const i=+d.stg;if(d.v==='1')S.al[i].st=1;else delete S.al[i].st;render();return}
   if(d.c!==undefined){const x=alloc()[+d.c];copy(x.it.map(y=>(x.it.length>1||multi()?y.p+'\n':'')+list(y).map((s,j)=>`${j+1}. ${s}`).join('\n')).join('\n\n'),t)}
   if(d.r!==undefined){const x=alloc()[+d.r];copy(`*WL ${[...new Set(x.it.map(y=>y.p))].join(' + ')}*\n`+outTxt(x,x.i+1),t)}
-  if(t.id==='cr'){const A=alloc();copy(`*WL ${prods()}*\n`+A.map(x=>outTxt(x,x.i+1)).join('\n\n')+'\n\n'+totLine(),t)}
-  if(t.id==='cs'){const A=alloc();copy(`*WL ${prods()}*\n\n`+A.map(x=>outTxt(x,x.i+1,true)).join('\n\n')+'\n\n'+totLine(),t)}
+  if(t.id==='cr'){const A=alloc();copy(`*WL ${prods()}*\n`+A.map(x=>outTxt(x,x.i+1)).join(multi()?'\n\n\n':'\n\n')+(multi()?'\n\n\n':'\n\n')+totLine(),t)}
+  if(t.id==='cs'){const A=alloc();copy(`*WL ${prods()}*\n\n`+A.map(x=>outTxt(x,x.i+1,true)).join(multi()?'\n\n\n':'\n\n')+(multi()?'\n\n\n':'\n\n')+totLine(),t)}
   if(t.id==='rs'&&confirm('Hapus semua daftar outlet?')){S.al=[];ed=-1;render()}
   if(t.id==='csv'){const rows=[['No','Outlet','Produk','SN','Harga']];let n=1;alloc().forEach(x=>x.it.forEach(y=>list(y).forEach(s=>rows.push([n++,x.n,y.p,{t:s},y.h||0]))));
     rows.push([]);rows.push(['','TOTAL','',used()+' pcs',nominal()]);
@@ -222,7 +222,7 @@ function sisaHTML(A){const B=sisaData(A),all=A.filter(x=>x.q>0).length,pcs=B.red
   return `<div class="card"><h2>4. Sisa WL belum ST</h2><div class="stk"><div><small>Outlet sudah ST</small><b style="color:var(--ok)">${all-B.length}/${all}</b></div><div><small>Sisa belum ST</small><b style="color:${pcs?'var(--ac)':'var(--ok)'}">${nf(pcs)} pcs</b></div></div>
   ${B.length?B.map(x=>`<div class="al"><div class="h"><b>${x.i+1}. ${esc(x.n||'(tanpa nama)')}</b><span class="m">${nf(x.q)} pcs</span></div>${x.it.map(y=>`<div class="it">${multi()?`<div class="ip">${esc(y.p)} · ${nf(y.q)} pcs</div>`:''}<div class="rg mono">${rgL(y).replace(/\n/g,'<br>')}</div></div>`).join('')}</div>`).join('')+`<div class="row"><button class="btn" id="kum">📋 Kumpulkan semua sisa WL</button><button class="btn s" id="kst">↩ Jadikan stok WL baru</button></div><div class="m" style="margin-top:6px;color:var(--mu);font-size:12.5px">Kumpulkan = salin rentang SN sisa per outlet. Jadikan stok = simpan WL ini ke riwayat, lalu mulai WL baru dengan stok dari SN sisa (per seri).</div>`:'<div class="m" style="margin-top:8px;color:var(--ok);font-weight:600">Semua outlet sudah ST ✓</div>'}</div>`}
 function sisaTxt(){const B=sisaData();const per={};B.forEach(x=>x.it.forEach(y=>per[y.p]=(per[y.p]||0)+y.q));
-  return `*Sisa WL belum ST – ${prods()}*\n`+B.map((x,k)=>`${k+1}. ${x.n||'-'} (${nf(x.q)} pcs)\n`+x.it.map(y=>(multi()?`${y.p} (${nf(y.q)} pcs)\n`:'')+rgL(y)).join('\n')).join('\n\n')+`\n\nTotal sisa: ${nf(B.reduce((s,x)=>s+x.q,0))} pcs`+(multi()?'\n'+Object.entries(per).map(([p,q])=>`${p}: ${nf(q)} pcs`).join('\n'):'')}
+  return `*Sisa WL belum ST – ${prods()}*\n`+B.map((x,k)=>`${k+1}. ${x.n||'-'} (${nf(x.q)} pcs)\n`+(multi()?'\n':'')+x.it.map(y=>(multi()?`${y.p} (${nf(y.q)} pcs)\n`:'')+rgL(y)).join(multi()?'\n\n':'\n')).join(multi()?'\n\n\n':'\n\n')+(multi()?'\n\n\n':'\n\n')+`Total sisa: ${nf(B.reduce((s,x)=>s+x.q,0))} pcs`+(multi()?'\n\n'+Object.entries(per).map(([p,q])=>`${p}: ${nf(q)} pcs`).join('\n'):'')}
 document.addEventListener('click',e=>{const t=e.target;
   if(t.id==='kum'){copy(sisaTxt(),t);return}
   if(t.id==='kst'){const B=sisaData();if(!B.length)return;if(!confirm(`Simpan WL ini ke riwayat lalu mulai WL baru dengan stok ${nf(B.reduce((s,x)=>s+x.q,0))} SN sisa?`))return;
