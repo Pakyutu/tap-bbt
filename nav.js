@@ -6,6 +6,7 @@
     ["digipos.html","Dashboard DIGIPOS"],
     ["penjualan.html","Dashboard Penjualan"],
     ["wl.html","Penyusun WL"],
+    ["kalkulator.html","Kalkulator Jualan"],
     ["cekst.html","Cek WL vs ST"]
   ];
   var css = ''
