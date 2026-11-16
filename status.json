@@ -44,6 +44,11 @@
 "g": "Penjualan",
 "n": "Stock on Hand",
 "d": "2026-11-14"
+},
+{
+"g": "Penjualan",
+"n": "Stock Gudang",
+"d": "2026-11-16"
 }
 ]
 }
