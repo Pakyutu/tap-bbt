@@ -37,7 +37,8 @@ const $=i=>document.getElementById(i),nf=v=>Math.round(v).toLocaleString('id-ID'
 const col=p=>p>=90?'var(--ok)':p>=75?'var(--wn)':'var(--ac)',tg=d=>{const x=new Date(d+'T00:00:00');return x.getDate()+' '+['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][x.getMonth()]};
 const rg=r=>r.replace('-',' – ');
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
-const GK=Object.keys(CK.G||{});let P=GK[0]||'VF NOV',F='all';
+const BL=['JAN','FEB','MAR','APR','MEI','JUN','JUL','AGU','AGS','SEP','OKT','NOV','DES'],mi=k=>{const m=k.split(' ')[1]||'';const i=BL.indexOf(m);return i<0?99:(m==='AGS'?7:i>7?i-1:i)};
+const GK=Object.keys(CK.G||{}).sort((a,b)=>(a.split(' ')[0]>b.split(' ')[0]?-1:a.split(' ')[0]<b.split(' ')[0]?1:0)||mi(a)-mi(b));let P=GK[0]||'VF NOV',F='all';
 $('pt').innerHTML=GK.map(k=>`<button data-p="${k}" class="${k===P?'on':''}">${k}</button>`).join('');
 const cut=()=>P.startsWith('VF')?CK.cutVF:CK.cutSA;
 function draw(){const C=CK.G[P];
