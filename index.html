@@ -96,6 +96,11 @@ a.card:after{content:"";position:absolute;inset:0;border-radius:inherit;padding:
       <div class="tx"><b>Cek WL vs ST</b><span>WL dropingan SF vs ST Digipos · % ST per SF · rentang SN belum ST</span></div>
       <div class="arr">›</div>
     </a>
+    <a class="card rmd" href="pengingat.html" style="--c1:#b7791f;--c2:#c8102e">
+      <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M5 3L2 6M19 3l3 3"/></svg></div>
+      <div class="tx"><b>Pengingat Harian</b><span>Kirim data SURYA, rekap jualan · pasang alarm di Kalender HP</span></div>
+      <div class="arr">›</div>
+    </a>
     <a class="card bk" href="backup.html" style="--c1:#5b6b85;--c2:#14213d">
       <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></div>
       <div class="tx"><b>Backup Data</b><span>Simpan riwayat WL, nota & produk jadi file · pulihkan di HP baru</span></div>
@@ -149,4 +154,4 @@ fetch("status.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{const t=new D
   h+=`<div class="it"><span>${x.n}</span><span class="tg ${c}">${d.getDate()} ${B[d.getMonth()]}${a>2?" · "+a+" hr lalu":""}</span></div>`});
  document.getElementById("dstl").innerHTML=h;document.getElementById("dsts").innerHTML=late?`<span style="color:var(--red2)">⚠ ${late} perlu update</span>`:"semua terbaru ✓";
 }).catch(()=>{document.getElementById("dstl").innerHTML='<span class="mu">Status data tidak bisa dimuat (offline?).</span>'})})();
-</script></body></html>
+</script><script src="remind.js"></script></body></html>

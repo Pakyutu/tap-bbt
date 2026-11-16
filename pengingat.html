@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pengingat Harian</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0d0f14"><link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--tx:#14213d;--mu:#5b6b85;--bd:#e3e8f0;--soft:#eef2f8;--ac:#c8102e;--ok:#0f8a52}
+@media (prefers-color-scheme:dark){:root{--bg:#0d0f14;--card:#171b25;--tx:#eef1f6;--mu:#98a2b6;--bd:#283041;--soft:#1f2533;--ok:#4cd38f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:max(16px,env(safe-area-inset-top)) 16px 60px}
+.w{max-width:620px;margin:0 auto}h1{font-size:22px;margin:6px 60px 4px 0}.sub{color:var(--mu);font-size:13px;margin-bottom:12px;line-height:1.5}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}.card h2{font-size:16px;margin:0 0 6px}
+input{width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);font-size:15px;font-family:inherit}
+label{display:block;font-size:12px;color:var(--mu);margin:8px 0 4px}
+.btn{padding:10px 14px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;display:inline-block}.btn.s{background:var(--soft);color:var(--tx);border:1px solid var(--bd);font-size:13px;padding:8px 11px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.rm{border:1px solid var(--bd);border-radius:12px;padding:11px 12px;margin-top:10px}.rm.off{opacity:.5}
+.rm .h{display:flex;justify-content:space-between;align-items:center;gap:8px}.rm .t{font-size:22px;font-weight:800}.rm .n{font-weight:600;font-size:14.5px;margin-top:2px}.rm .d{color:var(--mu);font-size:12.5px;margin-top:2px}
+.dy{display:flex;gap:4px;flex-wrap:wrap}.dy button{width:38px;padding:7px 0;border-radius:8px;border:1px solid var(--bd);background:transparent;color:var(--mu);font-size:12.5px;font-weight:600;cursor:pointer}.dy button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.sw{position:relative;width:46px;height:26px;flex:none}.sw input{display:none}.sw span{position:absolute;inset:0;background:var(--bd);border-radius:999px;transition:.2s}.sw span:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}.sw input:checked+span{background:var(--ok)}.sw input:checked+span:before{transform:translateX(20px)}
+.g2{display:grid;grid-template-columns:1fr 140px;gap:8px}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 8px;margin-left:6px}.due{background:rgba(200,16,46,.12);color:var(--ac)}.dn{background:rgba(15,138,82,.14);color:var(--ok)}
+ol{margin:6px 0 0;padding-left:20px;font-size:13.5px;line-height:1.6}
+</style></head><body><div class="w">
+<h1>Pengingat Harian</h1><div class="sub">Atur pengingat rutin. Supaya HP <b>tetap berbunyi walau aplikasi ditutup</b>, ketuk <b>📅 Pasang di Kalender</b> di tiap pengingat. Kalender HP yang akan membunyikan alarmnya setiap hari.</div>
+<div class="card"><h2>Pengingat</h2><div id="ls"></div></div>
+<div class="card"><h2>Tambah pengingat</h2>
+  <div class="g2"><div><label>Judul</label><input id="nn" placeholder="mis. Kirim data SURYA"></div><div><label>Jam</label><input id="nt" type="time" value="09:00"></div></div>
+  <label>Hari</label><div class="dy" id="nd"></div>
+  <label>Catatan (opsional)</label><input id="nc" placeholder="mis. Detail Outlet PV/SA, MoM, SOH">
+  <div class="row"><button class="btn" id="add">＋ Tambah</button></div></div>
+<div class="card"><h2>Notifikasi saat aplikasi dibuka</h2><div class="sub" style="margin:0">Kalau diizinkan, aplikasi juga memberi notifikasi pengingat yang sudah lewat jamnya setiap kali aplikasi dibuka.</div>
+  <div class="row"><button class="btn s" id="np">🔔 Izinkan notifikasi</button><span id="ns" style="font-size:13px;color:var(--mu)"></span></div></div>
+<div class="card"><h2>Cara pasang di Kalender</h2><ol>
+  <li>Ketuk <b>📅 Pasang di Kalender</b> → pilih <b>Google Calendar</b>.</li>
+  <li>Cek jam & pengulangan sudah benar, lalu <b>Simpan</b>.</li>
+  <li>Kalender akan memberi notifikasi tiap hari sesuai jadwal. Ketuk notifikasinya, lalu buka aplikasi TAP BBT.</li>
+  <li>Kalau HP pakai kalender lain (Samsung, dll.), pilih <b>⬇️ File .ics</b> lalu buka filenya.</li></ol></div>
+</div>
+<script>
+const $=i=>document.getElementById(i),esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const DN=['Min','Sen','Sel','Rab','Kam','Jum','Sab'],RD=['SU','MO','TU','WE','TH','FR','SA'];
+const D0=[{id:'r1',n:'Kirim data SURYA ke Claude',c:'Detail Outlet PV/SA, MoM Sales Tap, Stock on Hand, Stock Gudang',t:'09:00',d:[1,2,3,4,5,6],on:1},
+ {id:'r2',n:'Kirim ST Digipos & Klik Misi',c:'File ST Gabungan + Monitoring Klik Misi',t:'10:00',d:[1,2,3,4,5,6],on:1},
+ {id:'r3',n:'Rekap jualan hari ini',c:'Kalkulator Jualan → Salin rekap hari ini',t:'20:00',d:[0,1,2,3,4,5,6],on:1}];
+let L;try{L=JSON.parse(localStorage.getItem('remind')||'null')}catch(e){}if(!Array.isArray(L))L=D0;
+let DONE;try{DONE=JSON.parse(localStorage.getItem('remind_done')||'{}')}catch(e){DONE={}}
+const save=()=>{try{localStorage.setItem('remind',JSON.stringify(L));localStorage.setItem('remind_done',JSON.stringify(DONE))}catch(e){}};
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
+const due=r=>{const n=new Date(),[h,m]=r.t.split(':').map(Number);return r.on&&r.d.includes(n.getDay())&&(n.getHours()*60+n.getMinutes())>=h*60+m};
+const dtxt=d=>d.length===7?'Setiap hari':d.join()==='1,2,3,4,5,6'?'Senin–Sabtu':d.join()==='1,2,3,4,5'?'Senin–Jumat':d.map(x=>DN[x]).join(', ');
+function nextDate(r){const n=new Date(),[h,m]=r.t.split(':').map(Number);for(let k=0;k<8;k++){const x=new Date(n.getFullYear(),n.getMonth(),n.getDate()+k,h,m);if(r.d.includes(x.getDay())&&x>n)return x}return new Date(n.getFullYear(),n.getMonth(),n.getDate()+1,h,m)}
+const f2=v=>String(v).padStart(2,'0'),zst=x=>x.toISOString().replace(/[-:]/g,'').slice(0,15)+'Z',stamp=x=>x.getFullYear()+f2(x.getMonth()+1)+f2(x.getDate())+'T'+f2(x.getHours())+f2(x.getMinutes())+'00';
+const rrule=r=>r.d.length===7?'RRULE:FREQ=DAILY':'RRULE:FREQ=WEEKLY;BYDAY='+r.d.map(x=>RD[x]).join(',');
+const url=()=>location.href.replace(/pengingat\.html.*$/,'');
+function gcal(r){const s=nextDate(r),e=new Date(s.getTime()+15*60000);return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('⏰ '+r.n)+'&details='+encodeURIComponent((r.c?r.c+'\n':'')+'Buka aplikasi: '+url())+'&dates='+stamp(s)+'/'+stamp(e)+'&ctz=Asia/Jakarta&recur='+encodeURIComponent(rrule(r))}
+function ics(r){const s=nextDate(r),e=new Date(s.getTime()+15*60000);
+  const t=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//TAP BBT//Pengingat//ID','BEGIN:VEVENT','UID:'+r.id+'-'+Date.now()+'@tap-bbt','DTSTAMP:'+zst(new Date()),'DTSTART:'+zst(s),'DTEND:'+zst(e),rrule(r),'SUMMARY:⏰ '+r.n,'DESCRIPTION:'+(r.c||'').replace(/[,;]/g,'\\$&')+'\\nBuka aplikasi: '+url(),'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+r.n,'TRIGGER:PT0M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/calendar'}));a.download='Pengingat_'+r.n.replace(/[^\w]+/g,'_')+'.ics';document.body.appendChild(a);a.click();a.remove()}
+function draw(){const td=today();
+  $('ls').innerHTML=L.map((r,i)=>{const dn=DONE[r.id]===td,du=due(r)&&!dn;return `<div class="rm${r.on?'':' off'}" data-i="${i}"><div class="h"><div><span class="t">${r.t}</span>${du?'<span class="tag due">Belum dikerjakan</span>':dn?'<span class="tag dn">✓ Selesai hari ini</span>':''}</div><label class="sw"><input type="checkbox" data-on${r.on?' checked':''}><span></span></label></div>
+    <div class="n">${esc(r.n)}</div><div class="d">${dtxt(r.d)}${r.c?' · '+esc(r.c):''}</div>
+    <div class="row"><a class="btn" href="${gcal(r)}" target="_blank" rel="noopener">📅 Pasang di Kalender</a><button class="btn s" data-ics>⬇️ File .ics</button>${dn?'':'<button class="btn s" data-dn>✓ Selesai</button>'}<button class="btn s" data-x style="color:var(--ac)">Hapus</button></div></div>`}).join('')||'<div class="sub" style="margin:0">Belum ada pengingat.</div>';
+  $('nd').innerHTML=DN.map((d,i)=>`<button data-nd="${i}" class="${ND.includes(i)?'on':''}">${d}</button>`).join('')}
+let ND=[1,2,3,4,5,6];
+document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{},w=t.closest('.rm'),i=w?+w.dataset.i:-1;
+  if(d.nd!==undefined){const k=+d.nd;ND=ND.includes(k)?ND.filter(x=>x!==k):[...ND,k].sort();draw()}
+  if(w&&d.ics!==undefined)ics(L[i]);
+  if(w&&d.dn!==undefined){DONE[L[i].id]=today();save();draw()}
+  if(w&&d.x!==undefined&&confirm('Hapus pengingat ini?')){L.splice(i,1);save();draw()}
+  if(t.id==='add'){const n=$('nn').value.trim();if(!n){$('nn').focus();return}if(!ND.length){alert('Pilih minimal satu hari.');return}L.push({id:'r'+Date.now().toString(36),n,c:$('nc').value.trim(),t:$('nt').value||'09:00',d:ND.slice(),on:1});L.sort((a,b)=>a.t.localeCompare(b.t));$('nn').value='';$('nc').value='';save();draw()}
+  if(t.id==='np'){if(!('Notification'in window)){$('ns').textContent='HP ini tidak mendukung notifikasi.';return}Notification.requestPermission().then(p=>{ns();if(p==='granted')try{navigator.serviceWorker.ready.then(r=>r.showNotification('Notifikasi aktif ✓',{body:'Pengingat TAP BBT akan muncul saat aplikasi dibuka.',icon:'icon-192.png'}))}catch(_){}})}});
+document.addEventListener('change',e=>{const w=e.target.closest('.rm');if(w&&e.target.dataset.on!==undefined){L[+w.dataset.i].on=e.target.checked?1:0;save();draw()}});
+function ns(){$('ns').textContent='Notification'in window?({granted:'✓ Diizinkan',denied:'Ditolak (ubah di pengaturan browser)',default:'Belum diizinkan'})[Notification.permission]:''}
+save();draw();ns();
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+</script><script src="nav.js"></script></body></html>
