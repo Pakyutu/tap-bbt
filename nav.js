@@ -8,7 +8,6 @@
     ["wl.html","Penyusun WL"],
     ["kalkulator.html","Kalkulator Jualan"],
     ["cekst.html","Cek WL vs ST"],
-    ["pengingat.html","Pengingat Harian"],
     ["backup.html","Backup Data"]
   ];
   var css = ''
@@ -40,4 +39,3 @@
   addEventListener("online",net);addEventListener("offline",net);net();
 })();
 
-(function(){var s=document.createElement("script");s.src="remind.js";document.body.appendChild(s)})();

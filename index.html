@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 .st{margin-top:16px;border-radius:18px;background:var(--card);border:1px solid var(--bd);padding:14px 16px}.st .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.st .sh b{font:600 15px Archivo,sans-serif}.st .sh span{font:500 11.5px "IBM Plex Mono",monospace;color:var(--mute)}.st .gr{font:600 11px "IBM Plex Mono",monospace;color:var(--mute);letter-spacing:.06em;text-transform:uppercase;margin:10px 0 2px}.st .it{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--bd);font-size:13.5px}.st .it:first-of-type{border-top:0}.st .tg{font:600 11.5px "IBM Plex Mono",monospace;padding:2px 8px;border-radius:999px;white-space:nowrap}.st .ok{background:rgba(47,210,122,.14);color:var(--ok)}.st .wn{background:rgba(255,176,32,.15);color:var(--warn)}.st .bd{background:rgba(227,19,47,.18);color:var(--red2)}.mu{color:var(--mute);font-size:13px}
+.nudge{margin:14px 0 4px;border-radius:16px;padding:12px 14px;background:linear-gradient(135deg,rgba(227,19,47,.18),rgba(255,176,32,.12));border:1px solid rgba(227,19,47,.35);font-size:14.5px;line-height:1.45;display:flex;gap:10px;align-items:center;animation:ndg 2.4s ease-in-out infinite}.nudge:empty{display:none}.nudge .e{font-size:24px}@keyframes ndg{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 :root{--bg:#0d0f14;--bg2:#151924;--card:rgba(255,255,255,.055);--bd:rgba(255,255,255,.09);--ink:#f2f4f8;--mute:#98a2b6;--red:#e3132f;--red2:#ff4d63;--blue:#5b8cff;--ok:#2fd27a;--warn:#ffb020}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
@@ -70,6 +71,7 @@ a.card:after{content:"";position:absolute;inset:0;border-radius:inherit;padding:
   </div>
   <h1 class="hello"><span id="greet">Halo</span>,<br>siap pantau hari ini?</h1>
   <div class="clock"><b id="time">--:--</b><span id="date"></span></div>
+  <div class="nudge" id="nudge"></div>
   <div class="cards">
     <a class="card dg" href="digipos.html">
       <div class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M9 7h6M9 11h6M9 15h3"/></svg></div>
@@ -94,11 +96,6 @@ a.card:after{content:"";position:absolute;inset:0;border-radius:inherit;padding:
     <a class="card cst" href="cekst.html" style="--c1:#7a3fd1;--c2:#c8102e">
       <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/><path d="M4 6h7M4 18h4"/></svg></div>
       <div class="tx"><b>Cek WL vs ST</b><span>WL dropingan SF vs ST Digipos · % ST per SF · rentang SN belum ST</span></div>
-      <div class="arr">›</div>
-    </a>
-    <a class="card rmd" href="pengingat.html" style="--c1:#b7791f;--c2:#c8102e">
-      <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M5 3L2 6M19 3l3 3"/></svg></div>
-      <div class="tx"><b>Pengingat Harian</b><span>Kirim data SURYA, rekap jualan · pasang alarm di Kalender HP</span></div>
       <div class="arr">›</div>
     </a>
     <a class="card bk" href="backup.html" style="--c1:#5b6b85;--c2:#14213d">
@@ -154,4 +151,8 @@ fetch("status.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{const t=new D
   h+=`<div class="it"><span>${x.n}</span><span class="tg ${c}">${d.getDate()} ${B[d.getMonth()]}${a>2?" · "+a+" hr lalu":""}</span></div>`});
  document.getElementById("dstl").innerHTML=h;document.getElementById("dsts").innerHTML=late?`<span style="color:var(--red2)">⚠ ${late} perlu update</span>`:"semua terbaru ✓";
 }).catch(()=>{document.getElementById("dstl").innerHTML='<span class="mu">Status data tidak bisa dimuat (offline?).</span>'})})();
-</script><script src="remind.js"></script></body></html>
+</script><script>
+(function(){const M=[[5,10,'☕','Selamat pagi! Jangan lupa input <b>SURYA</b> nya yaaa 😊'],[10,12,'📊','Jangan lupa input <b>SURYA</b> nya yaaa, ST Digipos & Klik Misi juga ya!'],[12,15,'🍛','Udah makan siang? Jangan lupa input <b>SURYA</b> nya yaaa'],[15,18,'📦','Sore! Cek stok SF & jangan lupa input <b>SURYA</b> nya yaaa'],[18,22,'📝','Jangan lupa input <b>SURYA</b> nya yaaa, sekalian rekap jualan hari ini'],[22,29,'🌙','Udah malam, istirahat ya. Besok jangan lupa input <b>SURYA</b> nya yaaa']];
+function up(){let h=new Date().getHours();if(h<5)h+=24;const m=M.find(x=>h>=x[0]&&h<x[1])||M[0];const el=document.getElementById('nudge');if(el)el.innerHTML='<span class="e">'+m[2]+'</span><span>'+m[3]+'</span>'}
+up();setInterval(up,60000)})();
+</script></body></html>
