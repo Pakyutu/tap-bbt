@@ -7,6 +7,7 @@
     ["penjualan.html","Dashboard Penjualan"],
     ["wl.html","Penyusun WL"],
     ["kalkulator.html","Kalkulator Jualan"],
+    ["backup.html","Backup Data"],
     ["cekst.html","Cek WL vs ST"]
   ];
   var css = ''
