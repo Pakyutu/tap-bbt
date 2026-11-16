@@ -25,12 +25,12 @@ textarea{font:13px ui-monospace,Menlo,monospace;min-height:90px}
 details summary{cursor:pointer;color:var(--mu);font-size:12.5px;margin-top:6px}
 .err{color:var(--ac);font-size:13px;font-weight:600;margin-top:6px}.ok{color:var(--ok)}
 </style></head><body><div class="w">
-<h1>Cek WL vs ST</h1><div class="sub">Cocokkan SN yang didrop (WL, per outlet atau per SF) dengan transaksi ST Digipos per SN. Semua diproses di HP ini, data tidak dikirim ke mana-mana.</div>
+<h1>Cek WL vs ST</h1><div class="sub">Cocokkan WL yang didrop ke SF dengan WL yang sudah ST di Digipos (per SN). Semua diproses di HP ini, data tidak dikirim ke mana-mana.</div>
 
 <div class="card"><h2>1. WL dropingan</h2>
-  <div class="tabs" id="wtab"><button data-w="h" class="on">Dari Penyusun WL</button><button data-w="f">Upload file</button><button data-w="t">Tempel teks</button></div>
-  <div id="wh"></div>
-  <div id="wf" style="display:none"><div class="drop" id="wdz">📄 Ketuk untuk pilih file WL dropingan (.xlsx / .csv)<br><small>Kolom: nama SF / outlet, SN (atau SN awal & SN akhir), produk (opsional)</small></div>
+  <div class="tabs" id="wtab"><button data-w="f" class="on">Upload file WL</button><button data-w="h">Dari Penyusun WL</button><button data-w="t">Tempel teks</button></div>
+  <div id="wh" style="display:none"></div>
+  <div id="wf"><div class="drop" id="wdz">📄 Ketuk untuk pilih file WL dropingan (.xlsx / .csv)<br><small>Kolom: nama SF, SN (atau SN awal & SN akhir), produk (opsional)</small></div>
     <input type="file" id="wfi" accept=".csv,.xlsx,.txt" multiple style="display:none"><div id="wfs" style="font-size:12.5px;color:var(--mu);margin-top:8px"></div><div id="wmp"></div></div>
   <div id="wt" style="display:none"><textarea id="wtx" placeholder="Tempel hasil 'Salin ringkasan' WL, atau baris rentang SN.&#10;Contoh:&#10;1. Toko A (25 pcs × Rp 16.500 = Rp 412.500)&#10;800601367498 – 800601367522"></textarea></div>
   <div class="m" id="wi" style="color:var(--mu);font-size:12.5px;margin-top:8px"></div>
@@ -84,7 +84,7 @@ function wlText(t){const out=[];let cur=null,prod='';
     let it=cur.it.find(y=>y.p===(prod||'-'));if(!it){it={p:prod||'-',sn:[]};cur.it.push(it)}
     const parts=ln.split(/,/);for(const pt of parts){const nn=pt.match(/\d{8,}/g);if(!nn)continue;const a=nn[0],b=nn[1]&&nn[1].length===a.length?nn[1]:a;let A=BigInt(a),B=BigInt(b);if(B<A){const x=A;A=B;B=x}if(B-A>200000n)continue;for(let c=A;c<=B;c++)it.sn.push(pad(c,a.length))}}
   return out.filter(o=>o.it.some(y=>y.sn.length))}
-let WT='h';
+let WT='f';
 function wlData(){if(WT==='t')return wlText($('wtx').value);if(WT==='f')return wlFile();const o=[];SRC.filter(s=>SEL.includes(s.id)).forEach(s=>o.push(...s.o));return o}
 
 // ---------- baca file ST ----------
@@ -119,7 +119,7 @@ async function addFiles(list){$('er').textContent='';for(const fl of list){try{c
 function drawFiles(){$('fs').innerHTML=FILES.map((f,i)=>`📄 <b>${esc(f.name)}</b> · ${nf(f.rows.length-f.hi-1)} baris <a href="#" data-rm="${i}" style="color:var(--ac)">hapus</a>`).join('<br>');
   $('mp').innerHTML=FILES.map((f,i)=>{const o=c=>`<option value="-1">— tidak ada —</option>`+f.hdr.map((h,k)=>`<option value="${k}"${k===c?' selected':''}>${esc(h||'Kolom '+(k+1))}</option>`).join('');
     return `<details${f.map.sn<0?' open':''} style="margin-top:6px;border:1px solid var(--bd);border-radius:10px;padding:6px 10px"><summary style="margin:0">Atur kolom ${esc(f.name)} · SN: <b>${esc(f.hdr[f.map.sn]||'belum ketemu')}</b>${f.map.sn<0?' <span class="err" style="display:inline">pilih manual</span>':''}</summary>
-    <div class="map">${[['sn','Kolom SN'],['ol','Nama outlet'],['id','ID outlet'],['tg','Tanggal'],['pr','Produk']].map(([k,l])=>`<div><label>${l}</label><select data-fm="${i}" data-k="${k}">${o(f.map[k])}</select></div>`).join('')}</div></details>`}).join('')}
+    <div class="map">${[['sn','Kolom SN']].map(([k,l])=>`<div><label>${l}</label><select data-fm="${i}" data-k="${k}">${o(f.map[k])}</select></div>`).join('')}</div></details>`}).join('')}
 $('dz').onclick=()=>$('fi').click();$('fi').onchange=e=>{addFiles([...e.target.files]);e.target.value=''};
 ['dragover','dragenter'].forEach(ev=>$('dz').addEventListener(ev,e=>{e.preventDefault();$('dz').classList.add('on')}));['dragleave','drop'].forEach(ev=>$('dz').addEventListener(ev,e=>{e.preventDefault();$('dz').classList.remove('on')}));
 $('dz').addEventListener('drop',e=>addFiles([...e.dataTransfer.files]));
@@ -133,7 +133,7 @@ function guessWL(rows){const g=guess(rows),h=g.hdr,f=re=>h.findIndex(x=>re.test(
 function drawWF(){$('wfs').innerHTML=WF.map((f,i)=>`📄 <b>${esc(f.name)}</b> · ${nf(f.rows.length-f.hi-1)} baris <a href="#" data-wrm="${i}" style="color:var(--ac)">hapus</a>`).join('<br>');
   $('wmp').innerHTML=WF.map((f,i)=>{const o=c=>`<option value="-1">— tidak ada —</option>`+f.hdr.map((h,k)=>`<option value="${k}"${k===c?' selected':''}>${esc(h||'Kolom '+(k+1))}</option>`).join('');const bad=f.map.sn<0||f.map.nm<0;
     return `<details${bad?' open':''} style="margin-top:6px;border:1px solid var(--bd);border-radius:10px;padding:6px 10px"><summary style="margin:0">Atur kolom ${esc(f.name)} · Nama: <b>${esc(f.hdr[f.map.nm]||'belum ketemu')}</b> · SN: <b>${esc(f.hdr[f.map.sn]||'belum ketemu')}</b>${bad?' <span class="err" style="display:inline">pilih manual</span>':''}</summary>
-    <div class="map">${[['nm','Nama SF / outlet'],['sn','SN / SN awal'],['ak','SN akhir (kalau ada)'],['pr','Produk']].map(([k,l])=>`<div><label>${l}</label><select data-wm="${i}" data-k="${k}">${o(f.map[k])}</select></div>`).join('')}</div></details>`}).join('')}
+    <div class="map">${[['nm','Nama SF'],['sn','SN / SN awal'],['ak','SN akhir (kalau ada)'],['pr','Produk']].map(([k,l])=>`<div><label>${l}</label><select data-wm="${i}" data-k="${k}">${o(f.map[k])}</select></div>`).join('')}</div></details>`}).join('')}
 function wlFile(){const G=new Map();
   WF.forEach(f=>{const M=f.map;if(M.sn<0)return;f.rows.slice(f.hi+1).forEach(r=>{let a=parseSN(r[M.sn]),b=M.ak>=0?parseSN(r[M.ak]):'';
       if(!a||a==='!'){const nn=String(r[M.sn]||'').match(/\d{10,}/g);if(!nn)return;a=nn[0];b=nn[1]||b}
@@ -157,11 +157,11 @@ function stMap(){const m=new Map();let sci=0;
   String($('stx').value||'').split(/\n/).forEach(ln=>{const nn=ln.match(/\d{8,}/g);if(!nn)return;const a=nn[0],b=nn[1]&&nn[1].length===a.length?nn[1]:a;let A=BigInt(a),B=BigInt(b);if(B<A){const x=A;A=B;B=x}if(B-A>200000n)return;for(let c=A;c<=B;c++){const s=pad(c,a.length);if(!m.has(s))m.set(s,{ol:'',id:'',tg:'',pr:''})}});
   return{m,sci}}
 function run(){const W=wlData(),{m:ST,sci}=stMap();
-  $('wi').innerHTML=W.length?`Dipakai: <b>${W.length}</b> ${WT==='f'?'SF / penerima':'outlet'} · <b>${nf(W.reduce((t,o)=>t+o.it.reduce((u,y)=>u+y.sn.length,0),0))}</b> SN`:'';
+  $('wi').innerHTML=W.length?`Dipakai: <b>${W.length}</b> ${WT==='f'?'SF':'outlet'} · <b>${nf(W.reduce((t,o)=>t+o.it.reduce((u,y)=>u+y.sn.length,0),0))}</b> SN`:'';
   if(!W.length||!ST.size){$('res').innerHTML=`<div class="card" style="color:var(--mu);font-size:13.5px">${!W.length?'Pilih / tempel WL dulu.':''} ${!ST.size?'Masukkan file ST Digipos (kolom SN harus ada).':''}${sci?`<div class="err">${nf(sci)} SN di file berbentuk angka E+ (rusak oleh Excel). Ekspor ulang dengan kolom SN sebagai teks.</div>`:''}</div>`;return}
   const inWL=new Set(),R=W.map(o=>{const its=o.it.map(y=>{const st=y.sn.filter(s=>ST.has(s)),bl=y.sn.filter(s=>!ST.has(s));y.sn.forEach(s=>inWL.add(s));return{...y,st,bl}});
-    const all=its.flatMap(y=>y.sn),st=its.flatMap(y=>y.st),beda={},sto={};st.forEach(s=>{const x=ST.get(s);if(x.ol)sto[x.ol]=(sto[x.ol]||0)+1;if(WT!=='f'&&x.ol&&!(norm(x.ol).includes(norm(o.n))||norm(o.n).includes(norm(x.ol)))&&norm(o.n)){beda[x.ol]=(beda[x.ol]||0)+1}});
-    return{n:o.n,its,tot:all.length,st:st.length,bl:all.length-st.length,beda,sto}});
+    const all=its.flatMap(y=>y.sn),st=its.flatMap(y=>y.st),beda={};st.forEach(s=>{const x=ST.get(s);if(false&&x.ol&&!(norm(x.ol).includes(norm(o.n))||norm(o.n).includes(norm(x.ol)))&&norm(o.n)){beda[x.ol]=(beda[x.ol]||0)+1}});
+    return{n:o.n,its,tot:all.length,st:st.length,bl:all.length-st.length,beda}});
   const T=R.reduce((s,o)=>s+o.tot,0),Y=R.reduce((s,o)=>s+o.st,0),luar=[...ST.keys()].filter(s=>!inWL.has(s));
   const luarG={};luar.forEach(s=>{const k=ST.get(s).ol||'(outlet tidak diketahui)';(luarG[k]=luarG[k]||[]).push(s)});
   const pc=(a,b)=>b?Math.round(a/b*100):0,col=p=>p>=100?'var(--ok)':p>=50?'var(--wn)':'var(--ac)';
@@ -169,15 +169,14 @@ function run(){const W=wlData(),{m:ST,sci}=stMap();
   $('res').innerHTML=`<div class="card"><h2>3. Hasil</h2><div class="kpi"><div><small>SN didrop</small><b>${nf(T)}</b></div><div><small>Sudah ST</small><b class="ok">${nf(Y)}</b></div><div><small>Belum ST</small><b style="color:var(--ac)">${nf(T-Y)}</b></div><div><small>% ST</small><b style="color:${col(pc(Y,T))}">${pc(Y,T)}%</b></div><div><small>ST di luar WL</small><b style="color:var(--wn)">${nf(luar.length)}</b></div></div>
     <div class="bar"><i style="width:${pc(Y,T)}%;background:${col(pc(Y,T))}"></i></div>${sci?`<div class="err">${nf(sci)} SN di file berbentuk angka E+ (rusak oleh Excel) tidak bisa dicocokkan.</div>`:''}
     <div class="row"><button class="btn" id="cpr">Salin rekap</button><button class="btn s" id="cpb">Salin SN belum ST</button><button class="btn s" id="csv">⬇️ Unduh detail (CSV)</button></div>
-    <div class="tabs" style="margin-top:12px">${[['all','Semua ('+R.length+')'],['bl','Belum lengkap ('+R.filter(o=>o.bl).length+')'],['ok','100% ST ('+R.filter(o=>!o.bl).length+')'],['bd','ST di outlet lain ('+R.filter(o=>Object.keys(o.beda).length).length+')']].map(([k,t])=>`<button data-f="${k}" class="${FLT===k?'on':''}">${t}</button>`).join('')}</div>
+    <div class="tabs" style="margin-top:12px">${[['all','Semua ('+R.length+')'],['bl','Belum lengkap ('+R.filter(o=>o.bl).length+')'],['ok','100% ST ('+R.filter(o=>!o.bl).length+')']].map(([k,t])=>`<button data-f="${k}" class="${FLT===k?'on':''}">${t}</button>`).join('')}</div>
     ${V.map(o=>{const p=pc(o.st,o.tot);return `<div class="ol"><div class="h"><b>${esc(o.n)}</b><span class="pc" style="color:${col(p)}">${o.st}/${o.tot} · ${p}%</span></div><div class="bar"><i style="width:${p}%;background:${col(p)}"></i></div>
       ${o.its.map(y=>`<div class="m">${o.its.length>1||y.p!=='-'?`<b>${esc(y.p)}</b>: `:''}${y.st.length}/${y.sn.length} ST${y.bl.length?` · belum: <span class="mono">${comp(y.bl).join(', ')}</span>`:' ✓'}</div>`).join('')}
-      ${Object.keys(o.beda).length?Object.entries(o.beda).map(([k,v])=>`<span class="tag w">⚠ ${v} SN di-ST oleh ${esc(k)}</span>`).join(''):''}
-      ${WT==='f'&&Object.keys(o.sto).length?`<div class="m">ST di ${Object.keys(o.sto).length} outlet: ${Object.entries(o.sto).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>esc(k)+' ('+v+')').join(', ')}${Object.keys(o.sto).length>6?', …':''}</div>`:''}<details><summary>Detail SN</summary><div class="mono" style="column-width:240px;margin-top:6px">${o.its.flatMap(y=>y.sn).map(s=>{const x=ST.get(s);return `<div>${x?'✅':'⬜'} ${s}${x&&(x.ol||x.tg)?` <span style="color:var(--mu)">${esc([x.ol,x.tg].filter(Boolean).join(' · '))}</span>`:''}</div>`}).join('')}</div></details></div>`}).join('')||'<div class="m" style="color:var(--mu)">Tidak ada.</div>'}</div>
-    ${luar.length?`<div class="card"><h2>ST di luar WL (${nf(luar.length)} SN)</h2><div class="m" style="color:var(--mu);font-size:12.5px">SN ini ada di ST Digipos tapi tidak ada di WL yang dipilih.</div>${Object.entries(luarG).sort((a,b)=>b[1].length-a[1].length).slice(0,60).map(([k,a])=>`<div class="ol"><div class="h"><b>${esc(k)}</b><span class="pc">${a.length} SN</span></div><div class="m mono">${comp(a).slice(0,12).join(', ')}${comp(a).length>12?' …':''}</div></div>`).join('')}</div>`:''}`;
+<details><summary>Detail SN</summary><div class="mono" style="column-width:240px;margin-top:6px">${o.its.flatMap(y=>y.sn).map(s=>{const x=ST.get(s);return `<div>${x?'✅':'⬜'} ${s}</div>`}).join('')}</div></details></div>`}).join('')||'<div class="m" style="color:var(--mu)">Tidak ada.</div>'}</div>
+    ${luar.length?`<div class="card"><h2>ST di luar WL (${nf(luar.length)} SN)</h2><div class="m" style="color:var(--mu);font-size:12.5px">SN ini ada di ST Digipos tapi tidak ada di WL dropingan.</div><details><summary>Lihat rentang SN</summary><div class="mono" style="margin-top:6px">${comp(luar).slice(0,300).join('<br>')}${comp(luar).length>300?'<br>…':''}</div></details></div>`:''}`;
   window._R={R,T,Y,luar,ST}}
 const pcT=(a,b)=>b?Math.round(a/b*100):0;
-function rekapTxt(){const {R,T,Y,luar}=window._R;return `*Cek WL vs ST Digipos*\nST: ${nf(Y)}/${nf(T)} SN (${pcT(Y,T)}%) · belum ST ${nf(T-Y)}${luar.length?`\nST di luar WL: ${nf(luar.length)} SN`:''}\n\n`+R.map((o,i)=>`${i+1}. ${o.n}: ${o.st}/${o.tot} (${pcT(o.st,o.tot)}%)`+(o.bl?'\nBelum ST:\n'+o.its.filter(y=>y.bl.length).map(y=>(o.its.length>1||y.p!=='-'?y.p+' ('+y.bl.length+' pcs)\n':'')+comp(y.bl).join('\n')).join('\n'):' ✓')+(Object.keys(o.beda).length?'\n⚠ '+Object.entries(o.beda).map(([k,v])=>`${v} SN di-ST oleh ${k}`).join(', '):'')).join('\n\n')}
+function rekapTxt(){const {R,T,Y,luar}=window._R;return `*Cek WL vs ST Digipos*\nST: ${nf(Y)}/${nf(T)} SN (${pcT(Y,T)}%) · belum ST ${nf(T-Y)}${luar.length?`\nST di luar WL: ${nf(luar.length)} SN`:''}\n\n`+R.map((o,i)=>`${i+1}. ${o.n}: ${o.st}/${o.tot} (${pcT(o.st,o.tot)}%)`+(o.bl?'\nBelum ST:\n'+o.its.filter(y=>y.bl.length).map(y=>(o.its.length>1||y.p!=='-'?y.p+' ('+y.bl.length+' pcs)\n':'')+comp(y.bl).join('\n')).join('\n'):' ✓')).join('\n\n')}
 function belumTxt(){const {R}=window._R,B=R.filter(o=>o.bl);return `*SN belum ST*\n`+B.map((o,i)=>`${i+1}. ${o.n} (${o.bl} pcs)\n`+o.its.filter(y=>y.bl.length).map(y=>(o.its.length>1||y.p!=='-'?y.p+' ('+y.bl.length+' pcs)\n':'')+comp(y.bl).join('\n')).join('\n\n')).join('\n\n\n')+`\n\nTotal belum ST: ${nf(B.reduce((s,o)=>s+o.bl,0))} pcs`}
 document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{};
   if(d.w){WT=d.w;document.querySelectorAll('#wtab button').forEach(b=>b.classList.toggle('on',b.dataset.w===WT));$('wh').style.display=WT==='h'?'':'none';$('wt').style.display=WT==='t'?'':'none';$('wf').style.display=WT==='f'?'':'none';run()}
@@ -185,9 +184,9 @@ document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{};
   if(d.f){FLT=d.f;run()}
   if(d.rm!==undefined){e.preventDefault();FILES.splice(+d.rm,1);drawFiles();run()}
   if(t.id==='cpr')copy(rekapTxt(),t);if(t.id==='cpb')copy(belumTxt(),t);
-  if(t.id==='csv'){const {R,ST,luar}=window._R,rows=[['Outlet WL','Produk','SN','Status','Outlet ST','ID outlet ST','Tanggal ST']];
-    R.forEach(o=>o.its.forEach(y=>y.sn.forEach(s=>{const x=ST.get(s);rows.push([o.n,y.p,{t:s},x?'Sudah ST':'Belum ST',x?x.ol:'',x?x.id:'',x?x.tg:''])})));
-    luar.forEach(s=>{const x=ST.get(s);rows.push(['(di luar WL)',x.pr,{t:s},'ST di luar WL',x.ol,x.id,x.tg])});
+  if(t.id==='csv'){const {R,ST,luar}=window._R,rows=[['SF / Penerima','Produk','SN','Status']];
+    R.forEach(o=>o.its.forEach(y=>y.sn.forEach(s=>{const x=ST.get(s);rows.push([o.n,y.p,{t:s},x?'Sudah ST':'Belum ST'])})));
+    luar.forEach(s=>{const x=ST.get(s);rows.push(['(di luar WL)','',{t:s},'ST di luar WL'])});
     const csv='﻿'+rows.map(r=>r.map(v=>v&&v.t?`="${v.t}"`:`"${String(v??'').replace(/"/g,'""')}"`).join(';')).join('\r\n');
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=`Cek_WL_ST_${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove()}});
 document.addEventListener('change',e=>{const t=e.target,d=t.dataset||{};
