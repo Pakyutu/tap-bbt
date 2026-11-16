@@ -28,7 +28,7 @@ details summary{cursor:pointer;color:var(--mu);font-size:12.5px;margin-top:6px}
 table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px 8px;border-bottom:1px solid var(--bd);text-align:right}th{color:var(--mu);font-size:11.5px;font-weight:600}td:first-child,th:first-child{text-align:left}
 </style></head><body><div class="w">
 <h1>Cek WL vs ST</h1><div class="sub" id="sub"></div>
-<div class="tabs" id="pt"><button data-p="VF" class="on">VF</button><button data-p="SA">SA</button></div>
+<div class="tabs" id="pt"></div>
 <div id="res"></div>
 </div>
 <script src="cekst-data.js"></script>
@@ -37,23 +37,25 @@ const $=i=>document.getElementById(i),nf=v=>Math.round(v).toLocaleString('id-ID'
 const col=p=>p>=90?'var(--ok)':p>=75?'var(--wn)':'var(--ac)',tg=d=>{const x=new Date(d+'T00:00:00');return x.getDate()+' '+['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][x.getMonth()]};
 const rg=r=>r.replace('-',' – ');
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
-let P='VF',F='all';
-function draw(){const C=CK[P];
-  $('sub').innerHTML=`WL dropingan November vs transaksi ST Digipos per SN. Diperbarui ${tg(CK.upd)}.`;
-  if(!C||C.na){$('res').innerHTML=`<div class="card" style="font-size:14px">Raw ST ${P} belum ada. WL ${P} November: <b>${nf(C?C.drop:0)}</b> SN didrop.<div class="sub" style="margin-top:6px">Kirim file raw ST ${P} ke Claude untuk dicek.</div></div>`;return}
+const GK=Object.keys(CK.G||{});let P=GK[0]||'VF NOV',F='all';
+$('pt').innerHTML=GK.map(k=>`<button data-p="${k}" class="${k===P?'on':''}">${k}</button>`).join('');
+const cut=()=>P.startsWith('VF')?CK.cutVF:CK.cutSA;
+function draw(){const C=CK.G[P];
+  $('sub').innerHTML=`WL dropingan vs transaksi ST Digipos per SN (raw ST Agustus s/d ${tg(CK.cutVF||CK.cutSA)}). Diperbarui ${tg(CK.upd)}.`;
+  if(!C){$('res').innerHTML='<div class="card">Belum ada data.</div>';return}
   const S=C.sf,T=S.reduce((a,o)=>a+o.d,0),Y=S.reduce((a,o)=>a+o.s,0);
   let V=S;if(F==='bl')V=S.filter(o=>o.s<o.d);
   $('res').innerHTML=`<div class="card"><div class="kpi"><div><small>SN didrop</small><b>${nf(T)}</b></div><div><small>Sudah ST</small><b class="ok">${nf(Y)}</b></div><div><small>Belum ST</small><b style="color:var(--ac)">${nf(T-Y)}</b></div><div><small>% ST</small><b style="color:${col(pc(Y,T))}">${pc(Y,T)}%</b></div></div>
-    <div class="bar"><i style="width:${pc(Y,T)}%;background:${col(pc(Y,T))}"></i></div><div class="sub" style="margin-top:8px">ST dihitung s/d ${tg(C.cut)} (data tanggal terakhir bisa belum lengkap).</div>
+    <div class="bar"><i style="width:${pc(Y,T)}%;background:${col(pc(Y,T))}"></i></div><div class="sub" style="margin-top:8px">ST dihitung s/d ${tg(cut())} (data tanggal terakhir bisa belum lengkap).${C.mon&&C.mon.length?' ST per bulan: '+C.mon.map(([m,v])=>['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][+m.slice(5)-1]+' '+nf(v)).join(' · ')+'.':''}${C.lain&&C.lain.length?' <b style="color:var(--wn)">ST di TAP lain: '+C.lain.map(([t,v])=>esc(t)+' '+nf(v)).join(', ')+'</b>.':''}</div>
     <div class="row"><button class="btn" id="cpr">Salin rekap</button><button class="btn s" id="cpb">Salin SN belum ST</button></div></div>
     <div class="card"><h2>Per SF</h2><div class="tabs">${[['all','Semua ('+S.length+')'],['bl','Belum lengkap ('+S.filter(o=>o.s<o.d).length+')']].map(([k,t])=>`<button data-f="${k}" class="${F===k?'on':''}">${t}</button>`).join('')}</div>
     ${V.map(o=>{const p=pc(o.s,o.d);return `<div class="ol"><div class="h"><b>${esc(o.n)}</b><span class="pc" style="color:${col(p)}">${nf(o.s)}/${nf(o.d)} · ${p}%</span></div><div class="bar"><i style="width:${p}%;background:${col(p)}"></i></div>
       ${o.p.map(x=>`<div class="pk"><b>${esc(x.p)}</b>: ${nf(x.s)}/${nf(x.d)} ST${x.b.length?` · <span style="color:var(--ac)">belum ${nf(x.d-x.s)}</span><details><summary>${x.b.length} rentang belum ST</summary><div class="rg">${x.b.map(rg).join('<br>')}</div></details>`:' ✓'}</div>`).join('')}</div>`}).join('')}</div>
-    <div class="card"><h2>Per tanggal drop</h2><table><tr><th>Tanggal</th><th>Drop</th><th>Sudah ST</th><th>%</th></tr>${C.tgl.map(([d,a,b])=>`<tr><td>${tg(d)}</td><td>${nf(a)}</td><td>${nf(b)}</td><td style="color:${col(pc(b,a))};font-weight:700">${pc(b,a)}%</td></tr>`).join('')}</table></div>`}
-function rekap(){const C=CK[P],S=C.sf,T=S.reduce((a,o)=>a+o.d,0),Y=S.reduce((a,o)=>a+o.s,0);
-  return `*Cek WL ${P} vs ST Digipos*\nST s/d ${tg(C.cut)}: ${nf(Y)}/${nf(T)} (${pc(Y,T)}%) · belum ${nf(T-Y)}\n\n`+S.map((o,i)=>`${i+1}. ${o.n}: ${nf(o.s)}/${nf(o.d)} (${pc(o.s,o.d)}%)`).join('\n')}
-function belum(){const C=CK[P],B=C.sf.filter(o=>o.s<o.d);
-  return `*SN ${P} belum ST* (s/d ${tg(C.cut)})\n\n`+B.map((o,i)=>`${i+1}. ${o.n} (${nf(o.d-o.s)} pcs)\n\n`+o.p.filter(x=>x.b.length).map(x=>`${x.p} (${nf(x.d-x.s)} pcs)\n${x.b.map(rg).join('\n')}`).join('\n\n')).join('\n\n\n')+`\n\nTotal belum ST: ${nf(B.reduce((a,o)=>a+o.d-o.s,0))} pcs`}
+    ${C.tgl.length?`<div class="card"><h2>Per tanggal drop</h2><table><tr><th>Tanggal</th><th>Drop</th><th>Sudah ST</th><th>%</th></tr>${C.tgl.map(([d,a,b])=>`<tr><td>${tg(d)}</td><td>${nf(a)}</td><td>${nf(b)}</td><td style="color:${col(pc(b,a))};font-weight:700">${pc(b,a)}%</td></tr>`).join('')}</table></div>`:''}`}
+function rekap(){const C=CK.G[P],S=C.sf,T=S.reduce((a,o)=>a+o.d,0),Y=S.reduce((a,o)=>a+o.s,0);
+  return `*Cek WL ${P} vs ST Digipos*\nST s/d ${tg(cut())}: ${nf(Y)}/${nf(T)} (${pc(Y,T)}%) · belum ${nf(T-Y)}\n\n`+S.map((o,i)=>`${i+1}. ${o.n}: ${nf(o.s)}/${nf(o.d)} (${pc(o.s,o.d)}%)`).join('\n')}
+function belum(){const C=CK.G[P],B=C.sf.filter(o=>o.s<o.d);
+  return `*SN ${P} belum ST* (s/d ${tg(cut())})\n\n`+B.map((o,i)=>`${i+1}. ${o.n} (${nf(o.d-o.s)} pcs)\n\n`+o.p.filter(x=>x.b.length).map(x=>`${x.p} (${nf(x.d-x.s)} pcs)\n${x.b.map(rg).join('\n')}`).join('\n\n')).join('\n\n\n')+`\n\nTotal belum ST: ${nf(B.reduce((a,o)=>a+o.d-o.s,0))} pcs`}
 document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{};
   if(d.p){P=d.p;document.querySelectorAll('#pt button').forEach(b=>b.classList.toggle('on',b.dataset.p===P));draw()}
   if(d.f){F=d.f;draw()}
