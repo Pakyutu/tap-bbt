@@ -30,6 +30,7 @@ input{width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:10px;
 </div>
 <div class="card"><h2>Pembayaran</h2><div class="g2"><div><label>Diskon (Rp)</label><input id="ds" inputmode="numeric" placeholder="0"></div><div><label>Bayar (Rp)</label><input id="by" inputmode="numeric" placeholder="0"></div></div>
   <div class="row" style="margin-top:8px" id="byq"></div></div>
+<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Total jualan</h2><input type="date" id="tg" style="width:auto;padding:6px 8px;font-size:13px"></div><div id="rk" style="margin-top:8px"></div></div>
 <div class="card"><h2>Riwayat nota</h2><div id="hist"></div></div>
 </div>
 <div class="tot"><div class="in">
@@ -70,18 +71,28 @@ document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{},it=t.clos
   if(t.id==='rs'&&confirm('Kosongkan semua jumlah?')){S.it={};S.ds=0;S.by=0;S.on='';$('on').value='';$('ds').value='';$('by').value='';draw()}
   if(d.ho!==undefined){const h=HL[+d.ho];S.on=h.on;S.ds=h.ds;S.by=h.by;S.it={};h.R.forEach(r=>{if(!prods().some(p=>p.n===r.n))S.ex.push({n:r.n,h:r.h});S.it[r.n]={q:r.q,h:r.h}});$('on').value=S.on||'';$('ds').value=S.ds?nf(S.ds):'';$('by').value=S.by?nf(S.by):'';draw();scrollTo({top:0,behavior:'smooth'})}
   if(d.hc!==undefined)copy(nota(HL[+d.hc]),t);
+  if(t.id==='cpd')copy(rekapD(),t);
   if(d.hx!==undefined&&confirm('Hapus nota ini?')){HL.splice(+d.hx,1);try{localStorage.setItem('kalkh',JSON.stringify(HL))}catch(_){}drawH()}});
 document.addEventListener('input',e=>{const t=e.target,it=t.closest('.it');
   if(it&&t.dataset.q!==undefined){line(it.dataset.n).q=num(t.value);const c=t.selectionStart;upd(t);try{t.setSelectionRange(c,c)}catch(_){}}
   if(it&&t.dataset.h!==undefined){const v=num(t.value);line(it.dataset.n).h=v;const o=v?nf(v):'';if(t.value!==o)t.value=o;upd(t)}
   if(['ds','by','nh'].includes(t.id)){const v=num(t.value),o=v?nf(v):'';if(t.value!==o)t.value=o;if(t.id!=='nh'){S[t.id]=v;tot()}}
-  if(t.id==='on'){S.on=t.value;save()}if(t.id==='q')draw()});
+  if(t.id==='on'){S.on=t.value;save()}if(t.id==='q')draw();if(t.id==='tg')drawD()});
 const tglF=t=>{const d=new Date(t);return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})+' '+d.toTimeString().slice(0,5)};
 function nota(h){const x=h?{R:h.R,q:h.R.reduce((s,r)=>s+r.q,0),sub:h.R.reduce((s,r)=>s+r.q*r.h,0),t:h.tt}:tot(),on=h?h.on:S.on,ds=h?h.ds:S.ds,by=h?h.by:S.by;
   return `*NOTA${on?' – '+on:''}*\n${tglF(h?h.t:Date.now())}\n\n`+x.R.map(r=>`${r.n}\n${nf(r.q)} × ${rp(r.h)} = ${rp(r.q*r.h)}`).join('\n\n')+`\n\n*Total jualan: ${nf(x.q)} pcs · ${rp(x.sub)}*`+grp(x.R)+(ds?`\nDiskon: ${rp(ds)}`:'')+`\n*Total bayar: ${rp(x.t)}*`+(by?`\nBayar: ${rp(by)}\n${by>=x.t?'Kembali: '+rp(by-x.t):'Kurang: '+rp(x.t-by)}`:'')}
 function grp(R){const G={};R.forEach(r=>{const k=/^SA\b/i.test(r.n)?'SA':/^VF\b/i.test(r.n)?'VF':'Lainnya';(G[k]=G[k]||[0,0]);G[k][0]+=r.q;G[k][1]+=r.q*r.h});const K=Object.keys(G);return K.length>1?K.map(k=>`\n${k}: ${nf(G[k][0])} pcs · ${rp(G[k][1])}`).join(''):''}
-function drawH(){$('hist').innerHTML=HL.length?HL.slice(0,30).map((h,i)=>`<div class="h"><div class="row" style="justify-content:space-between"><b>${esc(h.on||'(tanpa nama)')}</b><span style="color:var(--mu);font-size:12px">${tglF(h.t)}</span></div><div style="color:var(--mu);margin:2px 0 6px">${nf(h.R.reduce((s,r)=>s+r.q,0))} pcs · <b style="color:var(--tx)">${rp(h.tt)}</b> · ${esc(h.R.map(r=>r.n).join(', ').slice(0,80))}</div><div class="row"><button class="btn s" data-ho="${i}">Buka</button><button class="btn s" data-hc="${i}">Salin</button><button class="btn s" data-hx="${i}" style="color:var(--ac)">Hapus</button></div></div>`).join(''):'<div class="sub" style="margin:0">Belum ada nota tersimpan.</div>'}
+const dk=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function day(){const k=$('tg').value||dk(Date.now()),H=HL.filter(h=>dk(h.t)===k),P={};let q=0,sub=0,tt=0,ds=0;
+  H.forEach(h=>{h.R.forEach(r=>{(P[r.n]=P[r.n]||[0,0]);P[r.n][0]+=r.q;P[r.n][1]+=r.q*r.h;q+=r.q;sub+=r.q*r.h});ds+=h.ds||0;tt+=h.tt});return{k,H,P,q,sub,tt,ds}}
+function drawD(){const x=day(),lab=x.k===dk(Date.now())?'Hari ini':new Date(x.k+'T00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'short'});
+  $('rk').innerHTML=x.H.length?`<div style="font-size:13px;color:var(--mu)">${lab} · ${x.H.length} nota</div><div style="font-size:22px;font-weight:800;margin:2px 0">${rp(x.tt)}</div><div style="font-size:13px;color:var(--mu)">${nf(x.q)} pcs${x.ds?' · diskon '+rp(x.ds):''}</div>
+    <div style="margin-top:8px">${Object.entries(x.P).sort((a,b)=>b[1][1]-a[1][1]).map(([n,v])=>`<div class="row" style="justify-content:space-between;font-size:13px;padding:4px 0;border-top:1px solid var(--bd)"><span>${esc(n)}</span><span>${nf(v[0])} pcs · <b>${rp(v[1])}</b></span></div>`).join('')}</div>
+    <div class="row" style="margin-top:8px"><button class="btn s" id="cpd">Salin rekap ${lab.toLowerCase()}</button></div>`:`<div class="sub" style="margin:0">${lab}: belum ada nota tersimpan. Ketuk 💾 Simpan setelah tiap transaksi supaya masuk ke total jualan.</div>`}
+function rekapD(){const x=day(),d=new Date(x.k+'T00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  return `*Total jualan ${d}*\n${x.H.length} nota · ${nf(x.q)} pcs\n\n`+Object.entries(x.P).sort((a,b)=>b[1][1]-a[1][1]).map(([n,v])=>`${n}: ${nf(v[0])} pcs · ${rp(v[1])}`).join('\n')+(g=>g?'\n'+g:'')(grp(Object.entries(x.P).map(([n,v])=>({n,q:v[0],h:v[0]?v[1]/v[0]:0}))))+`\n\nPer outlet:\n`+x.H.slice().reverse().map((h,i)=>`${i+1}. ${h.on||'(tanpa nama)'}: ${nf(h.R.reduce((s,r)=>s+r.q,0))} pcs · ${rp(h.tt)}`).join('\n')+(x.ds?`\n\nTotal diskon: ${rp(x.ds)}`:'')+`\n\n*Total jualan: ${rp(x.tt)}*`}
+function drawH(){drawD();$('hist').innerHTML=HL.length?HL.slice(0,30).map((h,i)=>`<div class="h"><div class="row" style="justify-content:space-between"><b>${esc(h.on||'(tanpa nama)')}</b><span style="color:var(--mu);font-size:12px">${tglF(h.t)}</span></div><div style="color:var(--mu);margin:2px 0 6px">${nf(h.R.reduce((s,r)=>s+r.q,0))} pcs · <b style="color:var(--tx)">${rp(h.tt)}</b> · ${esc(h.R.map(r=>r.n).join(', ').slice(0,80))}</div><div class="row"><button class="btn s" data-ho="${i}">Buka</button><button class="btn s" data-hc="${i}">Salin</button><button class="btn s" data-hx="${i}" style="color:var(--ac)">Hapus</button></div></div>`).join(''):'<div class="sub" style="margin:0">Belum ada nota tersimpan.</div>'}
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
-$('on').value=S.on||'';$('ds').value=S.ds?nf(S.ds):'';$('by').value=S.by?nf(S.by):'';draw();drawH();
+$('on').value=S.on||'';$('ds').value=S.ds?nf(S.ds):'';$('by').value=S.by?nf(S.by):'';$('tg').value=dk(Date.now());draw();drawH();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
 </script><script src="nav.js"></script></body></html>
