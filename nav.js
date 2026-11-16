@@ -7,8 +7,8 @@
     ["penjualan.html","Dashboard Penjualan"],
     ["wl.html","Penyusun WL"],
     ["kalkulator.html","Kalkulator Jualan"],
-    ["backup.html","Backup Data"],
-    ["cekst.html","Cek WL vs ST"]
+    ["cekst.html","Cek WL vs ST"],
+    ["backup.html","Backup Data"]
   ];
   var css = ''
    +'#bbtnav{position:fixed;right:12px;top:calc(10px + env(safe-area-inset-top,0px));z-index:30;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}'

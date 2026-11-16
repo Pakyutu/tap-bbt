@@ -36,7 +36,7 @@ input{width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:10px;
 <div class="tot"><div class="in">
   <div class="r"><small id="tq">0 pcs</small><span class="big" id="tt">Rp 0</span></div>
   <div class="r" style="margin-top:2px"><small id="kb"></small><small id="dsx"></small></div>
-  <div class="row" style="margin-top:8px"><button class="btn" id="cp" style="flex:1">Salin nota WA</button><button class="btn s" id="sv">💾 Simpan</button><button class="btn s" id="rs">Reset</button></div>
+  <div class="row" style="margin-top:8px"><button class="btn" id="cp" style="flex:1">Salin nota WA</button><button class="btn s" id="sv">💾 Simpan & struk</button><button class="btn s" id="rs">Reset</button></div>
 </div></div>
 <script>
 const $=i=>document.getElementById(i),nf=v=>Math.round(v).toLocaleString('id-ID'),rp=v=>'Rp '+nf(v),num=v=>parseInt(String(v||'').replace(/\D/g,'')||'0',10),esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -67,11 +67,12 @@ document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{},it=t.clos
   if(d.by){$('by').value=nf(+d.by);S.by=+d.by;tot()}
   if(t.id==='na'){const n=$('nn').value.trim();if(!n){$('nn').focus();return}if(!prods().some(p=>p.n===n))S.ex.push({n,h:num($('nh').value)});$('nn').value='';$('nh').value='';draw()}
   if(t.id==='cp'){copy(nota(),t)}
-  if(t.id==='sv'){const x=tot();if(!x.R.length){alert('Belum ada produk.');return}HL.unshift({t:Date.now(),on:S.on,R:x.R.map(r=>({n:r.n,q:r.q,h:r.h})),ds:S.ds,by:S.by,tt:x.t});HL=HL.slice(0,100);try{localStorage.setItem('kalkh',JSON.stringify(HL))}catch(_){}drawH();t.textContent='Tersimpan ✓';setTimeout(()=>t.textContent='💾 Simpan',1500)}
+  if(t.id==='sv'){const x=tot();if(!x.R.length){alert('Belum ada produk.');return}HL.unshift({t:Date.now(),on:S.on,R:x.R.map(r=>({n:r.n,q:r.q,h:r.h})),ds:S.ds,by:S.by,tt:x.t});HL=HL.slice(0,100);try{localStorage.setItem('kalkh',JSON.stringify(HL))}catch(_){}drawH();showStruk(0)}
   if(t.id==='rs'&&confirm('Kosongkan semua jumlah?')){S.it={};S.ds=0;S.by=0;S.on='';$('on').value='';$('ds').value='';$('by').value='';draw()}
   if(d.ho!==undefined){const h=HL[+d.ho];S.on=h.on;S.ds=h.ds;S.by=h.by;S.it={};h.R.forEach(r=>{if(!prods().some(p=>p.n===r.n))S.ex.push({n:r.n,h:r.h});S.it[r.n]={q:r.q,h:r.h}});$('on').value=S.on||'';$('ds').value=S.ds?nf(S.ds):'';$('by').value=S.by?nf(S.by):'';draw();scrollTo({top:0,behavior:'smooth'})}
   if(d.hc!==undefined)copy(nota(HL[+d.hc]),t);
   if(t.id==='cpd')copy(rekapD(),t);
+  if(d.hs!==undefined)showStruk(+d.hs);
   if(d.hx!==undefined&&confirm('Hapus nota ini?')){HL.splice(+d.hx,1);try{localStorage.setItem('kalkh',JSON.stringify(HL))}catch(_){}drawH()}});
 document.addEventListener('input',e=>{const t=e.target,it=t.closest('.it');
   if(it&&t.dataset.q!==undefined){line(it.dataset.n).q=num(t.value);const c=t.selectionStart;upd(t);try{t.setSelectionRange(c,c)}catch(_){}}
@@ -91,7 +92,54 @@ function drawD(){const x=day(),lab=x.k===dk(Date.now())?'Hari ini':new Date(x.k+
     <div class="row" style="margin-top:8px"><button class="btn s" id="cpd">Salin rekap ${lab.toLowerCase()}</button></div>`:`<div class="sub" style="margin:0">${lab}: belum ada nota tersimpan. Ketuk 💾 Simpan setelah tiap transaksi supaya masuk ke total jualan.</div>`}
 function rekapD(){const x=day(),d=new Date(x.k+'T00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   return `*Total jualan ${d}*\n${x.H.length} nota · ${nf(x.q)} pcs\n\n`+Object.entries(x.P).sort((a,b)=>b[1][1]-a[1][1]).map(([n,v])=>`${n}: ${nf(v[0])} pcs · ${rp(v[1])}`).join('\n')+(g=>g?'\n'+g:'')(grp(Object.entries(x.P).map(([n,v])=>({n,q:v[0],h:v[0]?v[1]/v[0]:0}))))+`\n\n*Per outlet:*\n`+x.H.slice().reverse().map((h,i)=>`${i+1}. ${h.on||'(tanpa nama)'} (${nf(h.R.reduce((s,r)=>s+r.q,0))} pcs · ${rp(h.tt)})\n`+h.R.map(r=>`${r.n}: ${nf(r.q)} × ${rp(r.h)}`).join('\n')+(h.ds?`\nDiskon ${rp(h.ds)}`:'')).join('\n\n')+(x.ds?`\n\nTotal diskon: ${rp(x.ds)}`:'')+`\n\n*Total jualan: ${rp(x.tt)}*`}
-function drawH(){drawD();$('hist').innerHTML=HL.length?HL.slice(0,30).map((h,i)=>`<div class="h"><div class="row" style="justify-content:space-between"><b>${esc(h.on||'(tanpa nama)')}</b><span style="color:var(--mu);font-size:12px">${tglF(h.t)}</span></div><div style="color:var(--mu);margin:2px 0 6px">${nf(h.R.reduce((s,r)=>s+r.q,0))} pcs · <b style="color:var(--tx)">${rp(h.tt)}</b> · ${esc(h.R.map(r=>r.n).join(', ').slice(0,80))}</div><div class="row"><button class="btn s" data-ho="${i}">Buka</button><button class="btn s" data-hc="${i}">Salin</button><button class="btn s" data-hx="${i}" style="color:var(--ac)">Hapus</button></div></div>`).join(''):'<div class="sub" style="margin:0">Belum ada nota tersimpan.</div>'}
+function drawH(){drawD();$('hist').innerHTML=HL.length?HL.slice(0,30).map((h,i)=>`<div class="h"><div class="row" style="justify-content:space-between"><b>${esc(h.on||'(tanpa nama)')}</b><span style="color:var(--mu);font-size:12px">${tglF(h.t)}</span></div><div style="color:var(--mu);margin:2px 0 6px">${nf(h.R.reduce((s,r)=>s+r.q,0))} pcs · <b style="color:var(--tx)">${rp(h.tt)}</b> · ${esc(h.R.map(r=>r.n).join(', ').slice(0,80))}</div><div class="row"><button class="btn s" data-ho="${i}">Buka</button><button class="btn s" data-hs="${i}">🧾 Struk</button><button class="btn s" data-hc="${i}">Salin</button><button class="btn s" data-hx="${i}" style="color:var(--ac)">Hapus</button></div></div>`).join(''):'<div class="sub" style="margin:0">Belum ada nota tersimpan.</div>'}
+
+// ---------- struk (bukti transaksi) ----------
+const SK=document.createElement('div');SK.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(10,14,22,.72);display:none;overflow:auto;padding:calc(16px + env(safe-area-inset-top,0px)) 14px 24px';document.body.appendChild(SK);
+let SI=-1;
+function hx(h){const R=h.R,q=R.reduce((s,r)=>s+r.q,0),sub=R.reduce((s,r)=>s+r.q*r.h,0);return{R,q,sub,tt:h.tt,ds:h.ds||0,by:h.by||0}}
+function noStr(h){const d=new Date(h.t);return 'TBB'+d.getFullYear().toString().slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+String(d.getSeconds()).padStart(2,'0')}
+function showStruk(i){const h=HL[i];if(!h)return;SI=i;const x=hx(h),L=(a,b,st='')=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:5px 0;${st}"><span style="color:#5b6b85">${a}</span><span style="text-align:right;font-weight:600">${b}</span></div>`;
+  SK.innerHTML=`<div style="max-width:420px;margin:0 auto;background:#fff;color:#14213d;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)">
+    <div style="background:linear-gradient(135deg,#c8102e,#7a0a1c);color:#fff;padding:22px 20px 18px;text-align:center">
+      <div style="width:54px;height:54px;border-radius:50%;background:#fff;color:#0f8a52;font-size:30px;font-weight:900;line-height:54px;margin:0 auto 8px">✓</div>
+      <div style="font-size:17px;font-weight:800">Transaksi Berhasil</div><div style="font-size:12.5px;opacity:.85;margin-top:2px">${tglF(h.t)}</div>
+      <div style="font-size:28px;font-weight:900;margin-top:10px">${rp(x.tt)}</div></div>
+    <div style="padding:14px 18px 6px;font-size:14px">
+      ${L('No. nota',noStr(h))}${L('Outlet',esc(h.on||'-'))}${L('Total item',nf(x.q)+' pcs')}
+      <div style="border-top:1px dashed #cfd6e2;margin:8px 0"></div>
+      ${x.R.map(r=>`<div style="padding:5px 0"><div style="font-weight:700">${esc(r.n)}</div><div style="display:flex;justify-content:space-between;color:#5b6b85;font-size:13px"><span>${nf(r.q)} × ${rp(r.h)}</span><span style="color:#14213d;font-weight:600">${rp(r.q*r.h)}</span></div></div>`).join('')}
+      <div style="border-top:1px dashed #cfd6e2;margin:8px 0"></div>
+      ${L('Subtotal',rp(x.sub))}${x.ds?L('Diskon','− '+rp(x.ds)):''}${L('<b style="color:#14213d">Total bayar</b>','<b style="font-size:16px">'+rp(x.tt)+'</b>')}${x.by?L('Bayar',rp(x.by))+L(x.by>=x.tt?'Kembali':'Kurang',rp(Math.abs(x.by-x.tt))):''}
+      <div style="text-align:center;color:#98a2b6;font-size:11.5px;margin:10px 0 6px">TAP Bagan Batu · Terima kasih</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px">
+      <button data-sk="sh" style="grid-column:1/-1;padding:13px;border:0;border-radius:12px;background:#c8102e;color:#fff;font-weight:800;font-size:15.5px">📤 Teruskan / Bagikan</button>
+      <button data-sk="cp" style="padding:11px;border:1px solid #cfd6e2;border-radius:12px;background:#f4f6fa;color:#14213d;font-weight:700">Salin teks</button>
+      <button data-sk="dl" style="padding:11px;border:1px solid #cfd6e2;border-radius:12px;background:#f4f6fa;color:#14213d;font-weight:700">⬇️ Simpan gambar</button>
+      <button data-sk="nw" style="padding:11px;border:1px solid #cfd6e2;border-radius:12px;background:#f4f6fa;color:#14213d;font-weight:700">＋ Transaksi baru</button>
+      <button data-sk="x" style="padding:11px;border:1px solid #cfd6e2;border-radius:12px;background:#f4f6fa;color:#14213d;font-weight:700">Tutup</button></div></div>`;
+  SK.style.display='block';SK.scrollTop=0}
+function strukPNG(h){const x=hx(h),W=720,P=44,lines=[];const c=document.createElement('canvas'),g=c.getContext('2d');
+  const H=300+120+x.R.length*78+(x.ds?40:0)+(x.by?80:0)+200;c.width=W;c.height=H;
+  g.fillStyle='#fff';g.fillRect(0,0,W,H);const gr=g.createLinearGradient(0,0,W,300);gr.addColorStop(0,'#c8102e');gr.addColorStop(1,'#7a0a1c');g.fillStyle=gr;g.fillRect(0,0,W,300);
+  g.textAlign='center';g.fillStyle='#fff';g.beginPath();g.arc(W/2,70,38,0,7);g.fill();g.fillStyle='#0f8a52';g.font='900 48px system-ui,sans-serif';g.fillText('✓',W/2,88);
+  g.fillStyle='#fff';g.font='800 32px system-ui,sans-serif';g.fillText('Transaksi Berhasil',W/2,155);g.font='400 22px system-ui,sans-serif';g.globalAlpha=.85;g.fillText(tglF(h.t),W/2,190);g.globalAlpha=1;
+  g.font='900 54px system-ui,sans-serif';g.fillText(rp(x.tt),W/2,262);
+  let y=340;const row=(a,b,bold,size)=>{g.textAlign='left';g.fillStyle='#5b6b85';g.font=`400 ${size||24}px system-ui,sans-serif`;g.fillText(a,P,y);g.textAlign='right';g.fillStyle='#14213d';g.font=`${bold?800:600} ${size||24}px system-ui,sans-serif`;g.fillText(b,W-P,y);y+=40};
+  const dash=()=>{g.strokeStyle='#cfd6e2';g.setLineDash([8,8]);g.beginPath();g.moveTo(P,y-14);g.lineTo(W-P,y-14);g.stroke();g.setLineDash([]);y+=16};
+  row('No. nota',noStr(h));row('Outlet',h.on||'-');row('Total item',nf(x.q)+' pcs');dash();
+  x.R.forEach(r=>{g.textAlign='left';g.fillStyle='#14213d';g.font='700 25px system-ui,sans-serif';g.fillText(r.n,P,y);y+=34;row(nf(r.q)+' × '+rp(r.h),rp(r.q*r.h));y+=4});
+  dash();row('Subtotal',rp(x.sub));if(x.ds)row('Diskon','− '+rp(x.ds));row('Total bayar',rp(x.tt),true,28);if(x.by){row('Bayar',rp(x.by));row(x.by>=x.tt?'Kembali':'Kurang',rp(Math.abs(x.by-x.tt)))}
+  g.textAlign='center';g.fillStyle='#98a2b6';g.font='400 21px system-ui,sans-serif';g.fillText('TAP Bagan Batu · Terima kasih',W/2,y+30);
+  const out=document.createElement('canvas');out.width=W;out.height=y+70;out.getContext('2d').drawImage(c,0,0);return out}
+SK.addEventListener('click',async e=>{const b=e.target.closest('[data-sk]');if(!b){if(e.target===SK)SK.style.display='none';return}const h=HL[SI],k=b.dataset.sk;
+  if(k==='x'){SK.style.display='none';return}
+  if(k==='cp'){copy(nota(h),b);return}
+  if(k==='nw'){SK.style.display='none';S.it={};S.ds=0;S.by=0;S.on='';$('on').value='';$('ds').value='';$('by').value='';draw();scrollTo({top:0,behavior:'smooth'});$('on').focus();return}
+  const cv=strukPNG(h),fn=`Struk_${(h.on||'nota').replace(/[^\w-]+/g,'_')}_${noStr(h)}.png`;
+  const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+  if(k==='sh'){const f=new File([blob],fn,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],text:nota(h)});return}catch(err){if(err.name==='AbortError')return}}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();a.remove();const o=b.textContent;b.textContent='Tersimpan ✓';setTimeout(()=>b.textContent=o,1500)});
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
 $('on').value=S.on||'';$('ds').value=S.ds?nf(S.ds):'';$('by').value=S.by?nf(S.by):'';$('tg').value=dk(Date.now());draw();drawH();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
