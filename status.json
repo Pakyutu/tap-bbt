@@ -49,6 +49,11 @@
 "g": "Penjualan",
 "n": "Stock Gudang",
 "d": "2026-11-16"
+},
+{
+"g": "Cek WL",
+"n": "WL vs ST VF",
+"d": "2026-11-14"
 }
 ]
 }
