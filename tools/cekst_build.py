@@ -89,7 +89,7 @@ if __name__=='__main__':
     STv,STs,mx={},{},{}
     raw(a.pv,{key(x[1]) for k in L if k.startswith('VF') for x in L[k]},STv,mx)
     raw(a.sa,{key(x[1]) for k in L if k.startswith('SA') for x in L[k]},STs,mx)
-    out={'upd':datetime.date.today().isoformat(),'cutVF':max([v for k,v in mx.items() if k in a.pv] or ['']),'cutSA':max([v for k,v in mx.items() if k in a.sa] or ['']),'G':{}}
+    out={'upd':(datetime.datetime.utcnow()+datetime.timedelta(hours=7)).strftime('%Y-%m-%dT%H:%M'),'cutVF':max([v for k,v in mx.items() if k in a.pv] or ['']),'cutSA':max([v for k,v in mx.items() if k in a.sa] or ['']),'G':{}}
     for k,rows in L.items():
         if not rows:continue
         st=STv if k.startswith('VF') else STs
