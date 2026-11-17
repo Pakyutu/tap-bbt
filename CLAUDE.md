@@ -4,3 +4,4 @@
 - Cek WL vs ST: data dari `tools/cekst_build.py --wl WL.xlsx [--byu WL_SA_BYU.xlsx] --pv raw_st_pv*.xlsx --sa raw_st_sp*.xlsx` -> `cekst-data.js`, update juga status.json.
 - ST Digipos: `python3 tools/st_digipos.py <ST_DIGIPOS.xlsx>` (update kolom vr/vb/ss/sb D.O di digipos.html), lalu ganti label "update DD Nov" + D.VER.
 - MoM Sales Tap (paste SURYA): `python3 tools/surya_mom.py <paste.txt> PV|SA <hari>`.
+- Stock on Hand (paste SURYA): `python3 tools/surya_soh.py <paste.txt> PV|SA <hari_MTD> <hari_paste>`.
