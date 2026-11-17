@@ -26,6 +26,12 @@ def comp(a):
         if o and len(s)==len(o[-1][1]) and int(s)==int(o[-1][1])+1:o[-1][1]=s
         else:o.append([s,s])
     return [x[0] if x[0]==x[1] else x[0]+'-'+x[1] for x in o]
+def ftime(path):
+    import zipfile
+    try:
+        c=zipfile.ZipFile(path).read('docProps/core.xml').decode();m=re.search(r'<dcterms:modified[^>]*>([^<]+)',c)
+        t=datetime.datetime.strptime(m.group(1)[:19],'%Y-%m-%dT%H:%M:%S')+datetime.timedelta(hours=7);return t.strftime('%Y-%m-%dT%H:%M')
+    except Exception:return ''
 def wl_sheet(wb,sheet,snc,pc,sfc,dc=1,start=3):
     out=[]
     if sheet not in wb.sheetnames:return out
@@ -90,6 +96,7 @@ if __name__=='__main__':
     raw(a.pv,{key(x[1]) for k in L if k.startswith('VF') for x in L[k]},STv,mx)
     raw(a.sa,{key(x[1]) for k in L if k.startswith('SA') for x in L[k]},STs,mx)
     out={'upd':(datetime.datetime.utcnow()+datetime.timedelta(hours=7)).strftime('%Y-%m-%dT%H:%M'),'cutVF':max([v for k,v in mx.items() if k in a.pv] or ['']),'cutSA':max([v for k,v in mx.items() if k in a.sa] or ['']),'G':{}}
+    out['ft']={'wl':ftime(a.wl),'pv':max([ftime(p) for p in a.pv] or ['']),'sa':max([ftime(p) for p in a.sa] or [''])}
     for k,rows in L.items():
         if not rows:continue
         st=STv if k.startswith('VF') else STs

@@ -35,6 +35,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px 8px;b
 <script>
 const $=i=>document.getElementById(i),nf=v=>Math.round(v).toLocaleString('id-ID'),pc=(a,b)=>b?Math.round(a/b*100):0,esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const col=p=>p>=90?'var(--ok)':p>=75?'var(--wn)':'var(--ac)',tg=d=>{const x=new Date(d+'T00:00:00');return x.getDate()+' '+['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][x.getMonth()]};
+const ft=x=>x?tg(x.slice(0,10))+' '+x.slice(11,16):'-';
 const rg=r=>r.replace('-',' – ');
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
 const BL=['JAN','FEB','MAR','APR','MEI','JUN','JUL','AGU','AGS','SEP','OKT','NOV','DES'],mi=k=>{const m=k.split(' ')[1]||'';const i=BL.indexOf(m);return i<0?99:(m==='AGS'?7:i>7?i-1:i)};
@@ -42,7 +43,7 @@ const GK=Object.keys(CK.G||{}).sort((a,b)=>mi(a)-mi(b)||(a.split(' ')[0]>b.split
 $('pt').innerHTML=GK.map(k=>`<button data-p="${k}" class="${k===P?'on':''}">${k}</button>`).join('');
 const cut=()=>P.startsWith('VF')?CK.cutVF:CK.cutSA;
 function draw(){const C=CK.G[P];
-  $('sub').innerHTML=`WL dropingan vs transaksi ST Digipos per SN (raw ST Agustus s/d ${tg(CK.cutVF||CK.cutSA)}). Diperbarui ${tg(CK.upd.slice(0,10))}${CK.upd.length>10?' jam '+CK.upd.slice(11,16)+' WIB':''}.`;
+  $('sub').innerHTML=`WL dropingan vs transaksi ST Digipos per SN (raw ST Agustus s/d ${tg(CK.cutVF||CK.cutSA)}). ${CK.ft?`<br>📄 File WL: <b>${ft(CK.ft.wl)}</b> · raw ST PV: <b>${ft(CK.ft.pv)}</b> · raw ST SA: <b>${ft(CK.ft.sa)}</b> (WIB)`:''}`;
   if(!C){$('res').innerHTML='<div class="card">Belum ada data.</div>';return}
   const S=C.sf,T=S.reduce((a,o)=>a+o.d,0),Y=S.reduce((a,o)=>a+o.s,0);
   let V=S;if(F==='bl')V=S.filter(o=>o.s<o.d);
