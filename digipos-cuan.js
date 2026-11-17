@@ -16,16 +16,16 @@ const CU={"d":"14 Nov","o":{"1201094925":[0,0,0,0,9],"1201116250":[0,0,0,0,9],"1
   R.cuan=function(){
     const L=sel().filter(o=>val(o.id)),T=sum(L);
     const by={};L.forEach(o=>(by[o.sf]=by[o.sf]||[]).push(o));
-    const rows=Object.entries(by).map(([sf,a])=>({sf,...sum(a)})).sort((a,b)=>a.oa/a.n-b.oa/b.n);
+    const rows=Object.entries(by).map(([sf,a])=>({sf,...sum(a)})).sort((a,b)=>b.oa/b.n-a.oa/a.n);
     const tr=rows.map(r=>{const p=r.n?r.oa/r.n*100:0;return `<tr><td class="l"><b>${es(tc(r.sf))}</b><i class="cu-b"><i style="width:${p}%;background:${col(p)}"></i></i></td><td>${r.n}</td><td>${r.oa}</td><td style="color:${col(p)};font-weight:600">${Math.round(p)}%</td><td>${nf(r.trx)}</td><td>${nf(r.bt)}</td><td>${rpj(r.rv)}</td><td>${nf(r.sk)}</td></tr>`}).join('');
     const LL=mode==='bl'?L.filter(o=>!(val(o.id)[0]>0)&&val(o.id)[4]>0).sort((a,b)=>val(b.id)[4]-val(a.id)[4]):L.filter(o=>val(o.id)[0]>0).sort((a,b)=>val(b.id)[3]-val(a.id)[3]);
     const ol=LL.map((o,i)=>{const v=val(o.id);return `<tr><td class="mu">${i+1}</td><td class="l"><b>${es(o.nm)}</b><br><span class="mu" style="font-size:11px">${o.id} · ${es(o.pjp||'')}</span></td><td class="l">${es(tc(o.sf).split(' ')[0])}</td><td>${nf(v[4])}</td><td>${v[1]?nf(v[1]):'<span class="mu">0</span>'}</td><td>${v[3]?rpj(v[3]):'<span class="mu">–</span>'}</td></tr>`}).join('');
     return `<div class="card"><h3>⭐ Program Cuan PV Redeem</h3><div class="sub">Data ${es(CU.d)} 2026 (sheet Reedem PV, file Monitoring Klik Misi & FR). Hanya outlet PJP. Ikut filter SF/Kecamatan/PJP di atas.</div>
-      <div class="kpi" style="margin-top:10px"><div class="k"><div class="t">Outlet redeem</div><div class="v">${nf(T.oa)} <span style="font-size:14px;color:var(--mu)">/ ${nf(T.n)}</span></div><div class="s" style="color:${col(T.n?T.oa/T.n*100:0)}">${pc(T.oa,T.n)} outlet PJP</div></div>
+      <div class="note" style="margin-top:8px">Produk yang masuk program: <b>VF validity 1 hari, 3 hari, 7 hari, dan 28 hari</b>.</div><div class="kpi" style="margin-top:10px"><div class="k"><div class="t">Outlet redeem</div><div class="v">${nf(T.oa)} <span style="font-size:14px;color:var(--mu)">/ ${nf(T.n)}</span></div><div class="s" style="color:${col(T.n?T.oa/T.n*100:0)}">${pc(T.oa,T.n)} outlet PJP</div></div>
       <div class="k"><div class="t">Trx redeem</div><div class="v">${nf(T.trx)}</div><div class="s">${nf(T.bt)} bintang</div></div>
       <div class="k"><div class="t">Revenue</div><div class="v">${rpj(T.rv)}</div><div class="s">stok PV outlet ${nf(T.sk)}</div></div>
       <div class="k"><div class="t">Belum redeem, ada stok</div><div class="v dn">${nf(L.filter(o=>!(val(o.id)[0]>0)&&val(o.id)[4]>0).length)}</div><div class="s">outlet potensi didorong</div></div></div></div>
-      <div class="card tw" style="margin-top:12px"><h3>Per SF</h3><table class="cu-t"><tr><th class="l">SF</th><th>Outlet</th><th>OA</th><th>% OA</th><th>Trx</th><th>Bintang</th><th>Revenue</th><th>Stok</th></tr>${tr}
+      <div class="card tw" style="margin-top:12px"><h3>Per SF · % OA tertinggi di atas</h3><table class="cu-t"><tr><th class="l">SF</th><th>Outlet</th><th>OA</th><th>% OA</th><th>Trx</th><th>Bintang</th><th>Revenue</th><th>Stok</th></tr>${tr}
       <tr class="t"><td class="l">Total</td><td>${T.n}</td><td>${T.oa}</td><td>${pc(T.oa,T.n)}</td><td>${nf(T.trx)}</td><td>${nf(T.bt)}</td><td>${rpj(T.rv)}</td><td>${nf(T.sk)}</td></tr></table></div>
       <div class="card tw" style="margin-top:12px"><h3>Daftar outlet</h3>
       <div class="cu-ch"><button data-cum="bl" class="${mode==='bl'?'on':''}">Belum redeem, ada stok</button><button data-cum="sd" class="${mode==='sd'?'on':''}">Sudah redeem</button></div>
@@ -35,7 +35,7 @@ const CU={"d":"14 Nov","o":{"1201094925":[0,0,0,0,9],"1201116250":[0,0,0,0,9],"1
     const L=sel().filter(o=>val(o.id)),T=sum(L);if(!T.n)return h;const by={};L.forEach(o=>(by[o.sf]=by[o.sf]||[]).push(o));
     const rows=Object.entries(by).map(([sf,a])=>({sf,...sum(a)})).sort((a,b)=>a.oa/a.n-b.oa/b.n),bl=L.filter(o=>!(val(o.id)[0]>0)&&val(o.id)[4]>0);
     const top=[...rows].sort((a,b)=>b.rv-a.rv)[0];
-    return h+`<div class="card" style="margin-top:12px"><h3>Temuan Cuan PV Redeem · ${es(CU.d)}</h3><ul class="f">
+    return h+`<div class="card" style="margin-top:12px"><h3>Temuan Cuan PV Redeem · ${es(CU.d)}</h3><ul class="f"><li>Program berlaku untuk VF validity 1, 3, 7, dan 28 hari.</li>
       <li>Outlet ikut redeem <b>${T.oa} dari ${T.n}</b> (${pc(T.oa,T.n)}), trx ${nf(T.trx)}, revenue ${rpj(T.rv)}.</li>
       <li>% OA terendah: ${rows.slice(0,3).map(r=>`<b>${es(tc(r.sf).split(' ')[0])}</b> ${r.oa}/${r.n} (${pc(r.oa,r.n)})`).join(', ')}.</li>
       <li><b class="dn">${bl.length}</b> outlet belum redeem padahal ada stok PV (total ${nf(bl.reduce((s,o)=>s+val(o.id)[4],0))} pcs) — cek di tab ⭐ Cuan PV.</li>
