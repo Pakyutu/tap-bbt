@@ -11,10 +11,10 @@ def sfn(n):
     for k,v in [('RINALDI','Rinaldi Al Islami'),('SYARIF','Ahmad Syarif Rambe'),('SAYRIF','Ahmad Syarif Rambe'),('SYARF','Ahmad Syarif Rambe'),('AFIF','Afif Alwan Syahridho'),('AFI ALWAN','Afif Alwan Syahridho'),('ALDI','Afif Alwan Syahridho'),('RIO','Rio Pranata Dani'),('NGIO','Rio Pranata Dani'),('MULKAN','Mulkan Azhar'),('MULKAB','Mulkan Azhar'),('IHSAN','Khoirul Ihsan Harahap'),('KHOIRUL','Khoirul Ihsan Harahap'),('GUSTI','Gusti Edwin'),('TEGUH','Teguh Ariwibowo'),('HERMAN','Herman Syahputra Harahap'),('TENGKU','Tengku Muhammad Sobry Amri'),('SOBRY','Tengku Muhammad Sobry Amri')]:
         if k in u:return v
     return ('Lainnya: '+str(n).strip()) if n else '(tanpa SF)'
-def pk(p):
+def pk(p,sa=False):
     s=re.sub(r'\s+',' ',str(p).upper()).strip()
     m=re.match(r'(\d+)\s*GB\s*(\d+)\s*(H|HARI)\b',s)
-    if m:return f'VF {m.group(1)}GB {m.group(2)} hari'
+    if m:return f'SA {m.group(1)}GB {m.group(2)}H' if sa else f'VF {m.group(1)}GB {m.group(2)} hari'
     if 'UNL' in s:return s.title()
     if 'SA' in s:
         g=re.search(r'(\d+)\s*GB',s);d=re.search(r'(\d+)\s*H\b',s)
@@ -39,7 +39,7 @@ def wl_sheet(wb,sheet,snc,pc,sfc,dc=1,start=3):
         if i<start or len(r)<=snc or r[snc] is None:continue
         sn=str(r[snc]).strip();sn=sn[:-2] if sn.endswith('.0') else sn
         if not re.fullmatch(r'\d{8,}',sn):continue
-        out.append((str(r[dc])[:10] if dc is not None else '',sn,pk(r[pc]),sfn(r[sfc]) if sfc is not None else '(tanpa SF)'))
+        out.append((str(r[dc])[:10] if dc is not None else '',sn,pk(r[pc],sheet.startswith('SA') or sheet.upper().find('SA')>=0 and dc is None),sfn(r[sfc]) if sfc is not None else '(tanpa SF)'))
     return out
 def raw(paths,need,ST,mx):
     for path in paths:
@@ -102,7 +102,7 @@ if __name__=='__main__':
             for i,r in enumerate(w[sh].iter_rows(values_only=True)):
                 if i<3 or len(r)<=max(snc,sfc) or r[snc] is None:continue
                 sn=str(r[snc]).strip();sn=sn[:-2] if sn.endswith('.0') else sn
-                if re.fullmatch(r'\d{8,}',sn):out.append((d,sn,pk(r[pc]),sfn(r[sfc])))
+                if re.fullmatch(r'\d{8,}',sn):out.append((d,sn,pk(r[pc],sh=='SA'),sfn(r[sfc])))
             return out
         ret={key(x[1]) for x in rows('WL Return',1,2,3)}
         nv=rows('VF',1,2,3);ns=rows('SA',2,3,4)
