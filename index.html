@@ -2,119 +2,116 @@
 <html lang="id"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>TAP Bagan Batu</title>
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0d0f14">
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f3f5f9" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#0b111c" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon.ico" sizes="32x32"><link rel="apple-touch-icon" href="icon-192.png">
 <style>
-.st{margin-top:16px;border-radius:18px;background:var(--card);border:1px solid var(--bd);padding:14px 16px}.st .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.st .sh b{font:600 15px Archivo,sans-serif}.st .sh span{font:500 11.5px "IBM Plex Mono",monospace;color:var(--mute)}.st .gr{font:600 11px "IBM Plex Mono",monospace;color:var(--mute);letter-spacing:.06em;text-transform:uppercase;margin:10px 0 2px}.st .it{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--bd);font-size:13.5px}.st .it:first-of-type{border-top:0}.st .tg{font:600 11.5px "IBM Plex Mono",monospace;padding:2px 8px;border-radius:999px;white-space:nowrap}.st .ok{background:rgba(47,210,122,.14);color:var(--ok)}.st .wn{background:rgba(255,176,32,.15);color:var(--warn)}.st .bd{background:rgba(227,19,47,.18);color:var(--red2)}.mu{color:var(--mute);font-size:13px}
-.nudge{margin:14px 0 4px;border-radius:16px;padding:12px 14px;background:linear-gradient(135deg,rgba(227,19,47,.18),rgba(255,176,32,.12));border:1px solid rgba(227,19,47,.35);font-size:14.5px;line-height:1.45;display:flex;gap:10px;align-items:center;animation:ndg 2.4s ease-in-out infinite}.nudge:empty{display:none}.nudge .e{font-size:24px}@keyframes ndg{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
-:root{--bg:#0d0f14;--bg2:#151924;--card:rgba(255,255,255,.055);--bd:rgba(255,255,255,.09);--ink:#f2f4f8;--mute:#98a2b6;--red:#e3132f;--red2:#ff4d63;--blue:#5b8cff;--ok:#2fd27a;--warn:#ffb020}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink)}
-body{font-family:"IBM Plex Sans",system-ui,sans-serif;min-height:100vh;overflow-x:hidden;
-  padding:max(20px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom))}
-body:before{content:"";position:fixed;inset:-30% -40% auto;height:80vh;z-index:-1;
-  background:radial-gradient(closest-side,rgba(227,19,47,.38),transparent 70%),radial-gradient(closest-side at 80% 60%,rgba(91,140,255,.22),transparent 70%);
-  filter:blur(10px);animation:drift 14s ease-in-out infinite alternate}
-@keyframes drift{to{transform:translate3d(8%,6%,0) scale(1.08)}}
-.wrap{max-width:560px;margin:0 auto}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
-.brand{display:flex;align-items:center;gap:10px;font:600 13px "IBM Plex Mono",monospace;letter-spacing:.06em;color:var(--mute);text-transform:uppercase}
-.brand img{width:30px;height:30px;border-radius:8px}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--card);border:1px solid var(--bd);font:500 12px "IBM Plex Mono",monospace;color:var(--mute)}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(47,210,122,.6);animation:pulse 2s infinite}
-.off .dot{background:var(--warn);animation:none}
-@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(47,210,122,0)}100%{box-shadow:0 0 0 0 rgba(47,210,122,0)}}
-.hello{font:700 clamp(28px,8vw,40px)/1.05 Archivo,sans-serif;margin:0 0 8px;letter-spacing:-.02em}
-.hello span{background:linear-gradient(90deg,var(--red2),#ff9a5a);-webkit-background-clip:text;background-clip:text;color:transparent}
-.clock{display:flex;align-items:baseline;gap:10px;color:var(--mute);font-size:14px;margin-bottom:26px}
-.clock b{font:500 22px "IBM Plex Mono",monospace;color:var(--ink);letter-spacing:.02em}
-.cards{display:grid;gap:14px}
-a.card{position:relative;display:flex;gap:14px;align-items:center;padding:18px;border-radius:20px;text-decoration:none;color:inherit;
-  background:var(--card);border:1px solid var(--bd);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:hidden;
-  opacity:0;transform:translateY(14px);animation:rise .55s cubic-bezier(.2,.8,.2,1) forwards;transition:transform .15s}
-a.card:nth-child(2){animation-delay:.08s}a.card:nth-child(3){animation-delay:.16s}
-a.card:active{transform:scale(.98)}
-@keyframes rise{to{opacity:1;transform:none}}
-a.card:after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
-  background:linear-gradient(135deg,var(--c1),transparent 45%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
-.ic{flex:none;width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(140deg,var(--c1),var(--c2));box-shadow:0 8px 22px -8px var(--c1)}
-.ic svg{width:28px;height:28px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.tx{flex:1;min-width:0}
-.tx b{display:block;font:600 18px Archivo,sans-serif;margin-bottom:3px}
-.tx span{display:block;font-size:13px;color:var(--mute);line-height:1.4}
-.tx small{display:block;margin-top:7px;font:500 11px "IBM Plex Mono",monospace;color:var(--mute);opacity:.85}
-.arr{flex:none;color:var(--mute);font-size:20px}
-.dg{--c1:#e3132f;--c2:#ff7a45}
-.pj{--c1:#3b6dff;--c2:#7a5cff}
-.install{display:none;width:100%;margin-top:18px;padding:14px;border-radius:16px;border:1px dashed rgba(255,255,255,.22);background:transparent;color:var(--ink);font:600 14px "IBM Plex Sans",sans-serif;cursor:pointer}
+html,body{margin:0;background:var(--bg);color:var(--tx)}
+body{min-height:100vh;padding:max(16px,env(safe-area-inset-top)) 16px 0;line-height:1.5}
+.wrap{max-width:560px;margin:0 auto;display:grid;gap:20px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand img{width:40px;height:40px;border-radius:12px;flex:none}
+.brand b{display:block;font-size:17px;font-weight:780;letter-spacing:-.02em;line-height:1.15}
+.brand small{display:block;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mu)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:650;white-space:nowrap}
+.pill.ok{background:var(--positive-bg);color:var(--positive)}.pill.wn{background:var(--warning-bg);color:var(--warning)}.pill.bd{background:var(--negative-bg);color:var(--negative)}.pill.in{background:var(--info-bg);color:var(--info)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.hero{border-radius:20px;padding:20px;background:linear-gradient(160deg,var(--card),color-mix(in srgb,var(--card) 70%,var(--soft)));border:1px solid var(--bd);box-shadow:var(--sh)}
+.lbl{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mu)}
+.hello{font-size:clamp(26px,7.5vw,32px);font-weight:780;letter-spacing:-.035em;line-height:1.12;margin:6px 0 2px}
+.clock{font-size:14px;color:var(--mu)}.clock b{color:var(--tx);font-weight:700}
+.nudge{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--accent-bg,var(--nobg));color:var(--tx);font-size:14.5px;line-height:1.45}
+.nudge .e{font-size:20px;line-height:1.1}.nudge b{color:var(--ac)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+h2.sec{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:18px;font-weight:750;letter-spacing:-.02em;margin:4px 2px -8px}
+h2.sec span{font-size:13px;font-weight:600}
+.box{background:var(--card);border:1px solid var(--bd);border-radius:16px;box-shadow:var(--sh);padding:6px 16px}
+.gr{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mu);padding:12px 0 2px}
+.it{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd);font-size:14.5px}
+.it:last-child{border-bottom:0}.it>span:first-child{font-weight:600;min-width:0}
+.it small{display:block;color:var(--mu);font-size:12.5px;font-weight:400}
+.menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+a.mc{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:16px;background:var(--card);border:1px solid var(--bd);box-shadow:var(--sh);text-decoration:none;color:inherit;min-width:0;transition:transform .15s,background .15s}
+a.mc:active{transform:scale(.98);background:var(--soft)}
+a.mc.wide{grid-column:1/-1;flex-direction:row;align-items:center}
+.ic{flex:none;width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 13%,transparent);color:var(--c)}
+.ic svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.mc b{display:block;font-size:15.5px;font-weight:720;letter-spacing:-.015em;line-height:1.25}
+.mc span{display:block;font-size:12.5px;color:var(--mu);line-height:1.4;margin-top:3px}
+.mc small{display:block;font-size:11.5px;color:var(--mu);margin-top:6px;font-weight:600}
+.mc .tx{min-width:0;flex:1}.mc .arr{color:var(--mu);font-size:20px;flex:none}
+.install{display:none;width:100%;min-height:48px;padding:12px;border-radius:14px;border:1.5px dashed var(--bd);background:transparent;color:var(--tx);font:650 14.5px var(--font);cursor:pointer}
 .install.show{display:block}
-.foot{margin-top:26px;text-align:center;font:400 11px "IBM Plex Mono",monospace;color:var(--mute);opacity:.6}
-/* splash */
-#splash{position:fixed;inset:0;z-index:99;background:var(--bg);display:grid;place-items:center;transition:opacity .45s,visibility .45s}
+.foot{text-align:center;font-size:12px;color:var(--mu);padding-bottom:4px}
+.mu{color:var(--mu)}
+#splash{position:fixed;inset:0;z-index:99;background:var(--bg);display:grid;place-items:center;transition:opacity .4s,visibility .4s}
 #splash.hide{opacity:0;visibility:hidden}
-.bars{display:flex;gap:7px;align-items:flex-end;height:56px}
-.bars i{width:12px;border-radius:4px;background:linear-gradient(var(--red2),var(--red));animation:grow .9s cubic-bezier(.2,.8,.2,1) both}
-.bars i:nth-child(1){height:40%}.bars i:nth-child(2){height:70%;animation-delay:.08s}.bars i:nth-child(3){height:100%;animation-delay:.16s}
-@keyframes grow{from{transform:scaleY(0);transform-origin:bottom}to{transform:scaleY(1);transform-origin:bottom}}
-#splash p{margin:16px 0 0;font:600 12px "IBM Plex Mono",monospace;letter-spacing:.2em;color:var(--mute);text-align:center}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}a.card{opacity:1;transform:none}}
-</style></head>
+#splash img{width:84px;height:84px;border-radius:24px;box-shadow:0 18px 50px -12px rgba(200,16,46,.55);animation:pop .6s cubic-bezier(.2,.7,.2,1) both}
+#splash p{margin:16px 0 0;font-size:12px;font-weight:700;letter-spacing:.2em;color:var(--mu);text-align:center}
+@keyframes pop{from{transform:scale(.8);opacity:0}}
+.rise{animation:rise .45s cubic-bezier(.2,.7,.2,1) both}.rise:nth-child(2){animation-delay:.05s}.rise:nth-child(3){animation-delay:.1s}.rise:nth-child(4){animation-delay:.15s}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+</style>
+<link rel="stylesheet" href="ui.css">
+</head>
 <body>
-<div id="splash"><div><div class="bars"><i></i><i></i><i></i></div><p>TAP BAGAN BATU</p></div></div>
-<div class="wrap">
-  <div class="top">
-    <div class="brand"><img src="icon-192.png" alt="">TAP BBT</div>
-    <div class="chip" id="net"><span class="dot"></span><span id="netx">Online</span></div>
-  </div>
-  <h1 class="hello"><span id="greet">Halo</span>,<br>siap pantau hari ini?</h1>
-  <div class="clock"><b id="time">--:--</b><span id="date"></span></div>
-  <div class="nudge" id="nudge"></div>
-  <div class="cards">
-    <a class="card dg" href="digipos.html">
-      <div class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M9 7h6M9 11h6M9 15h3"/></svg></div>
-      <div class="tx"><b>DIGIPOS</b><span>VF / SA Perdana · SF · Kecamatan · Klik Misi · Outlet</span><small id="u-digipos">Memuat…</small></div>
-      <div class="arr">›</div>
+<div id="splash"><div><img src="icon-192.png" alt=""><p>TAP BAGAN BATU</p></div></div>
+<main class="wrap">
+  <header class="top">
+    <div class="brand"><img src="icon-192.png" alt=""><div><b>TAP BBT</b><small>Sales Intelligence</small></div></div>
+    <span class="pill ok" id="net"><span class="dot"></span><span id="netx">Online</span></span>
+  </header>
+
+  <section class="hero rise">
+    <div class="lbl" id="date"></div>
+    <h1 class="hello"><span id="greet">Halo</span> 👋</h1>
+    <div class="clock">Pukul <b id="time">--:--</b> WIB</div>
+    <div class="nudge" id="nudge"></div>
+    <div class="chips" id="hchips"></div>
+  </section>
+
+  <h2 class="sec">Menu kerja</h2>
+  <nav class="menu" aria-label="Menu kerja">
+    <a class="mc rise" href="digipos.html" style="--c:#c8102e">
+      <div class="ic"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10 7h4M9.5 11h5M9.5 15h3"/></svg></div>
+      <div class="tx"><b>Dashboard DIGIPOS</b><span>VF / SA · SF · Kecamatan · Klik Misi · Outlet</span><small id="u-digipos">Memuat…</small></div>
     </a>
-    <a class="card pj" href="penjualan.html">
-      <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M6 16V11M11 16V6M16 16v-3M20 16V8"/></svg></div>
-      <div class="tx"><b>Penjualan</b><span>PV / SA / NGRS · Kunjungan · Tren · Petugas · Stok</span><small id="u-penjualan">Memuat…</small></div>
-      <div class="arr">›</div>
+    <a class="mc rise" href="penjualan.html" style="--c:#255fb4">
+      <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M6 16v-5M11 16V6M16 16v-3M20 16V8"/></svg></div>
+      <div class="tx"><b>Penjualan</b><span>PV / SA / NGRS · Petugas · Stok · Target</span><small id="u-penjualan">Memuat…</small></div>
     </a>
-    <a class="card wl" href="wl.html" style="--c1:#1d9a6c;--c2:#0f9bb5">
+    <a class="mc rise" href="wl.html" style="--c:#0f8a6c">
       <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
-      <div class="tx"><b>Penyusun WL</b><span>Bagi SN VF / SA multi seri ke outlet, harga bebas, total otomatis · riwayat &amp; cari SN</span></div>
-      <div class="arr">›</div>
+      <div class="tx"><b>Penyusun WL</b><span>Bagi SN multi seri ke outlet · barcode · riwayat</span></div>
     </a>
-    <a class="card kalk" href="kalkulator.html" style="--c1:#0f8a52;--c2:#1565c0">
+    <a class="mc rise" href="kalkulator.html" style="--c:#137447">
       <div class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M8 15h2M12 15h2M16 11v4"/></svg></div>
-      <div class="tx"><b>Kalkulator Jualan</b><span>Hitung order per produk · total, diskon, kembalian · salin nota WA</span></div>
-      <div class="arr">›</div>
+      <div class="tx"><b>Kalkulator Jualan</b><span>Nota, diskon, struk · total jualan harian</span></div>
     </a>
-    <a class="card cst" href="cekst.html" style="--c1:#7a3fd1;--c2:#c8102e">
+    <a class="mc rise" href="cekst.html" style="--c:#6d3fc4">
       <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/><path d="M4 6h7M4 18h4"/></svg></div>
-      <div class="tx"><b>Cek WL vs ST</b><span>WL dropingan SF vs ST Digipos · % ST per SF · rentang SN belum ST</span></div>
-      <div class="arr">›</div>
+      <div class="tx"><b>Cek WL vs ST</b><span>% ST per SF · rentang SN belum ST</span></div>
     </a>
-    <a class="card bk" href="backup.html" style="--c1:#5b6b85;--c2:#14213d">
+    <a class="mc rise" href="backup.html" style="--c:#526078">
       <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></div>
-      <div class="tx"><b>Backup Data</b><span>Simpan riwayat WL, nota & produk jadi file · pulihkan di HP baru</span></div>
-      <div class="arr">›</div>
+      <div class="tx"><b>Backup Data</b><span>Simpan & pulihkan di HP baru</span></div>
     </a>
-  </div>
-  <div class="st" id="dst"><div class="sh"><b>Status data</b><span id="dsts"></span></div><div id="dstl"><span class="mu">Memuat…</span></div></div>
+  </nav>
+
+  <h2 class="sec">Status data <span id="dsts"></span></h2>
+  <section class="box" id="dst"><div id="dstl"><div class="it"><span class="mu">Memuat…</span></div></div></section>
+
   <button class="install" id="inst">＋ Pasang aplikasi di layar utama</button>
-  <div class="foot">TAP Bagan Batu · v3</div>
-</div>
+  <div class="foot">TAP Bagan Batu · v4</div>
+</main>
 <script>
 (function(){
   var $=function(i){return document.getElementById(i)};
-  // splash: sekali per sesi
   var seen=false;try{seen=sessionStorage.getItem("bbt_splash")==="1";sessionStorage.setItem("bbt_splash","1")}catch(e){}
-  setTimeout(function(){$("splash").classList.add("hide")},seen?0:900);
-  // sapaan + jam
+  setTimeout(function(){$("splash").classList.add("hide")},seen?0:700);
   function tick(){
     var d=new Date(),h=d.getHours();
     $("greet").textContent=h<11?"Selamat pagi":h<15?"Selamat siang":h<18?"Selamat sore":"Selamat malam";
@@ -122,37 +119,35 @@ a.card:after{content:"";position:absolute;inset:0;border-radius:inherit;padding:
     $("date").textContent=d.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
   }
   tick();setInterval(tick,15000);
-  // status jaringan
-  function net(){var on=navigator.onLine;$("net").classList.toggle("off",!on);$("netx").textContent=on?"Online":"Offline"}
+  function net(){var on=navigator.onLine;$("net").className="pill "+(on?"ok":"wn");$("netx").textContent=on?"Online":"Offline"}
   addEventListener("online",net);addEventListener("offline",net);net();
-  // waktu data terakhir diperbarui
   function rel(t){var m=Math.round((Date.now()-t)/60000);if(m<1)return"baru saja";if(m<60)return m+" menit lalu";var h=Math.round(m/60);if(h<24)return h+" jam lalu";return Math.round(h/24)+" hari lalu"}
   ["digipos","penjualan"].forEach(function(n){
     fetch(n+".html",{method:"HEAD",cache:"no-store"}).then(function(r){
       var lm=r.headers.get("last-modified");if(!lm)throw 0;var t=new Date(lm);
-      $("u-"+n).textContent="Diperbarui "+rel(t)+" · "+t.toLocaleDateString("id-ID",{day:"numeric",month:"short"})+" "+t.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
-    }).catch(function(){$("u-"+n).textContent=navigator.onLine?"Siap dibuka":"Mode offline · data tersimpan"});
+      $("u-"+n).textContent="Diperbarui "+rel(t);
+    }).catch(function(){$("u-"+n).textContent=navigator.onLine?"Siap dibuka":"Offline · data tersimpan"});
   });
-  // tombol pasang
   var dp=null;
   addEventListener("beforeinstallprompt",function(e){e.preventDefault();dp=e;$("inst").classList.add("show")});
   $("inst").onclick=function(){if(!dp)return;dp.prompt();dp.userChoice.finally(function(){dp=null;$("inst").classList.remove("show")})};
   addEventListener("appinstalled",function(){$("inst").classList.remove("show")});
-  // getar halus saat ketuk kartu
-  document.querySelectorAll("a.card").forEach(function(a){a.addEventListener("click",function(){try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}})});
+  document.querySelectorAll("a.mc").forEach(function(a){a.addEventListener("click",function(){try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}})});
   if("serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("sw.js")});
 })();
 </script>
 <script>
 (function(){const B=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
-fetch("status.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{const t=new Date();t.setHours(0,0,0,0);let late=0,h="",g="";
- j.items.forEach(x=>{const d=new Date(x.d+"T00:00:00"),a=Math.round((t-d)/864e5),c=a<=2?"ok":a<=3?"wn":"bd";if(a>2)late++;
+fetch("status.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{const t=new Date();t.setHours(0,0,0,0);let late=0,h="",g="",n=0;
+ j.items.forEach(x=>{const d=new Date(x.d+"T00:00:00"),a=Math.round((t-d)/864e5),c=a<=2?"ok":a<=3?"wn":"bd",lb=a<=2?"Terbaru":a<=3?"Perlu cek":"Usang";if(a>2)late++;n++;
   if(x.g!==g){g=x.g;h+=`<div class="gr">${g}</div>`}
-  h+=`<div class="it"><span>${x.n}</span><span class="tg ${c}">${d.getDate()} ${B[d.getMonth()]}${a>2?" · "+a+" hr lalu":""}</span></div>`});
- document.getElementById("dstl").innerHTML=h;document.getElementById("dsts").innerHTML=late?`<span style="color:var(--red2)">⚠ ${late} perlu update</span>`:"semua terbaru ✓";
-}).catch(()=>{document.getElementById("dstl").innerHTML='<span class="mu">Status data tidak bisa dimuat (offline?).</span>'})})();
+  h+=`<div class="it"><span>${x.n}<small>${d.getDate()} ${B[d.getMonth()]}${a>0?" · "+a+" hari lalu":" · hari ini"}</small></span><span class="pill ${c}">${lb}</span></div>`});
+ document.getElementById("dstl").innerHTML=h;
+ document.getElementById("dsts").innerHTML=late?`<span class="pill bd">${late} perlu update</span>`:`<span class="pill ok">Semua terbaru</span>`;
+ document.getElementById("hchips").innerHTML=`<span class="pill ${late?"wn":"ok"}"><span class="dot"></span>${n-late}/${n} data terbaru</span><span class="pill in">9 sales force</span>`;
+}).catch(()=>{document.getElementById("dstl").innerHTML='<div class="it"><span class="mu">Status data tidak bisa dimuat (offline?).</span></div>'})})();
 </script><script>
 (function(){const M=[[5,10,'☕','Selamat pagi! Jangan lupa input <b>SURYA</b> nya yaaa 😊'],[10,12,'📊','Jangan lupa input <b>SURYA</b> nya yaaa, ST Digipos & Klik Misi juga ya!'],[12,15,'🍛','Udah makan siang? Jangan lupa input <b>SURYA</b> nya yaaa'],[15,18,'📦','Sore! Cek stok SF & jangan lupa input <b>SURYA</b> nya yaaa'],[18,22,'📝','Jangan lupa input <b>SURYA</b> nya yaaa, sekalian rekap jualan hari ini'],[22,29,'🌙','Udah malam, istirahat ya. Besok jangan lupa input <b>SURYA</b> nya yaaa']];
 function up(){let h=new Date().getHours();if(h<5)h+=24;const m=M.find(x=>h>=x[0]&&h<x[1])||M[0];const el=document.getElementById('nudge');if(el)el.innerHTML='<span class="e">'+m[2]+'</span><span>'+m[3]+'</span>'}
 up();setInterval(up,60000)})();
-</script></body></html>
+</script><script src="nav.js"></script></body></html>

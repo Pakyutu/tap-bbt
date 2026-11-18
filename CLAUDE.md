@@ -7,3 +7,4 @@
 - Stock on Hand (paste SURYA): `python3 tools/surya_soh.py <paste.txt> PV|SA <hari_MTD> <hari_paste>`.
 - Revenue Telkomsel per site (Monitoring Performance Region SUMBAGTENG): `python3 tools/site_rev.py <file.xlsx> "DD Nov"` (tanggal = Data Update di sheet SITE LEVEL).
 - Cuan PV Redeem (sheet "Reedem PV" di file Monitoring Klik Misi & FR): `python3 tools/cuan_pv.py <file.xlsx> "DD Nov"` -> digipos-cuan.js, update status.json.
+- Desain "Titik Gerak": token & gaya global di `ui.css` (dipasang di semua halaman, memetakan variabel lama --bg/--card/--tx/--mu/--bd/--ac dst). Navigasi bawah di `nav.js`. Halaman baru wajib pakai ui.css + nav.js.

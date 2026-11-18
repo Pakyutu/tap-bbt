@@ -1,0 +1,65 @@
+/* TAP BBT · Titik Gerak — lapisan desain global (token + gaya dasar).
+   Dipasang di semua halaman. Memetakan variabel lama tiap halaman ke token baru,
+   jadi markup & JavaScript halaman tidak diubah. Selector html:root dipakai supaya
+   menang atas :root di <style> halaman tanpa !important. */
+html:root{
+  color-scheme:light;
+  --brand:#c8102e;--brand-hover:#ae0c27;--on-brand:#fff;
+  --surface:#fff;--surface-soft:#eaf0f6;--text:#152137;--muted:#526078;--line:#dce3ed;
+  --positive:#137447;--positive-bg:#e8f5ee;--warning:#825000;--warning-bg:#fff3d6;
+  --negative:#b20e2d;--negative-bg:#fcebf0;--info:#255fb4;--info-bg:#eaf1ff;
+  --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --radius-md:12px;--radius-lg:16px;
+  --shadow-sm:0 2px 8px rgb(16 32 56 / .035);--shadow-card:0 8px 28px rgb(16 32 56 / .055);
+  --nav-h:64px;
+  /* alias variabel lama */
+  --bg:#f3f5f9;--bg2:#e9eef5;--card:#fff;--tx:#152137;--ink:#152137;--mu:#526078;--mute:#526078;--bd:#dce3ed;--soft:#eaf0f6;
+  --ac:#c8102e;--ac2:#e2475f;--red:#c8102e;--red2:#e2475f;--ok:#137447;--up:#137447;--dn:#b20e2d;
+  --wr:#825000;--wn:#825000;--warn:#825000;--blue:#255fb4;
+  --okbg:#e8f5ee;--nobg:#fcebf0;--midbg:#fff3d6;--bar:#152137;--bar2:#c8102e;--tg:#93a0b4;
+  --hero:#121c2e;--herotx:#f1f5fc;--heromu:#a4b2c8;--glow:rgba(200,16,46,.12);
+  --sh:0 2px 8px rgb(16 32 56 / .035),0 8px 28px rgb(16 32 56 / .055);
+  --fd:var(--font);--fb:var(--font);--fm:var(--mono);
+  --band:#121c2e;--band2:#1a2638;--band-bd:#2c3a52;--band-fg:#fff;--band-mu:#a4b2c8;
+}
+@media (prefers-color-scheme:dark){
+  html:root:not([data-theme="light"]){
+    color-scheme:dark;
+    --surface:#131d2c;--surface-soft:#1c2a3e;--text:#f1f5fc;--muted:#a4b2c8;--line:#2a384e;
+    --positive:#69dfaa;--positive-bg:#13372b;--warning:#ffd181;--warning-bg:#3a2d16;
+    --negative:#ff8da3;--negative-bg:#3e1e2c;--info:#95c1ff;--info-bg:#192f4e;
+    --shadow-sm:0 2px 8px rgb(0 0 0 / .12);--shadow-card:0 8px 28px rgb(0 0 0 / .16);
+    --bg:#0b111c;--bg2:#101827;--card:#131d2c;--tx:#f1f5fc;--ink:#f1f5fc;--mu:#a4b2c8;--mute:#a4b2c8;--bd:#2a384e;--soft:#1c2a3e;
+    --ac:#e8344f;--ac2:#ff6b82;--red:#e8344f;--red2:#ff6b82;--ok:#69dfaa;--up:#69dfaa;--dn:#ff8da3;
+    --wr:#ffd181;--wn:#ffd181;--warn:#ffd181;--blue:#95c1ff;
+    --okbg:#13372b;--nobg:#3e1e2c;--midbg:#3a2d16;--bar:#c9d6ea;--bar2:#e8344f;--tg:#56657e;
+    --hero:#070c16;--herotx:#f1f5fc;--heromu:#a4b2c8;--glow:rgba(232,52,79,.18);
+    --band:#070c16;--band2:#131d2c;--band-bd:#2a384e;--band-fg:#f1f5fc;--band-mu:#a4b2c8;
+    --sh:0 2px 8px rgb(0 0 0 / .12),0 8px 28px rgb(0 0 0 / .16);
+  }
+}
+html[data-theme="dark"]:root{
+  color-scheme:dark;
+  --surface:#131d2c;--surface-soft:#1c2a3e;--text:#f1f5fc;--muted:#a4b2c8;--line:#2a384e;
+  --positive:#69dfaa;--positive-bg:#13372b;--warning:#ffd181;--warning-bg:#3a2d16;
+  --negative:#ff8da3;--negative-bg:#3e1e2c;--info:#95c1ff;--info-bg:#192f4e;
+  --bg:#0b111c;--bg2:#101827;--card:#131d2c;--tx:#f1f5fc;--ink:#f1f5fc;--mu:#a4b2c8;--mute:#a4b2c8;--bd:#2a384e;--soft:#1c2a3e;
+  --ac:#e8344f;--ac2:#ff6b82;--red:#e8344f;--red2:#ff6b82;--ok:#69dfaa;--up:#69dfaa;--dn:#ff8da3;
+  --wr:#ffd181;--wn:#ffd181;--warn:#ffd181;--blue:#95c1ff;
+  --okbg:#13372b;--nobg:#3e1e2c;--midbg:#3a2d16;--bar:#c9d6ea;--bar2:#e8344f;--tg:#56657e;
+  --hero:#070c16;--herotx:#f1f5fc;--heromu:#a4b2c8;--glow:rgba(232,52,79,.18);
+  --band:#070c16;--band2:#131d2c;--band-bd:#2a384e;--band-fg:#f1f5fc;--band-mu:#a4b2c8;
+    --sh:0 2px 8px rgb(0 0 0 / .12),0 8px 28px rgb(0 0 0 / .16);
+}
+html body{font-family:var(--font);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;
+  padding-bottom:calc(var(--nav-h) + 24px + env(safe-area-inset-bottom,0px))}
+html body .card{border-radius:var(--radius-lg)}
+html body .btn{border-radius:var(--radius-md);min-height:44px}
+html body input,html body select,html body textarea{font-family:var(--font)}
+:focus-visible{outline:3px solid var(--info);outline-offset:2px}
+/* elemen yang menempel di bawah naik di atas navigasi */
+html body .tot{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
+html body #shotmsg{bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom,0px))}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media print{html body{padding-bottom:0}}
