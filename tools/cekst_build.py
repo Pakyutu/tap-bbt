@@ -86,9 +86,31 @@ def build(rows,ST,home='BAGAN BATU'):
     R.sort(key=lambda o:(o['n'].startswith(('Lainnya','(tanpa')),-o['d']))
     return {'sf':R,'tgl':sorted([k,v[0],v[1]] for k,v in dd.items()),'mon':sorted(mon.items()),'lain':lain.most_common(10)}
 if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('--wl');ap.add_argument('--byu');ap.add_argument('--pv',nargs='*',default=[]);ap.add_argument('--sa',nargs='*',default=[]);a=ap.parse_args()
+    ap=argparse.ArgumentParser();ap.add_argument('--wl');ap.add_argument('--byu');ap.add_argument('--add',nargs='*',default=[]);ap.add_argument('--pv',nargs='*',default=[]);ap.add_argument('--sa',nargs='*',default=[]);a=ap.parse_args()
     wb=openpyxl.load_workbook(a.wl,read_only=True,data_only=True)
     L={'VF NOV':wl_sheet(wb,'VF NOV',2,3,4),'VF OKT':wl_sheet(wb,'VF OKT',2,3,4),'SA NOV':wl_sheet(wb,'SA NOV',3,4,5),'SA OKT':wl_sheet(wb,'SA OKT',3,4,5)}
+    # WL tambahan (format baru: sheet VF / SA / WL Return, tanggal drop di baris 1 kolom C, data mulai baris 4)
+    for f in a.add:
+        w=openpyxl.load_workbook(f,read_only=True,data_only=True)
+        def tg(sh):
+            try:return str(next(w[sh].iter_rows(max_row=1,values_only=True))[2])[:10]
+            except Exception:return ''
+        def rows(sh,snc,pc,sfc):
+            out=[]
+            if sh not in w.sheetnames:return out
+            d=tg(sh)
+            for i,r in enumerate(w[sh].iter_rows(values_only=True)):
+                if i<3 or len(r)<=max(snc,sfc) or r[snc] is None:continue
+                sn=str(r[snc]).strip();sn=sn[:-2] if sn.endswith('.0') else sn
+                if re.fullmatch(r'\d{8,}',sn):out.append((d,sn,pk(r[pc]),sfn(r[sfc])))
+            return out
+        ret={key(x[1]) for x in rows('WL Return',1,2,3)}
+        nv=rows('VF',1,2,3);ns=rows('SA',2,3,4)
+        kv={key(x[1]) for x in nv};ks={key(x[1]) for x in ns}
+        b0=len(L['VF NOV'])
+        L['VF NOV']=[x for x in L['VF NOV'] if key(x[1]) not in ret|kv]+nv
+        L['SA NOV']=[x for x in L['SA NOV'] if key(x[1]) not in ks]+ns
+        print(f.split('/')[-1],'VF +',len(nv),'SA +',len(ns),'return',len(ret),'VF NOV',b0,'->',len(L['VF NOV']),file=sys.stderr)
     if a.byu:
         b=openpyxl.load_workbook(a.byu,read_only=True,data_only=True)
         L['SA BYU']=wl_sheet(b,b.sheetnames[0],2,3,None,dc=None,start=4)
@@ -96,7 +118,7 @@ if __name__=='__main__':
     raw(a.pv,{key(x[1]) for k in L if k.startswith('VF') for x in L[k]},STv,mx)
     raw(a.sa,{key(x[1]) for k in L if k.startswith('SA') for x in L[k]},STs,mx)
     out={'upd':(datetime.datetime.utcnow()+datetime.timedelta(hours=7)).strftime('%Y-%m-%dT%H:%M'),'cutVF':max([v for k,v in mx.items() if k in a.pv] or ['']),'cutSA':max([v for k,v in mx.items() if k in a.sa] or ['']),'G':{}}
-    out['ft']={'wl':ftime(a.wl),'pv':max([ftime(p) for p in a.pv] or ['']),'sa':max([ftime(p) for p in a.sa] or [''])}
+    out['ft']={'wl':max([ftime(a.wl)]+[ftime(f) for f in a.add]),'pv':max([ftime(p) for p in a.pv] or ['']),'sa':max([ftime(p) for p in a.sa] or [''])}
     for k,rows in L.items():
         if not rows:continue
         st=STv if k.startswith('VF') else STs
