@@ -1,0 +1,7 @@
+# SN yang sudah terpakai/tidak bisa di-ST lagi: tidak dihitung di Cek WL (satu SN per baris, boleh rentang a-b)
+# Gusti Edwin VF OKT (lapor 18 Nov)
+901971320291
+901971353552
+901971353654
+901971353663
+901971353672

@@ -119,10 +119,22 @@ if __name__=='__main__':
     raw(a.sa,{key(x[1]) for k in L if k.startswith('SA') for x in L[k]},STs,mx)
     out={'upd':(datetime.datetime.utcnow()+datetime.timedelta(hours=7)).strftime('%Y-%m-%dT%H:%M'),'cutVF':max([v for k,v in mx.items() if k in a.pv] or ['']),'cutSA':max([v for k,v in mx.items() if k in a.sa] or ['']),'G':{}}
     out['ft']={'wl':max([ftime(a.wl)]+[ftime(f) for f in a.add]),'pv':max([ftime(p) for p in a.pv] or ['']),'sa':max([ftime(p) for p in a.sa] or [''])}
+    TP=set()
+    try:
+        for ln in open(__file__.rsplit('/',1)[0]+'/cekst_terpakai.txt'):
+            ln=ln.split('#')[0].strip()
+            if not ln:continue
+            x,_,y=ln.partition('-');y=y or x
+            for v in range(int(x),int(y)+1):TP.add(key(str(v)))
+    except FileNotFoundError:pass
+    tpn={}
+    for k in L:
+        b=len(L[k]);L[k]=[x for x in L[k] if key(x[1]) not in TP];tpn[k]=b-len(L[k])
     for k,rows in L.items():
         if not rows:continue
         st=STv if k.startswith('VF') else STs
         if not (a.pv if k.startswith('VF') else a.sa):continue
         out['G'][k]=build(rows,st)
+        if tpn.get(k):out['G'][k]['tp']=tpn[k]
         print(k,sum(o['s'] for o in out['G'][k]['sf']),'/',len(rows),file=sys.stderr)
     open('cekst-data.js','w').write('// Hasil cek WL dropingan vs ST Digipos (dibuat dari tools/cekst_build.py)\nconst CK='+json.dumps(out,separators=(',',':'),ensure_ascii=False)+';\n')
