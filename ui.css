@@ -60,6 +60,7 @@ html body input,html body select,html body textarea{font-family:var(--font)}
 :focus-visible{outline:3px solid var(--info);outline-offset:2px}
 /* elemen yang menempel di bawah naik di atas navigasi */
 html body .tot{bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
+html body:has(.tot){padding-bottom:calc(var(--nav-h) + 140px + env(safe-area-inset-bottom,0px))}
 html body #shotmsg{bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom,0px))}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 @media print{html body{padding-bottom:0}}
