@@ -1,4 +1,5 @@
 # Update ST VF Reg/ByU & SA Simpati/ByU per outlet dari file ST_DIGIPOS.
+# Outlet PJP yang belum ada di DETAIL PEROUTLET diambil VF-nya dari sheet PIVOT.
 # Mendukung 2 format: (a) workbook multi-sheet dengan sheet "DETAIL PEROUTLET"; (b) 1 sheet gabungan "=== SHEET: DETAIL PEROUTLET ===".
 # Pakai (dari folder repo): python3 tools/st_digipos.py <ST_DIGIPOS.xlsx>
 import sys,csv,json,re,openpyxl
@@ -20,10 +21,21 @@ B={fix(r[1].strip()):r for r in rows}
 n=lambda v:int(float(str(v).replace(',','').strip() or 0)) if str(v).strip() not in('-','','None') else 0
 f='digipos.html';s=open(f).read();a=s.find('const D=')+8;D,e=json.JSONDecoder().raw_decode(s[a:])
 old=[sum(o[k] for o in D['O']) for k in (6,7,8,9)];miss=[];ch=[]
+# Outlet baru yang belum ada di DETAIL PEROUTLET: ambil VF reg/byu MTD dari blok pivot MTD (Date=(All)) "Row Labels | Sum of reg | Sum of byu" di sheet PIVOT
+PV={}
+if 'PIVOT' in getattr(wb,'sheetnames',[]):
+    PR=list(wb['PIVOT'].iter_rows(values_only=True))
+    if len(PR)>3:
+        for j in range(len(PR[2])-2):
+            if PR[2][j]=='Row Labels' and PR[2][j+1]=='Sum of reg' and PR[2][j+2]=='Sum of byu' and j>=2 and PR[0][j-2]=='MTD' and PR[0][j+1]=='(All)':
+                for r in PR[3:]:
+                    if len(r)>j+2 and r[j] is not None and str(r[j]).strip()!='(blank)':PV[fix(str(r[j]).strip())]=(n(r[j+1] or 0),n(r[j+2] or 0))
+                break
 for o in D['O']:
     r=B.get(o[0])
-    if not r:miss.append(o[1])
     nv=[n(r[69]),n(r[76]),n(r[48]),n(r[55])] if r else [0,0,0,0]
+    if not r and o[0] in PV:nv[0],nv[1]=PV[o[0]];miss.append(o[1]+' (dari PIVOT: VF reg '+str(nv[0])+')')
+    elif not r:miss.append(o[1])
     if nv[0]-o[6]>3000:ch.append((o[1],o[6],nv[0]))
     o[6:10]=nv
 new=[sum(o[k] for o in D['O']) for k in (6,7,8,9)]
