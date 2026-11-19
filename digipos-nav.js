@@ -9,8 +9,8 @@
   G.forEach(g=>g[2]=g[2].filter(btn));
   const last={};let mem={};try{mem=JSON.parse(localStorage.getItem('dgp_tabmem')||'{}')}catch(e){}
   const css=document.createElement('style');css.textContent=`#tabs{display:none!important}
-  .tg{display:flex;gap:4px;overflow-x:auto;margin-top:14px;scrollbar-width:none}.tg::-webkit-scrollbar,.ts::-webkit-scrollbar{display:none}
-  .tg button{border:0;background:none;color:var(--heromu);font:inherit;font-size:13.5px;font-weight:600;padding:9px 9px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;transition:color .15s}
+  .tg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin-top:14px}.tg::-webkit-scrollbar,.ts::-webkit-scrollbar{display:none}
+  .tg button{border:0;background:none;color:var(--heromu);font:inherit;font-size:12px;font-weight:600;padding:7px 2px 8px;border-bottom:3px solid transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15;transition:color .15s}.tg button i{font-style:normal;font-size:19px}
   .tg button.on{color:var(--herotx);border-bottom-color:var(--ac)}
   .ts{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
   .ts button{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:var(--herotx);font:inherit;font-size:12.5px;padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
@@ -19,7 +19,7 @@
   const w=document.createElement('div');w.innerHTML='<nav class="tg" id="tg" aria-label="Menu DIGIPOS"></nav><div class="ts" id="ts"></div>';tb.after(...w.children);
   const grp=t=>G.find(g=>g[2].includes(t))||G[0];
   function sync(){const g=grp(st.tab);last[g[0]]=st.tab;mem[g[0]]=st.tab;try{localStorage.setItem('dgp_tabmem',JSON.stringify(mem))}catch(e){}
-    document.getElementById('tg').innerHTML=G.filter(x=>x[2].length).map(x=>`<button data-g="${x[0]}" class="${x===g?'on':''}">${x[1]}</button>`).join('');
+    document.getElementById('tg').innerHTML=G.filter(x=>x[2].length).map(x=>`<button data-g="${x[0]}" class="${x===g?'on':''}"><i>${x[1].split(' ')[0]}</i>${x[1].split(' ').slice(1).join(' ')}</button>`).join('');
     document.getElementById('ts').innerHTML=g[2].length>1?g[2].map(t=>`<button data-st="${t}" class="${t===st.tab?'on':''}">${SUB[t]||btn(t).textContent}</button>`).join(''):'';
     [document.querySelector('#ts .on'),document.querySelector('#tg .on')].forEach(on=>{if(on){const p=on.parentElement;p.scrollLeft=Math.max(0,on.offsetLeft-p.clientWidth/2+on.clientWidth/2)}})}
   document.addEventListener('click',e=>{const a=e.target.closest('#tg [data-g]');if(a){const g=G.find(x=>x[0]===a.dataset.g);const t=last[g[0]]||(g[2].includes(mem[g[0]])?mem[g[0]]:g[2][0]);const b=btn(t);if(b)b.click();return}
