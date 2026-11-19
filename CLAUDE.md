@@ -9,3 +9,4 @@
 - Cuan PV Redeem (sheet "Reedem PV" di file Monitoring Klik Misi & FR): `python3 tools/cuan_pv.py <file.xlsx> "DD Nov"` -> digipos-cuan.js, update status.json.
 - Desain "Titik Gerak": token & gaya global di `ui.css` (dipasang di semua halaman, memetakan variabel lama --bg/--card/--tx/--mu/--bd/--ac dst). Navigasi bawah di `nav.js`. Halaman baru wajib pakai ui.css + nav.js.
 - SN terpakai (tidak bisa di-ST lagi) dicatat di `tools/cekst_terpakai.txt` → otomatis tidak dihitung di Cek WL.
+- Outlet PV/SA/NGRS (export SURYA csv): `python3 tools/surya_outlet.py --pv Detail_Outlet_PV_*.csv --sa Detail_Outlet_SA_*.csv --ngrs NGRS_2026_TRX.csv` (cutoff dari header "2026-10 MoM 1-DD"), update status.json. CVM: cek dulu, kalau Nov program masih 0 jangan dimasukkan.
