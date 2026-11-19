@@ -40,8 +40,8 @@ input{width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:10px;
 </div></div>
 <script>
 const $=i=>document.getElementById(i),nf=v=>Math.round(v).toLocaleString('id-ID'),rp=v=>'Rp '+nf(v),num=v=>parseInt(String(v||'').replace(/\D/g,'')||'0',10),esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const P0=['VF 7GB/24 jam','VF 7GB/2 hari','VF 7GB/3 hari','VF 7GB/5 hari','VF 11GB/5 hari','VF 7GB/7 hari','SA 3GB','SA 5GB','SA 7GB','SA 10GB','SA 15GB','SA BYU 3GB','SA BYU 5GB'].map(n=>({n,h:0}));
-let PL;try{PL=JSON.parse(localStorage.getItem('wlp')||'null')}catch(e){}if(!Array.isArray(PL)||!PL.length)PL=P0;
+const P0=['VF 7GB/24 jam','VF 7GB/2 hari','VF 7GB/3 hari','VF 7GB/5 hari','VF 11GB/5 hari','VF 7GB/7 hari','VF 11GB/7 hari','SA 3GB','SA 5GB','SA 7GB','SA 10GB','SA 15GB','SA BYU 3GB','SA BYU 5GB'].map(n=>({n,h:0}));
+let PL;try{PL=JSON.parse(localStorage.getItem('wlp')||'null')}catch(e){}if(!Array.isArray(PL)||!PL.length)PL=P0;try{if(!localStorage.getItem('wlp_11g7')){if(!PL.some(x=>x.n==='VF 11GB/7 hari')){let k=PL.findIndex(x=>x.n==='VF 7GB/7 hari');if(k<0)k=PL.findIndex(x=>x.n==='VF 11GB/5 hari');PL.splice(k<0?PL.length:k+1,0,{n:'VF 11GB/7 hari',h:0});localStorage.setItem('wlp',JSON.stringify(PL))}localStorage.setItem('wlp_11g7','1')}}catch(e){}
 let S={on:'',it:{},ex:[],ds:0,by:0};try{const x=JSON.parse(localStorage.getItem('kalk')||'null');if(x)S=Object.assign(S,x)}catch(e){}
 let HL;try{HL=JSON.parse(localStorage.getItem('kalkh')||'[]')}catch(e){HL=[]}if(!Array.isArray(HL))HL=[];
 const save=()=>{try{localStorage.setItem('kalk',JSON.stringify(S))}catch(e){}};
