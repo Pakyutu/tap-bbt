@@ -5,7 +5,7 @@
   const es=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),nf=v=>Math.round(v).toLocaleString('id-ID'),tc=s=>String(s).toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
   const mom=(a,b)=>b?Math.round((a/b-1)*100):null,pf=p=>p==null?'–':(p>0?'▲ ':p<0?'▼ ':'')+Math.abs(p)+'%',cl=p=>p==null?'':p<0?'dn':'up';
   const lb=()=>CV.dd&&CV.dd[BI]?CV.dd[BI]:'1–'+CV.d+' Nov';
-  let mode='dn';
+  let mode='dn';document.addEventListener('dgp-reset',()=>{mode='dn'});
   const tb=document.getElementById('tabs');
   if(tb&&!tb.querySelector('[data-t="bio"]')){const b=document.createElement('button');b.dataset.t='bio';b.textContent='🧬 Biometrik';b.onclick=()=>{st.tab='bio';draw()};const k=tb.querySelector('[data-t="cuan"]')||tb.querySelector('[data-t="site"]');k?tb.insertBefore(b,k):tb.appendChild(b)}
   if(typeof TABN!=='undefined')TABN.bio='Biometrik';

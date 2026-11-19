@@ -324,7 +324,7 @@ function draw(){setProd(st.prod);$("sub").innerHTML=L.sub;document.querySelector
   save()}
 ["kec","sf","pjp"].forEach(k=>$("f"+k).onchange=e=>{st[k]=e.target.value;st.pg=0;draw()});
 document.querySelectorAll("#prod button").forEach(b=>b.onclick=()=>{st.prod=b.dataset.v;st.pg=0;draw()});
-$("reset").onclick=()=>{st.kec=st.sf=st.pjp="";draw()};
+$("reset").onclick=()=>{st.kec=st.sf=st.pjp=st.q="";st.ost="all";st.sort="reg";st.pg=0;try{document.dispatchEvent(new Event("dgp-reset"))}catch(e){}draw()};
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{st.tab=b.dataset.t;draw()});
 const TABN={ring:"Ringkasan",sf:"Per SF",hari:"SF × Hari",kec:"Kecamatan",byu:"Belum OA By.U",km:"Klik Misi",out:"Outlet",tem:"Temuan"};
 function stamp(){const d=new Date(),p=n=>String(n).padStart(2,"0");return `${p(d.getDate())}-${p(d.getMonth()+1)}-${d.getFullYear()} ${p(d.getHours())}.${p(d.getMinutes())}`}

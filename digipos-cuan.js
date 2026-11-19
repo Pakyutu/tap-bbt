@@ -5,7 +5,7 @@ const CU={"d":"14 Nov","o":{"1201094925":[0,0,0,0,9],"1201116250":[0,0,0,0,9],"1
   if(typeof R==='undefined')return;
   const es=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),nf=v=>Math.round(v).toLocaleString('id-ID'),tc=s=>String(s).toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
   const rpj=v=>'Rp '+(v/1e6).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})+' jt',pc=(a,b)=>b?Math.round(a/b*100)+'%':'–';
-  let mode='bl';
+  let mode='bl';document.addEventListener('dgp-reset',()=>{mode='bl'});
   const tb=document.getElementById('tabs');
   if(tb&&!tb.querySelector('[data-t="cuan"]')){const b=document.createElement('button');b.dataset.t='cuan';b.textContent='⭐ Cuan PV';b.onclick=()=>{st.tab='cuan';draw()};const k=tb.querySelector('[data-t="site"]')||tb.querySelector('[data-t="bc"]');k?tb.insertBefore(b,k):tb.appendChild(b)}
   if(typeof TABN!=='undefined')TABN.cuan='Cuan PV Redeem';

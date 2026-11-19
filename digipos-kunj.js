@@ -4,7 +4,7 @@
   const HR=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
   const nf=v=>Math.round(v).toLocaleString('id-ID'),es=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const tc=s=>String(s).toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
-  let hari=HR[new Date().getDay()];if(hari==='Minggu')hari='Senin';let ksf='';
+  let hari=HR[new Date().getDay()];if(hari==='Minggu')hari='Senin';let ksf='';document.addEventListener('dgp-reset',()=>{ksf=''});
   const FR={};((D.FR||{}).rows||[]).forEach(r=>FR[r[0]]=r);
   const tb=document.getElementById('tabs');
   if(tb&&!tb.querySelector('[data-t="hari1"]')){const b=document.createElement('button');b.dataset.t='hari1';b.textContent='📍 Hari Ini';b.onclick=()=>{st.tab='hari1';draw()};tb.insertBefore(b,tb.firstChild.nextSibling)}
