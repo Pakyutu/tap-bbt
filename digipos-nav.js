@@ -1,29 +1,38 @@
-// Navigasi tab DIGIPOS dikelompokkan: 5 grup utama + sub-tab. Tombol asli di #tabs tetap dipakai (disembunyikan).
+// DIGIPOS: konfigurasi grup tab (dipakai tabgroup.js) + header ringkas (Filter & menu ⋯).
+window.TABG={key:'dgp',
+  groups:[['ring','📊 Ringkasan',['ring','hari1','tem']],['sf','👥 Wilayah',['sf','hari','kec','site']],['out','🏪 Outlet',['out']],['prog','🎯 Program',['km','xd','sso','cuan','cvm','bio']],['alat','🏷️ Scan',['bc','so']]],
+  names:{ring:'Ringkasan',hari1:'Hari Ini',tem:'Temuan',sf:'Per SF',hari:'SF × Hari',kec:'Kecamatan',site:'Site',out:'Outlet',km:'Klik Misi',xd:'Extra Dealing',sso:'Sultan SO',cuan:'Cuan PV',cvm:'CVM',bio:'Biometrik',bc:'Barcode',so:'Sell Out'}};
 (function(){
-  const tb=document.getElementById('tabs');if(!tb||typeof st==='undefined')return;
-  const G=[['ring','📊 Ringkasan',['ring','hari1','tem']],['sf','👥 Wilayah',['sf','hari','kec','site']],['out','🏪 Outlet',['out']],['prog','🎯 Program',['km','xd','sso','cuan','cvm','bio']],['alat','🏷️ Scan',['bc','so']]];
-  const SUB={ring:'Ringkasan',hari1:'Hari Ini',tem:'Temuan',sf:'Per SF',hari:'SF × Hari',kec:'Kecamatan',site:'Site',out:'Outlet',km:'Klik Misi',xd:'Extra Dealing',sso:'Sultan SO',cuan:'Cuan PV',cvm:'CVM',bio:'Biometrik',bc:'Barcode',so:'Sell Out'};
-  const btn=t=>tb.querySelector(`[data-t="${t}"]`);
-  // tab yang tidak terdaftar ikut grup Program
-  [...tb.querySelectorAll('button')].forEach(b=>{if(!G.some(g=>g[2].includes(b.dataset.t)))G[3][2].push(b.dataset.t)});
-  G.forEach(g=>g[2]=g[2].filter(btn));
-  const last={};let mem={};try{mem=JSON.parse(localStorage.getItem('dgp_tabmem')||'{}')}catch(e){}
-  const css=document.createElement('style');css.textContent=`#tabs{display:none!important}
-  .tg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin-top:14px}.tg::-webkit-scrollbar,.ts::-webkit-scrollbar{display:none}
-  .tg button{border:0;background:none;color:var(--heromu);font:inherit;font-size:12px;font-weight:600;padding:7px 2px 8px;border-bottom:3px solid transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15;transition:color .15s}.tg button i{font-style:normal;font-size:19px}
-  .tg button.on{color:var(--herotx);border-bottom-color:var(--ac)}
-  .ts{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
-  .ts button{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:var(--herotx);font:inherit;font-size:12.5px;padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
-  .ts button.on{background:var(--herotx);color:var(--hero);border-color:var(--herotx);font-weight:600}
-  .ts:empty{display:none}`;document.head.appendChild(css);
-  const w=document.createElement('div');w.innerHTML='<nav class="tg" id="tg" aria-label="Menu DIGIPOS"></nav><div class="ts" id="ts"></div>';tb.after(...w.children);
-  const grp=t=>G.find(g=>g[2].includes(t))||G[0];
-  function sync(){const g=grp(st.tab);last[g[0]]=st.tab;mem[g[0]]=st.tab;try{localStorage.setItem('dgp_tabmem',JSON.stringify(mem))}catch(e){}
-    document.getElementById('tg').innerHTML=G.filter(x=>x[2].length).map(x=>`<button data-g="${x[0]}" class="${x===g?'on':''}"><i>${x[1].split(' ')[0]}</i>${x[1].split(' ').slice(1).join(' ')}</button>`).join('');
-    document.getElementById('ts').innerHTML=g[2].length>1?g[2].map(t=>`<button data-st="${t}" class="${t===st.tab?'on':''}">${SUB[t]||btn(t).textContent}</button>`).join(''):'';
-    [document.querySelector('#ts .on'),document.querySelector('#tg .on')].forEach(on=>{if(on){const p=on.parentElement;p.scrollLeft=Math.max(0,on.offsetLeft-p.clientWidth/2+on.clientWidth/2)}})}
-  document.addEventListener('click',e=>{const a=e.target.closest('#tg [data-g]');if(a){const g=G.find(x=>x[0]===a.dataset.g);const t=last[g[0]]||(g[2].includes(mem[g[0]])?mem[g[0]]:g[2][0]);const b=btn(t);if(b)b.click();return}
-    const s=e.target.closest('#ts [data-st]');if(s){const b=btn(s.dataset.st);if(b)b.click()}});
-  const od=window.draw;if(typeof od==='function')window.draw=function(){const r=od.apply(this,arguments);try{sync()}catch(e){}return r};
-  sync();
+  const $=i=>document.getElementById(i),prod=$('prod'),row=prod&&prod.parentElement;if(!row)return;
+  const css=document.createElement('style');css.textContent=`
+  .hx{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .hx .ib{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:var(--herotx);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+  .hx .ib b{min-width:18px;height:18px;border-radius:9px;background:var(--ac);color:#fff;font-size:11px;display:inline-grid;place-items:center;padding:0 5px}
+  .hx .ib.on{background:var(--herotx);color:var(--hero)}
+  .hx .sp{flex:1}
+  #fpan{display:none;gap:8px;flex-wrap:wrap;margin-top:10px}#fpan.open{display:flex}
+  #fpan select{flex:1 1 140px;min-width:0}
+  .amw{position:relative}#amenu{display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:210px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:14px;box-shadow:0 14px 40px rgba(4,10,20,.3);padding:6px}
+  #amenu.open{display:block}#amenu .btn{display:flex!important;width:100%;justify-content:flex-start;background:none!important;color:var(--tx)!important;border:0!important;box-shadow:none!important;border-radius:10px;min-height:44px;font-weight:500}
+  #amenu .btn:hover,#amenu .btn:active{background:var(--soft)!important}#amenu .btn[hidden]{display:none!important}`;document.head.appendChild(css);
+  // susun ulang: baris utama = produk + Filter + ⋯ ; panel filter = kecamatan/SF/PJP/reset ; menu = aksi
+  const hx=document.createElement('div');hx.className='hx';
+  const fb=document.createElement('button');fb.type='button';fb.className='ib';fb.id='fbtn';fb.innerHTML='⚙️ Filter <b id="fcnt" hidden>0</b>';
+  const aw=document.createElement('span');aw.className='amw';aw.innerHTML='<button type="button" class="ib" id="abtn" aria-haspopup="menu" aria-label="Menu lainnya">⋯</button><div id="amenu" role="menu"></div>';
+  const sp=document.createElement('span');sp.className='sp';
+  const pan=document.createElement('div');pan.id='fpan';
+  row.before(hx);hx.append(prod,fb,sp,aw);
+  ['fkec','fsf','fpjp','reset'].forEach(i=>{const e=$(i);if(e)pan.appendChild(e)});
+  hx.after(pan);
+  const M=$('amenu');[['cimg','🖼️ '],['jpg','⬇️ '],['upbtn','📤 '],['fsbtn','⛶ ']].forEach(([i,ic])=>{const e=$(i);if(e){M.appendChild(e);if(!e.dataset.ic){e.dataset.ic=1;e.prepend(ic)}}});
+  ['upf','cpst'].forEach(i=>{const e=$(i);if(e)hx.appendChild(e)});
+  if(!row.children.length)row.remove();
+  const cnt=()=>{const n=['fkec','fsf','fpjp'].filter(i=>$(i)&&$(i).value).length,c=$('fcnt');c.textContent=n;c.hidden=!n;fb.classList.toggle('on',pan.classList.contains('open'))};
+  fb.onclick=()=>{pan.classList.toggle('open');cnt()};
+  $('abtn').onclick=e=>{e.stopPropagation();M.classList.toggle('open')};
+  document.addEventListener('click',e=>{if(!e.target.closest('.amw'))M.classList.remove('open');else if(e.target.closest('#amenu .btn'))setTimeout(()=>M.classList.remove('open'),50)});
+  ['fkec','fsf','fpjp'].forEach(i=>{const e=$(i);if(e)e.addEventListener('change',()=>setTimeout(cnt))});
+  addEventListener('keydown',e=>{if(e.key==='Escape')M.classList.remove('open')});
+  const od=window.draw;if(typeof od==='function')window.draw=function(){const r=od.apply(this,arguments);try{cnt()}catch(e){}return r};
+  cnt();
 })();

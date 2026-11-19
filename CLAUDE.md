@@ -15,3 +15,4 @@
 - ST per outlet juga bisa dari file "Monitoring ST Product <bulan> Cluster Rohil": `python3 tools/st_product.py <file.xlsx>` (pakai yang paling baru antara ini dan ST_DIGIPOS), lalu ganti label "update DD Nov" + D.VER.
 - Extra Dealing Misi (file Dealing_EXTRA_*.xlsx, sheet Raw + Sheet1): `python3 tools/extra_dealing.py <file.xlsx> "DD Nov"` -> digipos-xd.js (tab 🎯 Extra Dealing), update status.json.
 - Sultan Spesial SO (file Monitoting_Program_Dealing_Misi_Sultan_Spesial_SO.xlsx, sheet Raw): `python3 tools/sultan_so.py <file.xlsx> "DD Nov"` -> digipos-sso.js. Tab DIGIPOS dikelompokkan di `digipos-nav.js` (grup Ringkasan/Wilayah/Outlet/Program/Scan); tab baru tambahkan ke array G.
+- Grup tab: `tabgroup.js` generik (config window.TABG sebelum dimuat). DIGIPOS config di digipos-nav.js (juga header ringkas: ⚙️ Filter + menu ⋯); Penjualan config inline sebelum tabgroup.js. Tab baru otomatis masuk grup terakhir kalau tidak didaftarkan.
