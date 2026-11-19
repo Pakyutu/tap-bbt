@@ -1,9 +1,9 @@
 // Versi cache: naikkan angka ini kalau ada perubahan besar pada file app.
-const V = "tap-bbt-v99";
+const V = "tap-bbt-v100";
 const SAME = self.location.origin;
 const SHELL = [
   "./", "index.html", "digipos.html", "penjualan.html", "wl.html","kalkulator.html","backup.html","cekst.html","cekst-data.js","c128.js", "manifest.json",
-  "icon-192.png", "icon-512.png", "nav.js", "penjualan-x.js","penjualan-tgt.js", "digipos-cvm.js", "digipos-kunj.js","digipos-site.js","digipos-xd.js","digipos-cuan.js","digipos-bio.js","digipos-bc.js","qr.js","digipos-so.js","status.json","ui.css","favicon.svg","favicon.ico","icon-maskable-192.png","logo-symbol.svg","logo-h.svg","logo-h-dark.svg", "digipos-x.js", "icon-maskable.png",
+  "icon-192.png", "icon-512.png", "nav.js", "penjualan-x.js","penjualan-tgt.js", "digipos-cvm.js", "digipos-kunj.js","digipos-site.js","digipos-xd.js","digipos-sso.js","digipos-nav.js","digipos-cuan.js","digipos-bio.js","digipos-bc.js","qr.js","digipos-so.js","status.json","ui.css","favicon.svg","favicon.ico","icon-maskable-192.png","logo-symbol.svg","logo-h.svg","logo-h-dark.svg", "digipos-x.js", "icon-maskable.png",
   "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
   "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
   "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
