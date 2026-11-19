@@ -22,7 +22,11 @@ if PR=='PV':
         if c[0]=='BAGAN BATU' and k>0 and L[k-1].startswith('NAMA TAP') and 'Inject' not in ''.join(L[max(0,k-8):k]):X['TM'][10]=N(c[21]) or X['TM'][10]
         if c[0]=='BAGAN BATU' and k>0 and L[k-1].startswith('NAMA TAP') and 'Inject' in ''.join(L[max(0,k-8):k]):X['TI'][10]=N(c[21]) or X['TI'][10]
         if c[0] in X['PM'] and len(c)>=12 and L[k-1:k] and any(L[q].startswith('Nama Petugas\tJan') for q in range(max(0,k-25),k)):X['PM'][c[0]]=[N(v) or 0 for v in c[1:12]]
-        if c[0] in X['INJ'] and len(c)>=12:X['INJ'][c[0]]=[N(v) or 0 for v in c[1:12]]
+        if c[0].endswith(('HARI','JAM')) and len(c)>=12:
+            # tabel Validity Group: sebelum judul "Inject Bulanan" = penjualan, sesudahnya = inject
+            inj=any('Inject Bulanan' in L[q] for q in range(0,k)) and any('Inject Bulanan' in L[q] for q in range(max(0,k-25),k))
+            X.setdefault('SVM',{})
+            (X['INJ'] if inj else X['SVM'])[c[0]]=[N(v) or 0 for v in c[1:12]]
     vr=[l for l in L if re.match(r'^BAGAN BATU\t[\d,]+\t[\d,]+\t[\d,]+\t[\d,]+\t[\d,]+\t[\d,]+\t[\d,]+\t[\d,]+\t[\d,]+\t[\d,]+',l)]
     if vr:
         v=vr[0].split('\t');K=["1D","2D","3D","5D","7D","28D","U24","U48"]
