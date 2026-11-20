@@ -90,7 +90,8 @@ if __name__=='__main__':
     wb=openpyxl.load_workbook(a.wl,read_only=True,data_only=True)
     L={'VF NOV':wl_sheet(wb,'VF NOV',2,3,4),'VF OKT':wl_sheet(wb,'VF OKT',2,3,4),'SA NOV':wl_sheet(wb,'SA NOV',3,4,5),'SA OKT':wl_sheet(wb,'SA OKT',3,4,5)}
     # WL tambahan (format baru: sheet VF / SA / WL Return, tanggal drop di baris 1 kolom C, data mulai baris 4)
-    for f in a.add:
+    seen=set()
+    for f in sorted(a.add,key=lambda f:str(next(openpyxl.load_workbook(f,read_only=True)['VF'].iter_rows(max_row=1,values_only=True))[2])):
         w=openpyxl.load_workbook(f,read_only=True,data_only=True)
         def tg(sh):
             try:return str(next(w[sh].iter_rows(max_row=1,values_only=True))[2])[:10]
@@ -108,6 +109,9 @@ if __name__=='__main__':
         nv=rows('VF',1,2,3);ns=rows('SA',2,3,4)
         kv={key(x[1]) for x in nv};ks={key(x[1]) for x in ns}
         b0=len(L['VF NOV'])
+        # file --add bersifat kumulatif (tanggal header = tanggal file): SN yang sudah ada dari file --add sebelumnya tetap pakai tanggal drop pertamanya
+        od={key(x[1]):x[0] for k in ('VF NOV','SA NOV') for x in L[k] if key(x[1]) in seen}
+        nv=[(od.get(key(x[1]),x[0]),)+x[1:] for x in nv];ns=[(od.get(key(x[1]),x[0]),)+x[1:] for x in ns];seen|=kv|ks
         L['VF NOV']=[x for x in L['VF NOV'] if key(x[1]) not in ret|kv]+nv
         L['SA NOV']=[x for x in L['SA NOV'] if key(x[1]) not in ks]+ns
         print(f.split('/')[-1],'VF +',len(nv),'SA +',len(ns),'return',len(ret),'VF NOV',b0,'->',len(L['VF NOV']),file=sys.stderr)
