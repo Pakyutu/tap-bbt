@@ -55,7 +55,7 @@ def proses(msg):
     if cs and fd and not msg.get('caption'):iso=fd.group(0);d=int(fd.group(3));lab=f'{d} {BLN[int(fd.group(2))-1]}'
     cmd=([sys.executable,'tools/cvm_csv.py',str(dst)] if cs[1]=='CVM' else [sys.executable,'tools/surya_outlet.py',cs[1],str(dst)]) if cs else [sys.executable,'tools/'+rt[1],str(dst),lab]
     pg('⏳ 60% · menghitung data');rc,out=run(cmd)
-    if rc:pg(f'❌ {nm}\n{out[-600:]}');return False
+    if rc:pg(f'❌ {nm}\n'+(out.splitlines()[-1][:300] if out else 'gagal')+'\n(paste tidak sesuai format? Kalau ragu, lewat sesi Claude)');return False
     if not cs and rt[1]=='sultan_so.py':
         h=(R/'digipos-sso.js').read_text()
         if '"per":""' in h:
