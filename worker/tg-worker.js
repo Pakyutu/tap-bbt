@@ -9,9 +9,9 @@ export default {
     if (!m || String(m.chat.id) !== String(env.TG_CHAT)) return new Response("ok");
     const tg = (method, body) => fetch(`https://api.telegram.org/bot${env.TG_TOKEN}/${method}`, {
       method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-    const cmd = /^(mom|soh)\s+(pv|sa)\s+\d/i.test(m.text || "");
+    const cmd = /^\/?(mom|soh|sn|outlet|status)\b/i.test(m.text || "");
     if (!m.document && !cmd) {
-      await tg("sendMessage", { chat_id: m.chat.id, text: "Kirim sebagai FILE, atau paste dengan baris pertama \"mom pv 20\" / \"soh sa 19\"." });
+      await tg("sendMessage", { chat_id: m.chat.id, text: "Kirim FILE, atau perintah: status · sn <nomor> · outlet <id/nama> · mom pv 20 · soh sa 19" });
       return new Response("ok");
     }
     const r = await tg("sendMessage", { chat_id: m.chat.id, text: `📥 ${m.document ? m.document.file_name : (m.text || "").split("\n")[0]} diterima, mengantre diproses…` });

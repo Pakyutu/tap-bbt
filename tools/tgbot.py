@@ -37,6 +37,53 @@ def tgl(cap):
 def run(cmd):
     r=subprocess.run(cmd,cwd=R,capture_output=True,text=True)
     return r.returncode,(r.stdout+r.stderr).strip()
+QRY=re.compile(r'^/?(status|sn|outlet)\b\s*(.*)',re.I|re.S)
+def jl(f,k):
+    t=(R/f).read_text();i=t.index(k)+len(k);return json.JSONDecoder().raw_decode(t[i:])[0]
+def wib():return datetime.datetime.utcnow()+datetime.timedelta(hours=7)
+def q_status():
+    j=json.loads((R/'status.json').read_text());n=wib().date();o=[]
+    for i in j['items']:
+        d=datetime.date.fromisoformat(i['d']);t=(n-d).days
+        o.append(f"{'⚠️' if t>1 else '✅'} {i['n']}: {d.day} {BLN[d.month-1]}"+(f' ({t} hari lalu)' if t>1 else ''))
+    return 'Status data (hari ini '+f'{n.day} {BLN[n.month-1]}):\n'+'\n'.join(o)
+def q_sn(txt):
+    sn=list(dict.fromkeys(re.findall(r'\d{10,}',txt)))[:40]
+    if not sn:return 'Kirim nomor SN, contoh: sn 0150000076531300 (boleh banyak, satu per baris).'
+    t=(R/'cekst-data.js').read_text();CK=json.JSONDecoder().raw_decode(t[t.index('{'):])[0];n=wib().date();o=[]
+    for x in sn:
+        v=int(x);hit=None
+        for gk,g in CK['G'].items():
+            for sf in g['sf']:
+                for pr in sf['p']:
+                    for r in pr.get('b',[]):
+                        a,_,b=r.partition('-')
+                        if int(a)<=v<=int(b or a):hit=(gk,sf['n'],pr['p']);break
+                    if hit:break
+                if hit:break
+            if hit:break
+        if not hit:o.append(f'✅ {x}: tidak ada di daftar belum ST (sudah ST / terpakai / bukan WL)');continue
+        age=''
+        for a,b,dt in CK['DM'].get(hit[0],[]):
+            if a<=v<=b:
+                dd=datetime.date.fromisoformat(dt);age=f' · drop {dd.day} {BLN[dd.month-1]} ({(n-dd).days} hari)';break
+        o.append(f'⏳ {x}: BELUM ST · {hit[1]} · {hit[2]}{age}')
+    return '\n'.join(o)+f"\n\n(data sampai {CK['cutVF']}; bukan cek langsung Digipos)"
+def q_outlet(txt):
+    q=txt.strip().lower()
+    if not q:return 'Contoh: outlet 1200016545  atau  outlet nama toko'
+    D=jl('penjualan.html','const D=');n=len(D['CP']);c=D['CP'][-1]
+    h=[o for o in D['O'] if q==o['id'] or q in o['nm'].lower() or q in (o.get('rs') or '')][:5]
+    if not h:return f'Tidak ada outlet PJP yang cocok dengan "{txt.strip()}".'
+    out=[]
+    for o in h:
+        pv,sa=o['pv'],o['sa']
+        out.append(f"{o['nm']} ({o['id']})\n{o['kec']} · SF {o['sf']} · PJP {o['pjp']} · {o['kat']}\nPV 1-{c} Nov {pv[-1]:,} (Okt {pv[10+n-1]:,}) · SA {sa[-1]:,} (Okt {sa[10+n-1]:,})".replace(',','.'))
+    return '\n\n'.join(out)
+def kueri(m,k,a):
+    PG[0]=ACK
+    r={'status':lambda:q_status(),'sn':lambda:q_sn(a),'outlet':lambda:q_outlet(a)}[k]()
+    pg(r)
 CMD=re.compile(r'^(mom|soh)[\s_]+(pv|sa)[\s_]+(\d{1,2})(?:[\s_]+(\d{1,2}))?',re.I)
 def ver_label(d,iso):
     f=R/'digipos.html';t=f.read_text()
@@ -49,6 +96,8 @@ def proses(msg):
         nm=doc['file_name'];spec=re.sub(r'\.txt$','',nm,flags=re.I)
     else:
         t=(msg.get('text') or '').strip();nm,_,body=t.partition('\n');spec=nm.strip()
+        qm=QRY.match(t)
+        if qm:kueri(msg,qm.group(1).lower(),qm.group(2));return False
         if not CMD.match(spec):
             say('Kirim FILE (xlsx/csv), atau paste dengan baris pertama "mom pv 20" / "soh sa 19". Selain itu lewat sesi Claude.');return False
     low=nm.lower();cap=msg.get('caption')
