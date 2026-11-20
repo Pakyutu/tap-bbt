@@ -25,6 +25,7 @@ for g,G in CK['G'].items():
                     cur=c+1;hit+=1;pr['d']-=1;sf['d']-=1;rep.append((g,sf['n'],pr['p'],str(c).zfill(L)))
                 if cur<=B:nb.append(str(cur).zfill(L) if cur==B else f'{str(cur).zfill(L)}-{str(B).zfill(L)}')
             pr['b']=nb
+    for sf in G['sf']:sf['p']=[x for x in sf['p'] if x['d']>0]
     if hit:G['tp']=G.get('tp',0)+hit
 if len(sys.argv)>1 and rep:
     sys.path.insert(0,__file__.rsplit('/',1)[0]);import cekst_build as cb,openpyxl
