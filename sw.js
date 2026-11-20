@@ -1,5 +1,5 @@
 // Versi cache: naikkan angka ini kalau ada perubahan besar pada file app.
-const V = "tap-bbt-v134";
+const V = "tap-bbt-v135";
 const SAME = self.location.origin;
 const SHELL = [
   "./", "index.html", "digipos.html", "penjualan.html", "wl.html","kalkulator.html","backup.html","cekst.html","cekst-data.js","c128.js", "manifest.json",
@@ -37,14 +37,20 @@ self.addEventListener("fetch", e => {
 
   if (isPage) {
     // HTML: ambil dari jaringan dulu (supaya update data langsung terlihat), kalau offline pakai cache
+    // Sinyal lemah: kalau jaringan tidak menjawab dalam 4 dtk dan ada cache, pakai cache (jaringan tetap jalan di belakang untuk memperbarui)
     e.respondWith((async () => {
-      try {
-        const r = await fetch(req, { cache: "no-store" });
+      const cached = await caches.match(req, { ignoreSearch: true });
+      const net = fetch(req, { cache: "no-store" }).then(async r => {
         if (r.ok) (await caches.open(V)).put(req, r.clone());
         return r;
-      } catch {
-        return (await caches.match(req)) || (await caches.match("index.html"));
+      });
+      if (!cached) {
+        try { return await net; } catch { return (await caches.match("index.html")) || Response.error(); }
       }
+      net.catch(() => {});
+      try {
+        return await Promise.race([net, new Promise((_, no) => setTimeout(no, 4000))]);
+      } catch { return cached; }
     })());
     return;
   }
