@@ -85,8 +85,7 @@ def build(rows,ST,home='BAGAN BATU'):
         R.append({'n':n,'d':sum(x['d'] for x in P),'s':sum(x['s'] for x in P),'p':P})
     R.sort(key=lambda o:(o['n'].startswith(('Lainnya','(tanpa')),-o['d']))
     return {'sf':R,'tgl':sorted([k,v[0],v[1]] for k,v in dd.items()),'mon':sorted(mon.items()),'lain':lain.most_common(10)}
-if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('--wl');ap.add_argument('--byu');ap.add_argument('--add',nargs='*',default=[]);ap.add_argument('--pv',nargs='*',default=[]);ap.add_argument('--sa',nargs='*',default=[]);a=ap.parse_args()
+def assemble(a):
     wb=openpyxl.load_workbook(a.wl,read_only=True,data_only=True)
     L={'VF NOV':wl_sheet(wb,'VF NOV',2,3,4),'VF OKT':wl_sheet(wb,'VF OKT',2,3,4),'SA NOV':wl_sheet(wb,'SA NOV',3,4,5),'SA OKT':wl_sheet(wb,'SA OKT',3,4,5)}
     # WL tambahan (format baru: sheet VF / SA / WL Return, tanggal drop di baris 1 kolom C, data mulai baris 4)
@@ -118,11 +117,18 @@ if __name__=='__main__':
     if a.byu:
         b=openpyxl.load_workbook(a.byu,read_only=True,data_only=True)
         L['SA BYU']=wl_sheet(b,b.sheetnames[0],2,3,None,dc=None,start=4)
-    STv,STs,mx={},{},{}
-    raw(a.pv,{key(x[1]) for k in L if k.startswith('VF') for x in L[k]},STv,mx)
-    raw(a.sa,{key(x[1]) for k in L if k.startswith('SA') for x in L[k]},STs,mx)
-    out={'upd':(datetime.datetime.utcnow()+datetime.timedelta(hours=7)).strftime('%Y-%m-%dT%H:%M'),'cutVF':max([v for k,v in mx.items() if k in a.pv] or ['']),'cutSA':max([v for k,v in mx.items() if k in a.sa] or ['']),'G':{}}
-    out['ft']={'wl':max([ftime(a.wl)]+[ftime(f) for f in a.add]),'pv':max([ftime(p) for p in a.pv] or ['']),'sa':max([ftime(p) for p in a.sa] or [''])}
+    return L
+def dm(L):
+    # peta tanggal drop per rentang SN berurutan: {grup:[[sn_awal,sn_akhir,'YYYY-MM-DD'],...]} (angka tanpa nol di depan) -> umur SN belum ST di cekst.html
+    D={}
+    for k,rows in L.items():
+        iv=[]
+        for n,d in sorted((int(key(x[1])),x[0]) for x in rows if x[0]):
+            if iv and iv[-1][2]==d and n==iv[-1][1]+1:iv[-1][1]=n
+            else:iv.append([n,n,d])
+        D[k]=iv
+    return D
+def drop_tp(L):
     TP=set()
     try:
         for ln in open(__file__.rsplit('/',1)[0]+'/cekst_terpakai.txt'):
@@ -134,6 +140,16 @@ if __name__=='__main__':
     tpn={}
     for k in L:
         b=len(L[k]);L[k]=[x for x in L[k] if key(x[1]) not in TP];tpn[k]=b-len(L[k])
+    return tpn
+if __name__=='__main__':
+    ap=argparse.ArgumentParser();ap.add_argument('--wl');ap.add_argument('--byu');ap.add_argument('--add',nargs='*',default=[]);ap.add_argument('--pv',nargs='*',default=[]);ap.add_argument('--sa',nargs='*',default=[]);a=ap.parse_args()
+    L=assemble(a)
+    STv,STs,mx={},{},{}
+    raw(a.pv,{key(x[1]) for k in L if k.startswith('VF') for x in L[k]},STv,mx)
+    raw(a.sa,{key(x[1]) for k in L if k.startswith('SA') for x in L[k]},STs,mx)
+    out={'upd':(datetime.datetime.utcnow()+datetime.timedelta(hours=7)).strftime('%Y-%m-%dT%H:%M'),'cutVF':max([v for k,v in mx.items() if k in a.pv] or ['']),'cutSA':max([v for k,v in mx.items() if k in a.sa] or ['']),'G':{}}
+    out['ft']={'wl':max([ftime(a.wl)]+[ftime(f) for f in a.add]),'pv':max([ftime(p) for p in a.pv] or ['']),'sa':max([ftime(p) for p in a.sa] or [''])}
+    tpn=drop_tp(L);out['DM']=dm(L)
     for k,rows in L.items():
         if not rows:continue
         st=STv if k.startswith('VF') else STs

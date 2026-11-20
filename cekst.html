@@ -26,6 +26,7 @@ details summary{cursor:pointer;color:var(--mu);font-size:12.5px;margin-top:6px}
 .err{color:var(--ac);font-size:13px;font-weight:600;margin-top:6px}.ok{color:var(--ok)}
 .pk{margin-top:6px;font-size:13px}.pk b{font-weight:600}.rg{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--mu);margin-top:2px;line-height:1.5}
 table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px 8px;border-bottom:1px solid var(--bd);text-align:right}th{color:var(--mu);font-size:11.5px;font-weight:600}td:first-child,th:first-child{text-align:left}
+.ag{font-size:12.5px;margin-top:8px}.ag.a3{color:var(--ac)}.ag.a2{color:var(--wn)}.ag.a4{color:var(--mu)}td.ag{font-size:13px;margin:0}
 .bk{margin:2px 0 3px;font-size:12.5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}.cpb{border:1px solid var(--bd);background:var(--soft);color:var(--tx);border-radius:999px;padding:2px 9px;font-size:11.5px;cursor:pointer}</style><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="ui.css"></head><body><div class="w">
 <h1>Cek WL vs ST</h1><div class="sub" id="sub"></div>
 <div class="tabs" id="pt"></div>
@@ -47,6 +48,22 @@ function blk(list){const L=LIM(),R=[];let w=12;
   return out.map(g=>({aw:z(g.s,g.w),ak:z(g.e,g.w),n:g.n,lines:g.r.map(([a,b])=>a===b?z(a,g.w):z(a,g.w)+' – '+z(b,g.w))}))}
 const rgT=list=>blk(list).map((g,i,A)=>(A.length>1||g.lines.length>1?`▶ Cek ${g.aw} – ${g.ak} (${g.n} pcs)\n`:'')+g.lines.join('\n')).join('\n\n');
 const rgH=list=>blk(list).map((g,i,A)=>(A.length>1||g.lines.length>1?`<div class="bk"><b>▶ ${g.aw} – ${g.ak}</b> <span class="mu">${g.n} pcs</span> <button class="cpb" data-cp="${g.aw}|${g.ak}">Salin awal–akhir</button></div>`:'')+g.lines.join('<br>')).join('<span style="display:block;height:10px"></span>');
+// umur SN belum ST: tanggal drop dari CK.DM (peta rentang SN -> tanggal drop), umur = cutoff ST - tanggal drop
+const AG=[[0,3,'0–3 hari'],[4,7,'4–7 hari'],[8,14,'8–14 hari'],[15,9999,'Lebih dari 14 hari']];
+const dAge=d=>Math.max(0,Math.round((new Date(cut()+'T00:00:00')-new Date(d+'T00:00:00'))/864e5)),agB=n=>AG.findIndex(g=>n>=g[0]&&n<=g[1]);
+function aged(list){const M=CK.DM&&CK.DM[P];if(!M)return null;const out=[];
+  list.forEach(r=>{const [x,y]=r.split('-'),w=x.length;let a=+x;const b=+(y||x);let lo=0,hi=M.length;while(lo<hi){const m=(lo+hi)>>1;if(M[m][1]<a)lo=m+1;else hi=m}
+    for(let i=lo;i<M.length&&M[i][0]<=b&&a<=b;i++){const s=Math.max(a,M[i][0]);if(s>a)out.push([a,s-1,w,'']);const e=Math.min(b,M[i][1]);out.push([s,e,w,M[i][2]]);a=e+1}
+    if(a<=b)out.push([a,b,w,''])});return out}
+function ageG(list){const A=aged(list);if(!A)return null;const B=[0,1,2,3,4].map(()=>({r:[],n:0,d:[]}));
+  A.forEach(([a,b,w,d])=>{const i=d?agB(dAge(d)):4,z=v=>String(v).padStart(w,'0');B[i].r.push(a===b?z(a):z(a)+'-'+z(b));B[i].n+=b-a+1;if(d)B[i].d.push(d)});
+  return B.map((g,i)=>({...g,i,l:i<4?AG[i][2]:'Tanggal drop tidak ada'})).filter(g=>g.n).reverse()}
+const dr=g=>{const u=[...new Set(g.d)].sort();return !u.length?'-':u.length>1?tg(u[0])+' – '+tg(u[u.length-1]):tg(u[0])};
+const ageH=list=>{const G=ageG(list);return G?G.map(g=>`<div class="ag a${g.i}"><b>${g.l}</b> · ${nf(g.n)} pcs <span class="mu">(drop ${dr(g)})</span></div>`+rgH(g.r)).join('<span style="display:block;height:12px"></span>'):rgH(list)};
+const ageT=list=>{const G=ageG(list);return G?G.map(g=>`⏳ ${g.l} (drop ${dr(g)}) · ${nf(g.n)} pcs\n`+rgT(g.r)).join('\n\n'):rgT(list)};
+const oldN=o=>{if(!CK.DM||!CK.DM[P])return 0;let n=0;o.p.forEach(x=>{if(x.b.length){const G=ageG(x.b);G.forEach(g=>{if(g.i===3)n+=g.n})}});return n};
+function ageStat(S){if(!CK.DM||!CK.DM[P])return '';const T=[0,0,0,0,0];S.forEach(o=>o.p.forEach(x=>{if(x.b.length)ageG(x.b).forEach(g=>T[g.i]+=g.n)}));const tot=T.reduce((a,b)=>a+b,0);if(!tot)return '';
+  return `<div class="card"><h2>Umur SN belum ST</h2><div class="sub">Dihitung dari tanggal drop sampai ${tg(cut())}. Yang paling lama dikejar duluan.</div><table><tr><th>Umur</th><th>Belum ST</th><th>%</th></tr>${[3,2,1,0,4].filter(i=>T[i]).map(i=>`<tr><td class="ag a${i}"><b>${i<4?AG[i][2]:'Tanggal drop tidak ada'}</b></td><td>${nf(T[i])}</td><td>${pc(T[i],tot)}%</td></tr>`).join('')}</table></div>`}
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
 const BL=['JAN','FEB','MAR','APR','MEI','JUN','JUL','AGU','AGS','SEP','OKT','NOV','DES'],mi=k=>{const m=k.split(' ')[1]||'';const i=BL.indexOf(m);return i<0?99:(m==='AGS'?7:i>7?i-1:i)};
 const GK=Object.keys(CK.G||{}).sort((a,b)=>mi(a)-mi(b)||(a.split(' ')[0]>b.split(' ')[0]?-1:a.split(' ')[0]<b.split(' ')[0]?1:0));let P=GK[0]||'VF NOV',F='all';
@@ -60,15 +77,15 @@ function draw(){const C=CK.G[P];
   $('res').innerHTML=`<div class="card"><div class="kpi"><div><small>SN didrop</small><b>${nf(T)}</b></div><div><small>Sudah ST</small><b class="ok">${nf(Y)}</b></div><div><small>Belum ST</small><b style="color:var(--ac)">${nf(T-Y)}</b></div><div><small>% ST</small><b style="color:${col(pc(Y,T))}">${pc(Y,T)}%</b></div></div>
     <div class="bar"><i style="width:${pc(Y,T)}%;background:${col(pc(Y,T))}"></i></div><div class="sub" style="margin-top:8px">ST dihitung s/d ${tg(cut())} (data tanggal terakhir bisa belum lengkap).${C.tp?' '+nf(C.tp)+' SN sudah terpakai (tidak bisa di-ST) tidak dihitung.':''}${C.mon&&C.mon.length?' ST per bulan: '+C.mon.map(([m,v])=>['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][+m.slice(5)-1]+' '+nf(v)).join(' · ')+'.':''}${C.lain&&C.lain.length?' <b style="color:var(--wn)">ST di TAP lain: '+C.lain.map(([t,v])=>esc(t)+' '+nf(v)).join(', ')+'</b>.':''}</div>
     <div class="row"><button class="btn" id="cpr">Salin rekap</button><button class="btn s" id="cpb">Salin SN belum ST</button></div></div>
-    <div class="card"><h2>Per SF</h2><div class="tabs">${[['all','Semua ('+S.length+')'],['bl','Belum lengkap ('+S.filter(o=>o.s<o.d).length+')']].map(([k,t])=>`<button data-f="${k}" class="${F===k?'on':''}">${t}</button>`).join('')}</div>
-    ${V.map(o=>{const p=pc(o.s,o.d);return `<div class="ol"><div class="h"><b>${esc(o.n)}</b><span class="pc" style="color:${col(p)}">${nf(o.s)}/${nf(o.d)} · ${p}%</span></div><button class="btn s" data-cs="${S.indexOf(o)}" style="padding:6px 12px;font-size:13px;margin:6px 0 2px">📋 Salin ${esc(o.n.split(' ')[0])}</button><div class="bar"><i style="width:${p}%;background:${col(p)}"></i></div>
-      ${o.p.map(x=>`<div class="pk"><b>${esc(x.p)}</b>: ${nf(x.s)}/${nf(x.d)} ST${x.b.length?` · <span style="color:var(--ac)">belum ${nf(x.d-x.s)}</span><details><summary>${x.b.length} rentang belum ST</summary><div class="rg">${rgH(x.b)}</div></details>`:' ✓'}</div>`).join('')}</div>`}).join('')}</div>
+    ${ageStat(S)}<div class="card"><h2>Per SF</h2><div class="tabs">${[['all','Semua ('+S.length+')'],['bl','Belum lengkap ('+S.filter(o=>o.s<o.d).length+')']].map(([k,t])=>`<button data-f="${k}" class="${F===k?'on':''}">${t}</button>`).join('')}</div>
+    ${V.map(o=>{const p=pc(o.s,o.d);return `<div class="ol"><div class="h"><b>${esc(o.n)}</b><span class="pc" style="color:${col(p)}">${nf(o.s)}/${nf(o.d)} · ${p}%</span></div><button class="btn s" data-cs="${S.indexOf(o)}" style="padding:6px 12px;font-size:13px;margin:6px 0 2px">📋 Salin ${esc(o.n.split(' ')[0])}</button>${oldN(o)?`<span class="tag w">⚠ ${nf(oldN(o))} pcs sudah > 14 hari</span>`:''}<div class="bar"><i style="width:${p}%;background:${col(p)}"></i></div>
+      ${o.p.map(x=>`<div class="pk"><b>${esc(x.p)}</b>: ${nf(x.s)}/${nf(x.d)} ST${x.b.length?` · <span style="color:var(--ac)">belum ${nf(x.d-x.s)}</span><details><summary>${x.b.length} rentang belum ST</summary><div class="rg">${ageH(x.b)}</div></details>`:' ✓'}</div>`).join('')}</div>`}).join('')}</div>
     ${C.tgl.length?`<div class="card"><h2>Per tanggal drop</h2><table><tr><th>Tanggal</th><th>Drop</th><th>Sudah ST</th><th>%</th></tr>${C.tgl.map(([d,a,b])=>`<tr><td>${tg(d)}</td><td>${nf(a)}</td><td>${nf(b)}</td><td style="color:${col(pc(b,a))};font-weight:700">${pc(b,a)}%</td></tr>`).join('')}</table></div>`:''}`}
 function rekap(){const C=CK.G[P],S=C.sf,T=S.reduce((a,o)=>a+o.d,0),Y=S.reduce((a,o)=>a+o.s,0);
   return `*Cek WL ${P} vs ST Digipos*\nST s/d ${tg(cut())}: ${nf(Y)}/${nf(T)} (${pc(Y,T)}%) · belum ${nf(T-Y)}\n\n`+S.map((o,i)=>`${i+1}. ${o.n}: ${nf(o.s)}/${nf(o.d)} (${pc(o.s,o.d)}%)`).join('\n')}
-function sfTxt(o){return `*Cek WL ${P} vs ST Digipos*\n*${o.n}*\nST s/d ${tg(cut())}: ${nf(o.s)}/${nf(o.d)} (${pc(o.s,o.d)}%) · belum ${nf(o.d-o.s)} pcs\n\n`+o.p.map(x=>`${x.p}: ${nf(x.s)}/${nf(x.d)} ST`+(x.b.length?` · belum ${nf(x.d-x.s)} pcs\n${rgT(x.b)}`:' ✓')).join('\n\n')}
+function sfTxt(o){return `*Cek WL ${P} vs ST Digipos*\n*${o.n}*\nST s/d ${tg(cut())}: ${nf(o.s)}/${nf(o.d)} (${pc(o.s,o.d)}%) · belum ${nf(o.d-o.s)} pcs\n\n`+o.p.map(x=>`${x.p}: ${nf(x.s)}/${nf(x.d)} ST`+(x.b.length?` · belum ${nf(x.d-x.s)} pcs\n${ageT(x.b)}`:' ✓')).join('\n\n')}
 function belum(){const C=CK.G[P],B=C.sf.filter(o=>o.s<o.d);
-  return `*SN ${P} belum ST* (s/d ${tg(cut())})\n\n`+B.map((o,i)=>`${i+1}. ${o.n} (${nf(o.d-o.s)} pcs)\n\n`+o.p.filter(x=>x.b.length).map(x=>`${x.p} (${nf(x.d-x.s)} pcs)\n${rgT(x.b)}`).join('\n\n')).join('\n\n\n')+`\n\nTotal belum ST: ${nf(B.reduce((a,o)=>a+o.d-o.s,0))} pcs`}
+  return `*SN ${P} belum ST* (s/d ${tg(cut())})\n\n`+B.map((o,i)=>`${i+1}. ${o.n} (${nf(o.d-o.s)} pcs)\n\n`+o.p.filter(x=>x.b.length).map(x=>`${x.p} (${nf(x.d-x.s)} pcs)\n${ageT(x.b)}`).join('\n\n')).join('\n\n\n')+`\n\nTotal belum ST: ${nf(B.reduce((a,o)=>a+o.d-o.s,0))} pcs`}
 document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{};if(d.cp){const [x,y]=d.cp.split('|');copy(x+' - '+y,t);return}
   if(d.p){P=d.p;document.querySelectorAll('#pt button').forEach(b=>b.classList.toggle('on',b.dataset.p===P));draw()}
   if(d.f){F=d.f;draw()}
