@@ -67,7 +67,7 @@ def raw(paths,need,ST,mx):
                     n+=1
                     if dt is not None and r[dt] is not None:
                         d=str(r[dt])[:10]
-                        if d>mx.get(path,''):mx[path]=d
+                        if re.fullmatch(r'\d{4}-\d\d-\d\d',d) and d>mx.get(path,''):mx[path]=d
             print(path.split('/')[-1],ws.title,'baris',n,file=sys.stderr)
 def build(rows,ST,home='BAGAN BATU'):
     by=collections.OrderedDict();dd=collections.defaultdict(lambda:[0,0]);mon=collections.Counter();lain=collections.Counter()
