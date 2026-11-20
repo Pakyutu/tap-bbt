@@ -1,6 +1,7 @@
 # Terapkan tools/cekst_terpakai.txt ke cekst-data.js yang sudah ada (tanpa build ulang):
 # SN terpakai dibuang dari rentang belum ST & dikurangi dari jumlah drop (d) per produk/SF; G[k].tp = jumlah SN terpakai.
-import json,sys
+import json,sys,collections
+# Opsional: python3 tools/cekst_terpakai_apply.py WL.xlsx  -> tabel 'Per tanggal drop' ikut dikurangi (tanggal dari WL).
 TP=set()
 for ln in open('tools/cekst_terpakai.txt'):
     ln=ln.split('#')[0].strip()
@@ -25,6 +26,16 @@ for g,G in CK['G'].items():
                 if cur<=B:nb.append(str(cur).zfill(L) if cur==B else f'{str(cur).zfill(L)}-{str(B).zfill(L)}')
             pr['b']=nb
     if hit:G['tp']=G.get('tp',0)+hit
+if len(sys.argv)>1 and rep:
+    sys.path.insert(0,__file__.rsplit('/',1)[0]);import cekst_build as cb,openpyxl
+    wb=openpyxl.load_workbook(sys.argv[1],read_only=True,data_only=True);cut={(g,r[3]) for r in rep for g in [r[0]]}
+    for g in {r[0] for r in rep}:
+        sh=g if g in wb.sheetnames else None
+        if not sh:continue
+        L=cb.wl_sheet(wb,sh,2,3,4) if g.startswith('VF') else cb.wl_sheet(wb,sh,3,4,5)
+        c=collections.Counter(d for d,s,p,n in L if d and (g,s) in cut)
+        for r in CK['G'][g]['tgl']:r[1]-=c.get(r[0],0)
+        CK['G'][g]['tgl']=[r for r in CK['G'][g]['tgl'] if r[1]>0]
 t=t[:i]+json.dumps(CK,ensure_ascii=False,separators=(',',':'))+t[i+e:];open(p,'w').write(t)
 for r in rep:print(*r)
 print('dikeluarkan',len(rep))
