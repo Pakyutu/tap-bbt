@@ -46,7 +46,7 @@ def proses(msg):
     rt=cs or next((x for x in RT if x[0] in low),None)
     if not rt:say(f'File "{nm}" belum dikenali bot (butuh sesi Claude).');return False
     if doc.get('file_size',0)>19*1024*1024:say('File >20MB, batas Telegram. Kirim lewat sesi Claude.');return False
-    PG[0]=None;pg(f'⏳ 10% · {nm} diterima, mulai diproses')
+    PG[0]=ACK;pg(f'⏳ 10% · {nm} diterima, mulai diproses')
     fp=call('getFile',file_id=doc['file_id'])['result']['file_path']
     dst=pathlib.Path('/tmp')/('in_'+re.sub(r'[^\w.\-]','_',nm))
     dst.write_bytes(urllib.request.urlopen(f'https://api.telegram.org/file/bot{T}/{fp}',timeout=120).read())
@@ -64,17 +64,28 @@ def proses(msg):
     ok,_=run(['git','diff','--quiet']);
     if ok==0:pg(f'➖ {nm}: tidak ada perubahan data (file sama?).');return False
     pg(f'✅ 100% · {nm} masuk · {lab} (tayang ±1 mnt)');return True
+ACK=int(os.environ.get('TG_ACK') or 0) or None
+def bump():
+    s=(R/'sw.js').read_text()
+    s=re.sub(r'tap-bbt-v(\d+)',lambda x:f'tap-bbt-v{int(x.group(1))+1}',s,count=1)
+    (R/'sw.js').write_text(s)
 def main():
+    if os.environ.get('TG_UPDATE'):  # mode webhook (Worker)
+        m=json.loads(os.environ['TG_UPDATE']).get('message')
+        if m and str(m['chat']['id'])==CH:
+            try:ubah=proses(m)
+            except Exception as e:say(f'Error: {e}');ubah=False
+            if ubah:bump()
+        return
+
     o=int(OFF.read_text()) if OFF.exists() else 0
-    ups=call('getUpdates',offset=o,timeout=0).get('result',[]);ubah=False
+    try:ups=call('getUpdates',offset=o,timeout=0).get('result',[]);ubah=False
+    except Exception:return  # webhook aktif: getUpdates ditolak Telegram, tidak apa-apa
     for u in ups:
         o=u['update_id']+1;m=u.get('message')
         if not m or str(m['chat']['id'])!=CH:continue
         try:ubah|=proses(m)
         except Exception as e:say(f'Error: {e}')
     OFF.write_text(str(o))
-    if ubah:
-        s=(R/'sw.js').read_text()
-        s=re.sub(r'tap-bbt-v(\d+)',lambda x:f'tap-bbt-v{int(x.group(1))+1}',s,count=1)
-        (R/'sw.js').write_text(s)
+    if ubah:bump()
 main()

@@ -2,7 +2,7 @@ name: Bot update data
 on:
   schedule: [{cron: '*/5 * * * *'}]
   workflow_dispatch:
-concurrency: tgbot
+  repository_dispatch: {types: [tg]}
 permissions: {contents: write}
 jobs:
   go:
@@ -13,7 +13,14 @@ jobs:
         with: {python-version: '3.12'}
       - run: pip install -q openpyxl
       - run: python3 tools/tgbot.py
-        env: {TG_TOKEN: '${{ secrets.TG_TOKEN }}', TG_CHAT: '${{ secrets.TG_CHAT }}'}
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT: ${{ secrets.TG_CHAT }}
+          TG_UPDATE: ${{ github.event_name == 'repository_dispatch' && toJSON(github.event.client_payload.update) || '' }}
+          TG_ACK: ${{ github.event.client_payload.ack }}
       - run: |
           git config user.name "tap-bot"; git config user.email "bot@users.noreply.github.com"
-          git add -A; git diff --cached --quiet || (git commit -qm "Update data via bot" && git push)
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -qm "Update data via bot"
+          for i in 1 2 3; do git pull -q --rebase && git push && break; sleep 5; done
