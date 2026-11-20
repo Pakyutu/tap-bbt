@@ -16,6 +16,7 @@ RT=[('biometrik','biometrik.py',['Biometrik','FR Biometric']),
     ('dealing_extra','extra_dealing.py',['Extra Dealing']),('extra','extra_dealing.py',['Extra Dealing']),
     ('cuan_pv','cuan_pv.py',['Cuan PV Redeem']),
     ('monitoring_performance','site_rev.py',['Site ID & performa site']),('site','site_rev.py',['Site ID & performa site'])]
+CSV=[('detail_outlet_pv','--pv',['Outlet PV / SA']),('detail_outlet_sa','--sa',['Outlet PV / SA']),('ngrs','--ngrs',['NGRS'])]
 def stat(names,iso):
     p=R/'status.json';j=json.loads(p.read_text())
     for i in j['items']:
@@ -35,20 +36,24 @@ def proses(msg):
     if not doc:
         say('Kirim sebagai FILE (xlsx), bukan paste. Paste SURYA / ST Digipos masih lewat sesi Claude.');return False
     nm=doc['file_name'];low=nm.lower()
-    rt=next((x for x in RT if x[0] in low),None)
+    cs=next((x for x in CSV if x[0] in low),None) if low.endswith('.csv') else None
+    rt=cs or next((x for x in RT if x[0] in low),None)
     if not rt:say(f'File "{nm}" belum dikenali bot (butuh sesi Claude).');return False
     if doc.get('file_size',0)>19*1024*1024:say('File >20MB, batas Telegram. Kirim lewat sesi Claude.');return False
     fp=call('getFile',file_id=doc['file_id'])['result']['file_path']
     dst=pathlib.Path('/tmp')/('in_'+re.sub(r'[^\w.\-]','_',nm))
     dst.write_bytes(urllib.request.urlopen(f'https://api.telegram.org/file/bot{T}/{fp}',timeout=120).read())
     d,mo,iso=tgl(msg.get('caption'));lab=f'{d} {BLN[mo-1]}'
-    rc,out=run([sys.executable,'tools/'+rt[1],str(dst),lab])
+    fd=re.search(r'(\d{4})-(\d\d)-(\d\d)',nm)
+    if cs and fd and not msg.get('caption'):iso=fd.group(0);d=int(fd.group(3));lab=f'{d} {BLN[int(fd.group(2))-1]}'
+    cmd=[sys.executable,'tools/surya_outlet.py',cs[1],str(dst)] if cs else [sys.executable,'tools/'+rt[1],str(dst),lab]
+    rc,out=run(cmd)
     if rc:say(f'GAGAL {nm}\n{out[-600:]}');return False
-    if rt[1]=='sultan_so.py':
+    if not cs and rt[1]=='sultan_so.py':
         h=(R/'digipos-sso.js').read_text()
         if '"per":""' in h:
             run(['git','checkout','digipos-sso.js']);say(f'Sultan SO: kolom periode kosong, butuh dicek Claude. Tidak diubah.');return False
-    stat(rt[2],iso)
+    stat(rt[2] if not cs else rt[2],iso)
     ok,_=run(['git','diff','--quiet']);
     if ok==0:say(f'{nm}: tidak ada perubahan data (file sama?).');return False
     say(f'✅ {nm} masuk · {lab} · '+out.splitlines()[-1][:200] if out else f'✅ {nm} masuk · {lab}');return True
