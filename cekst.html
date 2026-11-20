@@ -37,6 +37,14 @@ const $=i=>document.getElementById(i),nf=v=>Math.round(v).toLocaleString('id-ID'
 const col=p=>p>=90?'var(--ok)':p>=75?'var(--wn)':'var(--ac)',tg=d=>{const x=new Date(d+'T00:00:00');return x.getDate()+' '+['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][x.getMonth()]};
 const ft=x=>x?tg(x.slice(0,10))+' '+x.slice(11,16):'-';
 const rg=r=>r.replace('-',' – ');
+// rentang dipecah per blok maks 1.000 pcs (VF) / 100 pcs (SA), antar blok diberi jarak
+const LIM=()=>/^SA/.test(P)?100:1000;
+function blk(list){const L=LIM(),out=[];let cur=[],n=0;
+  const push=(a,b,w)=>{const c=b-a+1;if(n+c>L&&cur.length){out.push(cur);cur=[];n=0}cur.push(a===b?String(a).padStart(w,'0'):String(a).padStart(w,'0')+' – '+String(b).padStart(w,'0'));n+=c;if(n>=L){out.push(cur);cur=[];n=0}};
+  list.forEach(r=>{const [x,y]=r.split('-'),w=x.length;let a=+x,b=+(y||x);while(b-a+1>L){push(a,a+L-1,w);a+=L}push(a,b,w)});
+  if(cur.length)out.push(cur);return out}
+const rgT=list=>blk(list).map(g=>g.join('\n')).join('\n\n');
+const rgH=list=>blk(list).map(g=>g.join('<br>')).join('<br><span style="display:block;height:8px"></span>');
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
 const BL=['JAN','FEB','MAR','APR','MEI','JUN','JUL','AGU','AGS','SEP','OKT','NOV','DES'],mi=k=>{const m=k.split(' ')[1]||'';const i=BL.indexOf(m);return i<0?99:(m==='AGS'?7:i>7?i-1:i)};
 const GK=Object.keys(CK.G||{}).sort((a,b)=>mi(a)-mi(b)||(a.split(' ')[0]>b.split(' ')[0]?-1:a.split(' ')[0]<b.split(' ')[0]?1:0));let P=GK[0]||'VF NOV',F='all';
@@ -52,13 +60,13 @@ function draw(){const C=CK.G[P];
     <div class="row"><button class="btn" id="cpr">Salin rekap</button><button class="btn s" id="cpb">Salin SN belum ST</button></div></div>
     <div class="card"><h2>Per SF</h2><div class="tabs">${[['all','Semua ('+S.length+')'],['bl','Belum lengkap ('+S.filter(o=>o.s<o.d).length+')']].map(([k,t])=>`<button data-f="${k}" class="${F===k?'on':''}">${t}</button>`).join('')}</div>
     ${V.map(o=>{const p=pc(o.s,o.d);return `<div class="ol"><div class="h"><b>${esc(o.n)}</b><span class="pc" style="color:${col(p)}">${nf(o.s)}/${nf(o.d)} · ${p}%</span></div><button class="btn s" data-cs="${S.indexOf(o)}" style="padding:6px 12px;font-size:13px;margin:6px 0 2px">📋 Salin ${esc(o.n.split(' ')[0])}</button><div class="bar"><i style="width:${p}%;background:${col(p)}"></i></div>
-      ${o.p.map(x=>`<div class="pk"><b>${esc(x.p)}</b>: ${nf(x.s)}/${nf(x.d)} ST${x.b.length?` · <span style="color:var(--ac)">belum ${nf(x.d-x.s)}</span><details><summary>${x.b.length} rentang belum ST</summary><div class="rg">${x.b.map(rg).join('<br>')}</div></details>`:' ✓'}</div>`).join('')}</div>`}).join('')}</div>
+      ${o.p.map(x=>`<div class="pk"><b>${esc(x.p)}</b>: ${nf(x.s)}/${nf(x.d)} ST${x.b.length?` · <span style="color:var(--ac)">belum ${nf(x.d-x.s)}</span><details><summary>${x.b.length} rentang belum ST</summary><div class="rg">${rgH(x.b)}</div></details>`:' ✓'}</div>`).join('')}</div>`}).join('')}</div>
     ${C.tgl.length?`<div class="card"><h2>Per tanggal drop</h2><table><tr><th>Tanggal</th><th>Drop</th><th>Sudah ST</th><th>%</th></tr>${C.tgl.map(([d,a,b])=>`<tr><td>${tg(d)}</td><td>${nf(a)}</td><td>${nf(b)}</td><td style="color:${col(pc(b,a))};font-weight:700">${pc(b,a)}%</td></tr>`).join('')}</table></div>`:''}`}
 function rekap(){const C=CK.G[P],S=C.sf,T=S.reduce((a,o)=>a+o.d,0),Y=S.reduce((a,o)=>a+o.s,0);
   return `*Cek WL ${P} vs ST Digipos*\nST s/d ${tg(cut())}: ${nf(Y)}/${nf(T)} (${pc(Y,T)}%) · belum ${nf(T-Y)}\n\n`+S.map((o,i)=>`${i+1}. ${o.n}: ${nf(o.s)}/${nf(o.d)} (${pc(o.s,o.d)}%)`).join('\n')}
-function sfTxt(o){return `*Cek WL ${P} vs ST Digipos*\n*${o.n}*\nST s/d ${tg(cut())}: ${nf(o.s)}/${nf(o.d)} (${pc(o.s,o.d)}%) · belum ${nf(o.d-o.s)} pcs\n\n`+o.p.map(x=>`${x.p}: ${nf(x.s)}/${nf(x.d)} ST`+(x.b.length?` · belum ${nf(x.d-x.s)} pcs\n${x.b.map(rg).join('\n')}`:' ✓')).join('\n\n')}
+function sfTxt(o){return `*Cek WL ${P} vs ST Digipos*\n*${o.n}*\nST s/d ${tg(cut())}: ${nf(o.s)}/${nf(o.d)} (${pc(o.s,o.d)}%) · belum ${nf(o.d-o.s)} pcs\n\n`+o.p.map(x=>`${x.p}: ${nf(x.s)}/${nf(x.d)} ST`+(x.b.length?` · belum ${nf(x.d-x.s)} pcs\n${rgT(x.b)}`:' ✓')).join('\n\n')}
 function belum(){const C=CK.G[P],B=C.sf.filter(o=>o.s<o.d);
-  return `*SN ${P} belum ST* (s/d ${tg(cut())})\n\n`+B.map((o,i)=>`${i+1}. ${o.n} (${nf(o.d-o.s)} pcs)\n\n`+o.p.filter(x=>x.b.length).map(x=>`${x.p} (${nf(x.d-x.s)} pcs)\n${x.b.map(rg).join('\n')}`).join('\n\n')).join('\n\n\n')+`\n\nTotal belum ST: ${nf(B.reduce((a,o)=>a+o.d-o.s,0))} pcs`}
+  return `*SN ${P} belum ST* (s/d ${tg(cut())})\n\n`+B.map((o,i)=>`${i+1}. ${o.n} (${nf(o.d-o.s)} pcs)\n\n`+o.p.filter(x=>x.b.length).map(x=>`${x.p} (${nf(x.d-x.s)} pcs)\n${rgT(x.b)}`).join('\n\n')).join('\n\n\n')+`\n\nTotal belum ST: ${nf(B.reduce((a,o)=>a+o.d-o.s,0))} pcs`}
 document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{};
   if(d.p){P=d.p;document.querySelectorAll('#pt button').forEach(b=>b.classList.toggle('on',b.dataset.p===P));draw()}
   if(d.f){F=d.f;draw()}
