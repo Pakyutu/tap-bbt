@@ -9,7 +9,13 @@ BLN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']
 def call(m,**p):
     d=urllib.parse.urlencode(p).encode()
     return json.load(urllib.request.urlopen(API+m,d,timeout=60))
-def say(t):call('sendMessage',chat_id=CH,text=t[:3500])
+def say(t):return call('sendMessage',chat_id=CH,text=t[:3500])['result']['message_id']
+PG=[None]
+def pg(t):
+    try:
+        if PG[0]:call('editMessageText',chat_id=CH,message_id=PG[0],text=t[:3500])
+        else:PG[0]=say(t)
+    except Exception:pass
 # (kata kunci nama file, skrip, nama status.json)
 RT=[('biometrik','biometrik.py',['Biometrik','FR Biometric']),
     ('sultan','sultan_so.py',['Sultan Spesial SO']),
@@ -40,23 +46,24 @@ def proses(msg):
     rt=cs or next((x for x in RT if x[0] in low),None)
     if not rt:say(f'File "{nm}" belum dikenali bot (butuh sesi Claude).');return False
     if doc.get('file_size',0)>19*1024*1024:say('File >20MB, batas Telegram. Kirim lewat sesi Claude.');return False
+    PG[0]=None;pg(f'⏳ 10% · {nm} diterima, mulai diproses')
     fp=call('getFile',file_id=doc['file_id'])['result']['file_path']
     dst=pathlib.Path('/tmp')/('in_'+re.sub(r'[^\w.\-]','_',nm))
     dst.write_bytes(urllib.request.urlopen(f'https://api.telegram.org/file/bot{T}/{fp}',timeout=120).read())
-    d,mo,iso=tgl(msg.get('caption'));lab=f'{d} {BLN[mo-1]}'
+    pg(f'⏳ 40% · {nm} terunduh');d,mo,iso=tgl(msg.get('caption'));lab=f'{d} {BLN[mo-1]}'
     fd=re.search(r'(\d{4})-(\d\d)-(\d\d)',nm)
     if cs and fd and not msg.get('caption'):iso=fd.group(0);d=int(fd.group(3));lab=f'{d} {BLN[int(fd.group(2))-1]}'
     cmd=[sys.executable,'tools/surya_outlet.py',cs[1],str(dst)] if cs else [sys.executable,'tools/'+rt[1],str(dst),lab]
-    rc,out=run(cmd)
-    if rc:say(f'GAGAL {nm}\n{out[-600:]}');return False
+    pg('⏳ 60% · menghitung data');rc,out=run(cmd)
+    if rc:pg(f'❌ GAGAL {nm}\n{out[-600:]}');return False
     if not cs and rt[1]=='sultan_so.py':
         h=(R/'digipos-sso.js').read_text()
         if '"per":""' in h:
-            run(['git','checkout','digipos-sso.js']);say(f'Sultan SO: kolom periode kosong, butuh dicek Claude. Tidak diubah.');return False
-    stat(rt[2] if not cs else rt[2],iso)
+            run(['git','checkout','digipos-sso.js']);pg(f'❌ Sultan SO: kolom periode kosong, butuh dicek Claude. Tidak diubah.');return False
+    pg('⏳ 85% · menyimpan & deploy');stat(rt[2],iso)
     ok,_=run(['git','diff','--quiet']);
-    if ok==0:say(f'{nm}: tidak ada perubahan data (file sama?).');return False
-    say(f'✅ {nm} masuk · {lab} · '+out.splitlines()[-1][:200] if out else f'✅ {nm} masuk · {lab}');return True
+    if ok==0:pg(f'➖ {nm}: tidak ada perubahan data (file sama?).');return False
+    pg(f'✅ 100% · {nm} masuk · {lab} (tayang ±1 mnt)');return True
 def main():
     o=int(OFF.read_text()) if OFF.exists() else 0
     ups=call('getUpdates',offset=o,timeout=0).get('result',[]);ubah=False
