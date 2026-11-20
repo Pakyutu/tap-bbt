@@ -22,7 +22,7 @@ RT=[('biometrik','biometrik.py',['Biometrik','FR Biometric']),
     ('dealing_extra','extra_dealing.py',['Extra Dealing']),('extra','extra_dealing.py',['Extra Dealing']),
     ('cuan_pv','cuan_pv.py',['Cuan PV Redeem']),
     ('monitoring_performance','site_rev.py',['Site ID & performa site']),('site','site_rev.py',['Site ID & performa site'])]
-CSV=[('detail_outlet_pv','--pv',['Outlet PV / SA']),('detail_outlet_sa','--sa',['Outlet PV / SA']),('ngrs','--ngrs',['NGRS'])]
+CSV=[('detail_outlet_cvm','CVM',['CVM']),('detail_outlet_pv','--pv',['Outlet PV / SA']),('detail_outlet_sa','--sa',['Outlet PV / SA']),('ngrs','--ngrs',['NGRS'])]
 def stat(names,iso):
     p=R/'status.json';j=json.loads(p.read_text())
     for i in j['items']:
@@ -53,9 +53,9 @@ def proses(msg):
     pg(f'⏳ 40% · {nm} terunduh');d,mo,iso=tgl(msg.get('caption'));lab=f'{d} {BLN[mo-1]}'
     fd=re.search(r'(\d{4})-(\d\d)-(\d\d)',nm)
     if cs and fd and not msg.get('caption'):iso=fd.group(0);d=int(fd.group(3));lab=f'{d} {BLN[int(fd.group(2))-1]}'
-    cmd=[sys.executable,'tools/surya_outlet.py',cs[1],str(dst)] if cs else [sys.executable,'tools/'+rt[1],str(dst),lab]
+    cmd=([sys.executable,'tools/cvm_csv.py',str(dst)] if cs[1]=='CVM' else [sys.executable,'tools/surya_outlet.py',cs[1],str(dst)]) if cs else [sys.executable,'tools/'+rt[1],str(dst),lab]
     pg('⏳ 60% · menghitung data');rc,out=run(cmd)
-    if rc:pg(f'❌ GAGAL {nm}\n{out[-600:]}');return False
+    if rc:pg(f'❌ {nm}\n{out[-600:]}');return False
     if not cs and rt[1]=='sultan_so.py':
         h=(R/'digipos-sso.js').read_text()
         if '"per":""' in h:
