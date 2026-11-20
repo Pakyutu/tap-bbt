@@ -24,7 +24,7 @@ window.TABG={key:'dgp',
   row.before(hx);hx.append(prod,fb,sp,aw);
   ['fkec','fsf','fpjp','reset'].forEach(i=>{const e=$(i);if(e)pan.appendChild(e)});
   hx.after(pan);
-  const M=$('amenu');[['cimg','🖼️ '],['jpg','⬇️ '],['upbtn','📤 '],['fsbtn','⛶ ']].forEach(([i,ic])=>{const e=$(i);if(e){M.appendChild(e);if(!e.dataset.ic){e.dataset.ic=1;e.prepend(ic)}}});
+  const M=$('amenu');[['cimg','🖼️ '],['jpg','⬇️ '],['upbtn','📤 '],['fsbtn','']].forEach(([i,ic])=>{const e=$(i);if(e){M.appendChild(e);if(!e.dataset.ic){e.dataset.ic=1;e.prepend(ic)}}});
   ['upf','cpst'].forEach(i=>{const e=$(i);if(e)hx.appendChild(e)});
   if(!row.children.length)row.remove();
   const cnt=()=>{const n=['fkec','fsf','fpjp'].filter(i=>$(i)&&$(i).value).length,c=$('fcnt');c.textContent=n;c.hidden=!n;fb.classList.toggle('on',pan.classList.contains('open'))};

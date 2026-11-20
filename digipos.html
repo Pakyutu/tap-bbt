@@ -407,7 +407,7 @@ async function handleFiles(files){
 $("upbtn").onclick=()=>$("upf").click();
 (function(){const de=document.documentElement,b=$("fsbtn"),isFs=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
   const req=de.requestFullscreen||de.webkitRequestFullscreen,ex=document.exitFullscreen||document.webkitExitFullscreen;
-  const sync=()=>{const on=isFs()||de.classList.contains("fs-lite");de.classList.toggle("fs",on);b.textContent=on?"Keluar layar penuh":"Layar penuh"};
+  const sync=()=>{const on=isFs()||de.classList.contains("fs-lite");de.classList.toggle("fs",on);b.textContent=on?"⛶ Keluar layar penuh":"⛶ Layar penuh"};
   de.classList.add("fs-lite");sync();
   const auto=e=>{document.removeEventListener("pointerdown",auto,true);if(e.target===b||isFs()||!req)return;try{const p=req.call(de);if(p&&p.catch)p.catch(()=>{})}catch(_){}};
   document.addEventListener("pointerdown",auto,true);
