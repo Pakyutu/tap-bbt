@@ -16,3 +16,5 @@
 - Extra Dealing Misi (file Dealing_EXTRA_*.xlsx, sheet Raw + Sheet1): `python3 tools/extra_dealing.py <file.xlsx> "DD Nov"` -> digipos-xd.js (tab 🎯 Extra Dealing), update status.json.
 - Sultan Spesial SO (file Monitoting_Program_Dealing_Misi_Sultan_Spesial_SO.xlsx, sheet Raw): `python3 tools/sultan_so.py <file.xlsx> "DD Nov"` -> digipos-sso.js. Tab DIGIPOS dikelompokkan di `digipos-nav.js` (grup Ringkasan/Wilayah/Outlet/Program/Scan); tab baru tambahkan ke array G.
 - Grup tab: `tabgroup.js` generik (config window.TABG sebelum dimuat). DIGIPOS config di digipos-nav.js (juga header ringkas: ⚙️ Filter + menu ⋯); Penjualan config inline sebelum tabgroup.js. Tab baru otomatis masuk grup terakhir kalau tidak didaftarkan.
+- Biometrik & FR Top 20 (file Outlet_Biometrik_Sumbagteng_2026_*.xlsx, sheet trx + Sheet1): `python3 tools/biometrik.py <file.xlsx> "DD Nov"` -> CV.v[4] di digipos-cvm.js + D.FR di digipos.html, update status.json (Biometrik, FR Biometric).
+- Umur SN belum ST (Cek WL): peta tanggal drop CK.DM dibuat otomatis oleh cekst_build.py; tanpa build ulang: `python3 tools/cekst_dm.py --wl ... --add ...`.
