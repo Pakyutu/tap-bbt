@@ -37,31 +37,62 @@ def tgl(cap):
 def run(cmd):
     r=subprocess.run(cmd,cwd=R,capture_output=True,text=True)
     return r.returncode,(r.stdout+r.stderr).strip()
+CMD=re.compile(r'^(mom|soh)[\s_]+(pv|sa)[\s_]+(\d{1,2})(?:[\s_]+(\d{1,2}))?',re.I)
+def ver_label(d,iso):
+    f=R/'digipos.html';t=f.read_text()
+    t=re.sub(r'update \d+ Nov 2026',f'update {d} Nov 2026',t)
+    now=datetime.datetime.utcnow()+datetime.timedelta(hours=7)
+    t=re.sub(r'"VER":"[^"]*"',f'"VER":"{iso}-{now:%H%M}"',t,count=1);f.write_text(t)
 def proses(msg):
-    doc=msg.get('document')
-    if not doc:
-        say('Kirim sebagai FILE (xlsx), bukan paste. Paste SURYA / ST Digipos masih lewat sesi Claude.');return False
-    nm=doc['file_name'];low=nm.lower()
-    cs=next((x for x in CSV if x[0] in low),None) if low.endswith('.csv') else None
-    rt=cs or next((x for x in RT if x[0] in low),None)
-    if not rt:say(f'File "{nm}" belum dikenali bot (butuh sesi Claude).');return False
-    if doc.get('file_size',0)>19*1024*1024:say('File >20MB, batas Telegram. Kirim lewat sesi Claude.');return False
+    doc=msg.get('document');body=None
+    if doc:
+        nm=doc['file_name'];spec=re.sub(r'\.txt$','',nm,flags=re.I)
+    else:
+        t=(msg.get('text') or '').strip();nm,_,body=t.partition('\n');spec=nm.strip()
+        if not CMD.match(spec):
+            say('Kirim FILE (xlsx/csv), atau paste dengan baris pertama "mom pv 20" / "soh sa 19". Selain itu lewat sesi Claude.');return False
+    low=nm.lower();cap=msg.get('caption')
+    d,mo,iso=tgl(cap);fd=re.search(r'(\d{4})-(\d\d)-(\d\d)',nm)
+    if fd and not cap:iso=fd.group(0);d=int(fd.group(3));mo=int(fd.group(2))
+    lab=f'{d} {BLN[mo-1]}';PY=sys.executable;ext=pathlib.Path(nm).suffix.lower()
+    cm=CMD.match(spec) if (not doc or ext=='.txt') else None
+    if cm:
+        k,pr,h1,h2=cm.group(1).lower(),cm.group(2).upper(),cm.group(3),cm.group(4)
+        d=int(h1);iso=f'{iso[:8]}{d:02d}'
+        job=('mom','Petugas (MoM)',[h1]) if k=='mom' else ('soh','Stock on Hand',[h1]+([h2] if h2 else []))
+        sc='tools/surya_mom.py' if k=='mom' else 'tools/surya_soh.py';st=[job[1]];extra=[pr]+job[2];kind='txt'
+    elif ext=='.csv' and 'detail_outlet_cvm' in low:sc,st,extra,kind='tools/cvm_csv.py',['CVM'],[],'f'
+    elif ext=='.csv' and 'detail_outlet_pv' in low:sc,st,extra,kind='tools/surya_outlet.py',['Outlet PV / SA'],['--pv'],'o'
+    elif ext=='.csv' and 'detail_outlet_sa' in low:sc,st,extra,kind='tools/surya_outlet.py',['Outlet PV / SA'],['--sa'],'o'
+    elif ext=='.csv' and 'ngrs' in low:sc,st,extra,kind='tools/surya_outlet.py',['NGRS'],['--ngrs'],'o'
+    elif ext=='.csv' and 'stock_gudang_sf' in low:sc,st,extra,kind='tools/surya_sgsf.py',['Stok per SF (PV/ByU/SA)'],[],'d'
+    elif ext=='.csv' and 'stock_gudang_all' in low:sc,st,extra,kind='tools/surya_sgall.py',['Stock Gudang'],[],'d'
+    elif ext=='.xlsx' and 'st_digipos' in low:sc,st,extra,kind='tools/st_digipos.py',['ST VF & SA'],[],'st'
+    elif ext=='.xlsx' and ('st_product' in low or 'monitoring_st' in low):sc,st,extra,kind='tools/st_product.py',['ST VF & SA'],[],'st'
+    else:
+        rt=next((x for x in RT if x[0] in low),None)
+        if not rt:say(f'File "{nm}" belum dikenali bot (butuh sesi Claude).');return False
+        sc,st,extra,kind='tools/'+rt[1],rt[2],[lab],'f'
+    if doc and doc.get('file_size',0)>19*1024*1024:say('File >20MB, batas Telegram. Kirim lewat sesi Claude.');return False
     PG[0]=ACK;pg(f'⏳ 10% · {nm} diterima, mulai diproses')
-    fp=call('getFile',file_id=doc['file_id'])['result']['file_path']
-    dst=pathlib.Path('/tmp')/('in_'+re.sub(r'[^\w.\-]','_',nm))
-    dst.write_bytes(urllib.request.urlopen(f'https://api.telegram.org/file/bot{T}/{fp}',timeout=120).read())
-    pg(f'⏳ 40% · {nm} terunduh');d,mo,iso=tgl(msg.get('caption'));lab=f'{d} {BLN[mo-1]}'
-    fd=re.search(r'(\d{4})-(\d\d)-(\d\d)',nm)
-    if cs and fd and not msg.get('caption'):iso=fd.group(0);d=int(fd.group(3));lab=f'{d} {BLN[int(fd.group(2))-1]}'
-    cmd=([sys.executable,'tools/cvm_csv.py',str(dst)] if cs[1]=='CVM' else [sys.executable,'tools/surya_outlet.py',cs[1],str(dst)]) if cs else [sys.executable,'tools/'+rt[1],str(dst),lab]
+    dst=pathlib.Path('/tmp')/('in_'+re.sub(r'[^\w.\-]','_',nm or 'paste')+('' if doc else '.txt'))
+    if doc:
+        fp=call('getFile',file_id=doc['file_id'])['result']['file_path']
+        dst.write_bytes(urllib.request.urlopen(f'https://api.telegram.org/file/bot{T}/{fp}',timeout=120).read())
+    else:dst.write_text(body,encoding='utf-8')
+    pg(f'⏳ 40% · {nm} terunduh')
+    if kind=='txt':cmd=[PY,sc,str(dst)]+extra
+    elif kind=='o':cmd=[PY,sc,extra[0],str(dst)]
+    elif kind=='d':cmd=[PY,sc,str(dst),str(d)]
+    else:cmd=[PY,sc,str(dst)]+extra
     pg('⏳ 60% · menghitung data');rc,out=run(cmd)
     if rc:pg(f'❌ {nm}\n'+(out.splitlines()[-1][:300] if out else 'gagal')+'\n(paste tidak sesuai format? Kalau ragu, lewat sesi Claude)');return False
-    if not cs and rt[1]=='sultan_so.py':
-        h=(R/'digipos-sso.js').read_text()
-        if '"per":""' in h:
-            run(['git','checkout','digipos-sso.js']);pg(f'❌ Sultan SO: kolom periode kosong, butuh dicek Claude. Tidak diubah.');return False
-    pg('⏳ 85% · menyimpan & deploy');stat(rt[2],iso)
-    ok,_=run(['git','diff','--quiet']);
+    if sc.endswith('sultan_so.py'):
+        if '"per":""' in (R/'digipos-sso.js').read_text():
+            run(['git','checkout','digipos-sso.js']);pg('❌ Sultan SO: kolom periode kosong, butuh dicek Claude. Tidak diubah.');return False
+    if kind=='st':ver_label(d,iso)
+    pg('⏳ 85% · menyimpan & deploy');stat(st,iso)
+    ok,_=run(['git','diff','--quiet'])
     if ok==0:pg(f'➖ {nm}: tidak ada perubahan data (file sama?).');return False
     pg(f'✅ 100% · {nm} masuk · {lab} (tayang ±1 mnt)');return True
 ACK=int(os.environ.get('TG_ACK') or 0) or None
