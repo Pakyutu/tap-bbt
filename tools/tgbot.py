@@ -132,8 +132,8 @@ def proses(msg):
     elif ext=='.csv' and 'ngrs' in low:sc,st,extra,kind='tools/surya_outlet.py',['NGRS'],['--ngrs'],'o'
     elif ext=='.csv' and 'stock_gudang_sf' in low:sc,st,extra,kind='tools/surya_sgsf.py',['Stok per SF (PV/ByU/SA)'],[],'d'
     elif ext=='.csv' and 'stock_gudang_all' in low:sc,st,extra,kind='tools/surya_sgall.py',['Stock Gudang'],[],'d'
-    elif ext=='.xlsx' and any(k in low for k in ('raw_st_pv','raw_st_sp','wl_vf_sa_st_dropingan','wl_sa_byu','wl_st_dropingan')):
-        role=next(r for k,r in (('raw_st_pv','pv'),('raw_st_sp','sa'),('wl_vf_sa_st_dropingan','wl'),('wl_sa_byu','byu'),('wl_st_dropingan','add')) if k in low)
+    elif ext=='.xlsx' and any(k in low for k in ('raw_st_pv','raw_st_sp','wl_sa_byu','dropingan')):
+        role=next(r for k,r in (('raw_st_pv','pv'),('raw_st_sp','sa'),('wl_sa_byu','byu'),('dropingan','wlx')) if k in low)
         sc,st,extra,kind='tools/cekst_build.py',['WL vs ST (VF & SA)'],[role],'inbox'
     elif ext=='.xlsx' and 'st_digipos' in low:sc,st,extra,kind='tools/st_digipos.py',['ST VF & SA'],[],'st'
     elif ext=='.xlsx' and ('st_product' in low or 'monitoring_st' in low):sc,st,extra,kind='tools/st_product.py',['ST VF & SA'],[],'st'
@@ -158,6 +158,10 @@ def proses(msg):
     if kind=='inbox':
         import shutil
         INB=R/'.inbox';INB.mkdir(exist_ok=True)
+        if extra[0]=='wlx':  # tentukan WL utama / tambahan dari isi (nama sheet), bukan nama file
+            import openpyxl
+            sn=openpyxl.load_workbook(dst,read_only=True).sheetnames
+            extra=['wl' if 'VF NOV' in sn else 'add' if ('VF' in sn or 'WL Return' in sn) else 'wl']
         shutil.move(str(dst),str(INB/f'{extra[0]}__{low}'))
         g=lambda r:sorted(str(x) for x in INB.glob(r+'__*'))
         wl,adds,byu,pvs,sas=g('wl'),g('add'),g('byu'),g('pv'),g('sa')
