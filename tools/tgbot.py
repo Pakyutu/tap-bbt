@@ -37,6 +37,17 @@ def tgl(cap):
 def run(cmd):
     r=subprocess.run(cmd,cwd=R,capture_output=True,text=True)
     return r.returncode,(r.stdout+r.stderr).strip()
+LNK=re.compile(r'^/?link\s+(https?://\S+)\s+(\S+\.(?:xlsx|csv|txt))\s*$',re.I)
+def ambil(url,out):
+    import shutil
+    if 'drive.google.com' in url or 'docs.google.com' in url:
+        import gdown
+        r=gdown.download(url,str(out),quiet=True,fuzzy=True)
+        if not r:raise RuntimeError('Drive menolak (atur link ke "siapa saja yang memiliki link")')
+    else:
+        if 'dropbox.com' in url:url=re.sub(r'dl=0','dl=1',url)
+        rq=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+        with urllib.request.urlopen(rq,timeout=600) as r,open(out,'wb') as f:shutil.copyfileobj(r,f)
 QRY=re.compile(r'^/?(status|sn|outlet)\b\s*(.*)',re.I|re.S)
 def jl(f,k):
     t=(R/f).read_text();i=t.index(k)+len(k);return json.JSONDecoder().raw_decode(t[i:])[0]
@@ -96,15 +107,18 @@ def proses(msg):
         nm=doc['file_name'];spec=re.sub(r'\.txt$','',nm,flags=re.I)
     else:
         t=(msg.get('text') or '').strip();nm,_,body=t.partition('\n');spec=nm.strip()
-        qm=QRY.match(t)
+        lm=LNK.match(t)
+        if lm:
+            nm=lm.group(2);spec=nm;doc={'file_name':nm,'_url':lm.group(1)};body=None
+        qm=QRY.match(t) if not lm else None
         if qm:kueri(msg,qm.group(1).lower(),qm.group(2));return False
-        if not CMD.match(spec):
-            say('Kirim FILE (xlsx/csv), atau paste dengan baris pertama "mom pv 20" / "soh sa 19". Selain itu lewat sesi Claude.');return False
+        if not lm and not CMD.match(spec):
+            PG[0]=ACK;pg('Kirim FILE (xlsx/csv), atau perintah: status · sn <nomor> · outlet <id/nama> · mom pv 20 · soh sa 19 · link <url Drive> <namafile.xlsx>');return False
     low=re.sub(r'[\s]+','_',nm.lower());cap=msg.get('caption')
     d,mo,iso=tgl(cap);fd=re.search(r'(\d{4})-(\d\d)-(\d\d)',nm)
     if fd and not cap:iso=fd.group(0);d=int(fd.group(3));mo=int(fd.group(2))
     lab=f'{d} {BLN[mo-1]}';PY=sys.executable;ext=pathlib.Path(nm).suffix.lower()
-    cm=CMD.match(spec) if (not doc or ext=='.txt') else None
+    cm=CMD.match(spec) if (not doc or (ext=='.txt' and not doc.get('_url'))) else None
     if cm:
         k,pr,h1,h2=cm.group(1).lower(),cm.group(2).upper(),cm.group(3),cm.group(4)
         d=int(h1);iso=f'{iso[:8]}{d:02d}'
@@ -124,10 +138,14 @@ def proses(msg):
         sc,st,extra,kind='tools/'+rt[1],rt[2],[lab],'f'
     if kind=='st' and re.search(r'oct|okt|sep|agu|aug',low):
         PG[0]=ACK;pg(f'➖ {nm}: ini file bulan lalu, bukan data berjalan. Tidak dimasukkan supaya data Nov tidak tertimpa (kalau perlu, lewat sesi Claude).');return False
-    if doc and doc.get('file_size',0)>19*1024*1024:say('File >20MB, batas Telegram. Kirim lewat sesi Claude.');return False
+    if doc and not doc.get('_url') and doc.get('file_size',0)>19*1024*1024:say('File >20MB, batas Telegram. Kirim lewat sesi Claude.');return False
     PG[0]=ACK;pg(f'⏳ 10% · {nm} diterima, mulai diproses')
     dst=pathlib.Path('/tmp')/('in_'+re.sub(r'[^\w.\-]','_',nm or 'paste')+('' if doc else '.txt'))
-    if doc:
+    if doc and doc.get('_url'):
+        pg(f'⏳ 20% · mengunduh dari link')
+        try:ambil(doc['_url'],dst)
+        except Exception as e:pg(f'❌ gagal unduh: {str(e)[:200]}');return False
+    elif doc:
         fp=call('getFile',file_id=doc['file_id'])['result']['file_path']
         dst.write_bytes(urllib.request.urlopen(f'https://api.telegram.org/file/bot{T}/{fp}',timeout=120).read())
     else:dst.write_text(body,encoding='utf-8')
