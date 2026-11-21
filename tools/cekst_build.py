@@ -173,6 +173,13 @@ if __name__=='__main__':
     out={'upd':(datetime.datetime.utcnow()+datetime.timedelta(hours=7)).strftime('%Y-%m-%dT%H:%M'),'cutVF':max([v for k,v in mx.items() if k in a.pv] or ['']),'cutSA':max([v for k,v in mx.items() if k in a.sa] or ['']),'G':{}}
     out['ft']={'wl':max([ftime(f) for f in [a.wl,a.wlnov] if f]+[ftime(f) for f in a.add]),'pv':max([ftime(p) for p in a.pv] or ['']),'sa':max([ftime(p) for p in a.sa] or [''])}
     tpn=drop_tp(L);out['DM']=dm(L)
+    # Oktober tidak dibangun ulang bila WL lama tidak diberikan: salin dari hasil sebelumnya (bulan sudah selesai)
+    try:
+        t0=open('cekst-data.js').read();old=json.JSONDecoder().raw_decode(t0[t0.index('const CK=')+9:])[0]
+        for gk in ('VF OKT','SA OKT'):
+            if gk not in L or not L[gk]:
+                if gk in old.get('G',{}):out['G'][gk]=old['G'][gk];out['DM'][gk]=old.get('DM',{}).get(gk,[])
+    except Exception:pass
     for k,rows in L.items():
         if not rows:continue
         st=STv if k.startswith('VF') else STs
