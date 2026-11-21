@@ -42,7 +42,9 @@ def ambil(url,out):
     import shutil
     if 'drive.google.com' in url or 'docs.google.com' in url:
         import gdown
-        r=gdown.download(url,str(out),quiet=True,fuzzy=True)
+        m=re.search(r'/d/([\w-]{20,})',url) or re.search(r'[?&]id=([\w-]{20,})',url)
+        if not m:raise RuntimeError('ID file Drive tidak terbaca dari link')
+        r=gdown.download(f'https://drive.google.com/uc?id={m.group(1)}',str(out),quiet=True)
         if not r:raise RuntimeError('Drive menolak (atur link ke "siapa saja yang memiliki link")')
     else:
         if 'dropbox.com' in url:url=re.sub(r'dl=0','dl=1',url)
