@@ -130,6 +130,9 @@ def proses(msg):
     elif ext=='.csv' and 'ngrs' in low:sc,st,extra,kind='tools/surya_outlet.py',['NGRS'],['--ngrs'],'o'
     elif ext=='.csv' and 'stock_gudang_sf' in low:sc,st,extra,kind='tools/surya_sgsf.py',['Stok per SF (PV/ByU/SA)'],[],'d'
     elif ext=='.csv' and 'stock_gudang_all' in low:sc,st,extra,kind='tools/surya_sgall.py',['Stock Gudang'],[],'d'
+    elif ext=='.xlsx' and any(k in low for k in ('raw_st_pv','raw_st_sp','wl_vf_sa_st_dropingan','wl_sa_byu','wl_st_dropingan')):
+        role=next(r for k,r in (('raw_st_pv','pv'),('raw_st_sp','sa'),('wl_vf_sa_st_dropingan','wl'),('wl_sa_byu','byu'),('wl_st_dropingan','add')) if k in low)
+        sc,st,extra,kind='tools/cekst_build.py',['WL vs ST (VF & SA)'],[role],'inbox'
     elif ext=='.xlsx' and 'st_digipos' in low:sc,st,extra,kind='tools/st_digipos.py',['ST VF & SA'],[],'st'
     elif ext=='.xlsx' and ('st_product' in low or 'monitoring_st' in low):sc,st,extra,kind='tools/st_product.py',['ST VF & SA'],[],'st'
     else:
@@ -150,6 +153,23 @@ def proses(msg):
         dst.write_bytes(urllib.request.urlopen(f'https://api.telegram.org/file/bot{T}/{fp}',timeout=120).read())
     else:dst.write_text(body,encoding='utf-8')
     pg(f'⏳ 40% · {nm} terunduh')
+    if kind=='inbox':
+        import shutil
+        INB=R/'.inbox';INB.mkdir(exist_ok=True)
+        shutil.move(str(dst),str(INB/f'{extra[0]}__{low}'))
+        g=lambda r:sorted(str(x) for x in INB.glob(r+'__*'))
+        wl,adds,byu,pvs,sas=g('wl'),g('add'),g('byu'),g('pv'),g('sa')
+        if not(wl and pvs and sas):
+            miss=[n for n,v in (('WL utama',wl),('raw ST PV',pvs),('raw ST SA',sas)) if not v]
+            pg(f'📦 {nm} tersimpan. Cek WL belum dibangun, masih kurang: '+', '.join(miss));return False
+        cmd=[PY,sc,'--wl',wl[-1]]+(['--add']+adds if adds else [])+(['--byu',byu[-1]] if byu else [])+['--pv']+pvs+['--sa']+sas
+        pg('⏳ 60% · membangun Cek WL (beberapa menit)');rc,out=run(cmd)
+        if rc:pg(f'❌ {nm}\n'+(out.splitlines()[-1][:300] if out else 'gagal'));return False
+        t=(R/'cekst-data.js').read_text();CK=json.JSONDecoder().raw_decode(t[t.index('const CK=')+9:])[0]
+        iso=CK.get('cutVF') or iso;stat(st,iso)
+        ok,_=run(['git','diff','--quiet'])
+        if ok==0:pg(f'➖ {nm}: tidak ada perubahan data.');return False
+        pg(f'✅ 100% · Cek WL dibangun (data sampai {iso}) — tayang ±1 mnt');return True
     if kind=='txt':cmd=[PY,sc,str(dst)]+extra
     elif kind=='o':cmd=[PY,sc,extra[0],str(dst)]
     elif kind=='d':cmd=[PY,sc,str(dst),str(d)]
