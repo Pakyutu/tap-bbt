@@ -100,7 +100,7 @@ def proses(msg):
         if qm:kueri(msg,qm.group(1).lower(),qm.group(2));return False
         if not CMD.match(spec):
             say('Kirim FILE (xlsx/csv), atau paste dengan baris pertama "mom pv 20" / "soh sa 19". Selain itu lewat sesi Claude.');return False
-    low=nm.lower();cap=msg.get('caption')
+    low=re.sub(r'[\s]+','_',nm.lower());cap=msg.get('caption')
     d,mo,iso=tgl(cap);fd=re.search(r'(\d{4})-(\d\d)-(\d\d)',nm)
     if fd and not cap:iso=fd.group(0);d=int(fd.group(3));mo=int(fd.group(2))
     lab=f'{d} {BLN[mo-1]}';PY=sys.executable;ext=pathlib.Path(nm).suffix.lower()
@@ -141,7 +141,10 @@ def proses(msg):
     if sc.endswith('sultan_so.py'):
         if '"per":""' in (R/'digipos-sso.js').read_text():
             run(['git','checkout','digipos-sso.js']);pg('❌ Sultan SO: kolom periode kosong, butuh dicek Claude. Tidak diubah.');return False
-    if kind=='st':ver_label(d,iso)
+    if kind=='st':
+        dm=[int(x) for x in re.findall(r'(\d{1,2}) Nov 2026',out)]
+        if dm:d=max(dm);iso=f'2026-11-{d:02d}';lab=f'{d} Nov'
+        ver_label(d,iso)
     pg('⏳ 85% · menyimpan & deploy');stat(st,iso)
     ok,_=run(['git','diff','--quiet'])
     if ok==0:pg(f'➖ {nm}: tidak ada perubahan data (file sama?).');return False
