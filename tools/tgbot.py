@@ -122,6 +122,8 @@ def proses(msg):
         rt=next((x for x in RT if x[0] in low),None)
         if not rt:say(f'File "{nm}" belum dikenali bot (butuh sesi Claude).');return False
         sc,st,extra,kind='tools/'+rt[1],rt[2],[lab],'f'
+    if kind=='st' and re.search(r'oct|okt|sep|agu|aug',low):
+        PG[0]=ACK;pg(f'➖ {nm}: ini file bulan lalu, bukan data berjalan. Tidak dimasukkan supaya data Nov tidak tertimpa (kalau perlu, lewat sesi Claude).');return False
     if doc and doc.get('file_size',0)>19*1024*1024:say('File >20MB, batas Telegram. Kirim lewat sesi Claude.');return False
     PG[0]=ACK;pg(f'⏳ 10% · {nm} diterima, mulai diproses')
     dst=pathlib.Path('/tmp')/('in_'+re.sub(r'[^\w.\-]','_',nm or 'paste')+('' if doc else '.txt'))
