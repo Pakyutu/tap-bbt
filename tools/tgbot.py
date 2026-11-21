@@ -132,8 +132,8 @@ def proses(msg):
     elif ext=='.csv' and 'ngrs' in low:sc,st,extra,kind='tools/surya_outlet.py',['NGRS'],['--ngrs'],'o'
     elif ext=='.csv' and 'stock_gudang_sf' in low:sc,st,extra,kind='tools/surya_sgsf.py',['Stok per SF (PV/ByU/SA)'],[],'d'
     elif ext=='.csv' and 'stock_gudang_all' in low:sc,st,extra,kind='tools/surya_sgall.py',['Stock Gudang'],[],'d'
-    elif ext=='.xlsx' and any(k in low for k in ('raw_st_pv','raw_st_sp','wl_sa_byu','dropingan')):
-        role=next(r for k,r in (('raw_st_pv','pv'),('raw_st_sp','sa'),('wl_sa_byu','byu'),('dropingan','wlx')) if k in low)
+    elif ext=='.xlsx' and any(k in low for k in ('raw_st_pv','raw_st_sp','wl_sa_byu','dropingan','wl_st_vf')):
+        role=next(r for k,r in (('raw_st_pv','pv'),('raw_st_sp','sa'),('wl_sa_byu','byu'),('dropingan','wlx'),('wl_st_vf','wlx')) if k in low)
         sc,st,extra,kind='tools/cekst_build.py',['WL vs ST (VF & SA)'],[role],'inbox'
     elif ext=='.xlsx' and 'st_digipos' in low:sc,st,extra,kind='tools/st_digipos.py',['ST VF & SA'],[],'st'
     elif ext=='.xlsx' and ('st_product' in low or 'monitoring_st' in low):sc,st,extra,kind='tools/st_product.py',['ST VF & SA'],[],'st'
@@ -161,14 +161,14 @@ def proses(msg):
         if extra[0]=='wlx':  # tentukan WL utama / tambahan dari isi (nama sheet), bukan nama file
             import openpyxl
             sn=openpyxl.load_workbook(dst,read_only=True).sheetnames
-            extra=['wl' if 'VF NOV' in sn else 'add' if ('VF' in sn or 'WL Return' in sn) else 'wl']
+            extra=['wl' if 'VF NOV' in sn else 'add' if ('VF' in sn or 'WL Return' in sn) else 'wlnov' if any(re.match(r'^\d+[.,]\s?\d+',x) or 'target' in x.lower() for x in sn) else 'wl']
         shutil.move(str(dst),str(INB/f'{extra[0]}__{low}'))
         g=lambda r:sorted(str(x) for x in INB.glob(r+'__*'))
-        wl,adds,byu,pvs,sas=g('wl'),g('add'),g('byu'),g('pv'),g('sa')
-        if not(wl and pvs and sas):
-            miss=[n for n,v in (('WL utama',wl),('raw ST PV',pvs),('raw ST SA',sas)) if not v]
+        wl,wln,adds,byu,pvs,sas=g('wl'),g('wlnov'),g('add'),g('byu'),g('pv'),g('sa')
+        if not((wl or wln) and pvs and sas):
+            miss=[n for n,v in (('WL dasar',wl or wln),('raw ST PV',pvs),('raw ST SA',sas)) if not v]
             pg(f'📦 {nm} tersimpan. Cek WL belum dibangun, masih kurang: '+', '.join(miss));return False
-        cmd=[PY,sc,'--wl',wl[-1]]+(['--add']+adds if adds else [])+(['--byu',byu[-1]] if byu else [])+['--pv']+pvs+['--sa']+sas
+        cmd=[PY,sc]+(['--wl',wl[-1]] if wl else [])+(['--wlnov',wln[-1]] if wln else [])+(['--add']+adds if adds else [])+(['--byu',byu[-1]] if byu else [])+['--pv']+pvs+['--sa']+sas
         pg('⏳ 60% · membangun Cek WL (beberapa menit)');rc,out=run(cmd)
         if rc:pg(f'❌ {nm}\n'+(out.splitlines()[-1][:300] if out else 'gagal'));return False
         t=(R/'cekst-data.js').read_text();CK=json.JSONDecoder().raw_decode(t[t.index('const CK=')+9:])[0]
