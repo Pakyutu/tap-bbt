@@ -122,6 +122,15 @@ def proses(msg):
         t=(msg.get('text') or '').strip()
         # paste panjang dipecah beberapa pesan: "mulai mom pv 21" -> bagian-bagian paste -> "selesai"
         BUF=R/'.inbox'/'paste.txt';BUF.parent.mkdir(exist_ok=True)
+        if re.match(r'^/?tes[\s_]*notif(?:ikasi)?$',t,re.I):  # uji notifikasi push ke semua HP yang sudah mengaktifkan lonceng
+            PG[0]=ACK
+            try:
+                u=json.load(urllib.request.urlopen(f'https://api.telegram.org/bot{T}/getWebhookInfo',timeout=20))['result']['url'].rstrip('/')
+                rq=urllib.request.Request(u+'/notify',data=b'',method='POST',headers={'x-key':T})
+                r=json.load(urllib.request.urlopen(rq,timeout=30))
+                pg(f"🔔 Notifikasi dikirim ke {r.get('ok',0)} perangkat" + (f" ({r['del']} langganan mati dibersihkan)" if r.get('del') else '') + '.')
+            except Exception as e:pg(f'Gagal kirim notifikasi: {e}')
+            return False
         mm=re.match(r'^/?mulai\s+((?:mom|soh)[\s_]+(?:pv|sa)[\s_]+\d{1,2}(?:[\s_]+\d{1,2})?)\s*$',t,re.I)
         if mm:
             BUF.write_text(mm.group(1)+'\n');PG[0]=ACK
@@ -151,7 +160,7 @@ def proses(msg):
         qm=QRY.match(t) if not lm else None
         if qm:kueri(msg,qm.group(1).lower(),qm.group(2));return False
         if not lm and not CMD.match(spec):
-            PG[0]=ACK;pg('Kirim FILE (xlsx/csv), atau perintah: status · sn <nomor> · outlet <id/nama> · mom pv 20 · soh sa 19 · mulai mom pv 21 (paste panjang) · tempel link Drive saja');return False
+            PG[0]=ACK;pg('Kirim FILE (xlsx/csv), atau perintah: status · tes notif · sn <nomor> · outlet <id/nama> · mom pv 20 · soh sa 19 · mulai mom pv 21 (paste panjang) · tempel link Drive saja');return False
     low=re.sub(r'[\s]+','_',nm.lower());cap=msg.get('caption')
     d,mo,iso=tgl(cap);fd=re.search(r'(\d{4})-(\d\d)-(\d\d)',nm)
     if fd and not cap:iso=fd.group(0);d=int(fd.group(3));mo=int(fd.group(2))
