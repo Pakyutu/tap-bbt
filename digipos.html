@@ -206,13 +206,13 @@ function sfTab(){
   ${fs?"":`<div class="sub" style="margin-top:6px">Target hanya ditampilkan tanpa filter kecamatan/hari, karena target ditetapkan per SF.</div>`}</div>`;
 }
 function hari(){
-  const a=sel(),hs=HARI.filter(h=>a.some(o=>o.pjp===h));
-  const cell=(x)=>{if(!x.n)return `<td class="mu">–</td>`;const r=x.reg/x.n;const c=r===0?"dn":r<.4?"wr":"up";return `<td class="hm ${c}" title="${x.reg} dari ${x.n} outlet ≥${L.ta} ${L.ua}">${x.reg}/${x.n}</td>`};
+  const a=sel(),hs=HARI.filter(h=>a.some(o=>o.pjp===h)),hb=st.hj==="b",nmh=hb?L.b:L.a,tg=hb?L.tb:L.ta,un=hb?L.ub:L.ua,val=x=>hb?x.byu:x.reg;
+  const cell=(x)=>{if(!x.n)return `<td class="mu">–</td>`;const v=val(x),r=v/x.n;const c=v===0?"dn":r<.4?"wr":"up";return `<td class="hm ${c}" title="${v} dari ${x.n} outlet ≥${tg} ${un}">${v}/${x.n}</td>`};
   const r=SF.filter(s=>!st.sf||s===st.sf).map(s=>`<tr><td>${s}</td>${hs.map(h=>cell(agg(a.filter(o=>o.sf===s&&o.pjp===h)))).join("")}${cell(agg(a.filter(o=>o.sf===s)))}</tr>`).join("");
   const tot=`<tr class="tot"><td>Total</td>${hs.map(h=>cell(agg(a.filter(o=>o.pjp===h)))).join("")}${cell(agg(a))}</tr>`;
-  return `<div class="card tw"><h3>OA ${L.a} per rute hari (aktif / total outlet)</h3><table><tr><th>SF</th>${hs.map(h=>`<th style="text-align:center">${h}</th>`).join("")}<th style="text-align:center">Total</th></tr>${r}${tot}</table>
+  return `<div class="seg" id="hjsel" style="margin-bottom:10px"><button data-v="r" class="${hb?"":"on"}">${L.a}</button><button data-v="b" class="${hb?"on":""}">${L.b}</button></div><div class="card tw"><h3>OA ${nmh} per rute hari (aktif / total outlet)</h3><table><tr><th>SF</th>${hs.map(h=>`<th style="text-align:center">${h}</th>`).join("")}<th style="text-align:center">Total</th></tr>${r}${tot}</table>
   <div class="lg"><span class="dn">■ 0 outlet aktif</span><span class="wr">■ di bawah 40%</span><span class="up">■ 40% ke atas</span></div></div>
-  <div class="note">Rute berwarna merah berarti satu hari kunjungan penuh tanpa satu pun outlet terisi VF. Itu kandidat pertama untuk dikejar.${st.prod==="SA"?" Untuk SA, angka ini memakai SA Simpati; lihat tab SF untuk By.U.":""}</div>`;
+  <div class="note">Rute berwarna merah berarti satu hari kunjungan penuh tanpa satu pun outlet terisi ${hb?"By.U":"VF"}. Itu kandidat pertama untuk dikejar.</div>`;
 }
 function kecTab(){
   const a=sel();const r=KEC.filter(k=>!st.kec||k===st.kec).map(k=>({k,...agg(a.filter(o=>o.kec===k))})).filter(x=>x.n).sort((p,q)=>q.n-p.n);
@@ -317,6 +317,7 @@ if(!R[st.tab])st.tab="ring";
 function draw(){setProd(st.prod);$("sub").innerHTML=L.sub;document.querySelectorAll("#prod button").forEach(b=>b.classList.toggle("on",b.dataset.v===st.prod));$("fkec").value=st.kec;$("fsf").value=st.sf;$("fpjp").value=st.pjp;
   document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===st.tab));
   $("P").innerHTML=R[st.tab]();
+  if(st.tab==="hari")document.querySelectorAll("#hjsel button").forEach(b=>b.onclick=()=>{st.hj=b.dataset.v;draw()});
   if(st.tab==="km")document.querySelectorAll("#kmsel button").forEach(b=>b.onclick=()=>{st.km=b.dataset.v;draw()});
   if(st.tab==="byu"||st.tab==="km")document.querySelectorAll(".cp").forEach(b=>b.onclick=e=>{e.preventDefault();const t=BY[b.dataset.s],ok=()=>{$("cpm").textContent="· Daftar "+b.dataset.s+" disalin"};
     const fb=()=>{const ta=$("cpt");ta.value=t;ta.style.left="0";ta.select();try{document.execCommand("copy");ok()}catch(_){$("cpm").textContent="· Salin gagal, pilih teks manual"}ta.style.left="-9999px"};
