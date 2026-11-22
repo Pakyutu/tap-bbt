@@ -30,7 +30,16 @@ for kind,f in (('pv',a.pv),('sa',a.sa)):
     rep.append((kind,c,'Nov',sum(M[o['id']][2] for o in D['O'] if o['id'] in M),'Okt 1-%d'%c,sum(M[o['id']][1] for o in D['O'] if o['id'] in M),'tidak ada',miss))
     cpv=c
 if a.pv or a.sa:
-    if cpv not in D['CP']:D['CP']=sorted(D['CP']+[cpv])
+    if cpv not in D['CP']:
+        # jenis yang tidak dikirim di run ini (PV/SA dikirim terpisah) diisi carry-forward cutoff sebelumnya, supaya panjang array tetap sama dengan CP;
+        # nilai asli menggantikannya saat file jenis itu masuk dengan cutoff yang sama
+        n=len(D['CP']);j=sum(1 for x in D['CP'] if x<cpv)
+        for kind,f in (('pv',a.pv),('sa',a.sa)):
+            if f:continue
+            for o in D['O']:
+                arr=o[kind];ok=arr[10:10+n];nv=arr[10+n:10+2*n]
+                ok.insert(j,ok[j-1] if j>0 else 0);nv.insert(j,nv[j-1] if j>0 else 0);o[kind]=arr[:10]+ok+nv
+        D['CP']=sorted(D['CP']+[cpv])
     D['C']=max(D['C'],cpv)
 if a.ngrs:
     c,M,h=load(a.ngrs,'ID Outlet');n=len(D['CN']);miss=[]
