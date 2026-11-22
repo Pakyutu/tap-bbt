@@ -128,7 +128,7 @@ def proses(msg):
                 u=json.load(urllib.request.urlopen(f'https://api.telegram.org/bot{T}/getWebhookInfo',timeout=20))['result']['url'].rstrip('/')
                 rq=urllib.request.Request(u+'/notify',data=b'',method='POST',headers={'x-key':T})
                 r=json.load(urllib.request.urlopen(rq,timeout=30))
-                pg(f"🔔 Notifikasi dikirim ke {r.get('ok',0)} perangkat" + (f" ({r['del']} langganan mati dibersihkan)" if r.get('del') else '') + '.')
+                pg(f"🔔 Notifikasi dikirim ke {r.get('ok',0)} perangkat" + (f" ({r['del']} langganan mati dibersihkan)" if r.get('del') else '') + '.' + (' Ditolak: '+'; '.join(r['st']) if r.get('st') else ''))
             except Exception as e:pg(f'Gagal kirim notifikasi: {e}')
             return False
         mm=re.match(r'^/?mulai\s+((?:mom|soh)[\s_]+(?:pv|sa)[\s_]+\d{1,2}(?:[\s_]+\d{1,2})?)\s*$',t,re.I)

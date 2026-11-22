@@ -34,12 +34,12 @@ async function pushRoutes(req, env, path) {
   if (path.endsWith("/notify") && req.method === "POST") {
     if (req.headers.get("x-key") !== env.TG_TOKEN) return new Response("no", { status: 403 });
     const v = await vapid(env), L = await env.PUSH.list({ prefix: "s:" });
-    let ok = 0, del = 0;
+    let ok = 0, del = 0; const st = [];
     for (const k of L.keys) {
       const sub = JSON.parse(await env.PUSH.get(k.name));
-      try { const r = await sendPush(env, v, sub); if (r.status === 404 || r.status === 410) { await env.PUSH.delete(k.name); del++ } else if (r.ok) ok++ } catch (e) {}
+      try { const r = await sendPush(env, v, sub); if (r.status === 404 || r.status === 410) { await env.PUSH.delete(k.name); del++ } else if (r.ok) ok++; else st.push(r.status + " " + (await r.text()).slice(0, 100)); } catch (e) { st.push("err " + e.message) }
     }
-    return new Response(JSON.stringify({ ok, del }), { headers: CORS });
+    return new Response(JSON.stringify({ ok, del, st }), { headers: CORS });
   }
   return null;
 }
