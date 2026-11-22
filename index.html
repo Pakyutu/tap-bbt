@@ -160,7 +160,7 @@ function lab(){b.textContent=L("pushOn")==="1"?"🔔 Notifikasi aktif (ketuk unt
 b.style.display="";lab();
 b.onclick=async function(){try{var reg=await navigator.serviceWorker.ready;
  if(L("pushOn")==="1"){var s0=await reg.pushManager.getSubscription();if(s0)await s0.unsubscribe();L("pushOn","0");lab();return}
- var url=L("pushUrl");if(!url){url=(prompt("Alamat Worker (contoh https://nama.akun.workers.dev):")||"").trim().replace(/\/+$/,"");if(!/^https:\/\//.test(url))return;}
+ var url="https://tap-bbt-bot.digipossaya.workers.dev";if(!url){url=(prompt("Alamat Worker (contoh https://nama.akun.workers.dev):")||"").trim().replace(/\/+$/,"");if(!/^https:\/\//.test(url))return;}
  if(await Notification.requestPermission()!=="granted"){alert("Izin notifikasi ditolak.");return}
  var pub=await (await fetch(url+"/vapid")).text();
  var sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(pub.trim())});
