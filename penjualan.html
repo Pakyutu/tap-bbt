@@ -821,4 +821,58 @@ $('st').onchange=e=>{S.st=e.target.value;S.page=0;render()};
 rStok();render();
 </script></body></html>
 
-<script src="penjualan-x.js"></script><script src="penjualan-tgt.js"></script><script>window.TABG={key:'pj',groups:[['ring','📊 Ringkasan',['ring','tren','tem']],['wil','🗺️ Wilayah',['kec','sf']],['pet','👥 Petugas',['pet','tgt']],['out','🏪 Outlet',['out','kunj']],['stok','📦 Stok',['stok']]],names:{ring:'Ringkasan',tren:'Tren bulanan',tem:'Temuan',kec:'Kecamatan',sf:'SF',pet:'Petugas (SURYA)',tgt:'Target SF',out:'Outlet',kunj:'Kunjungan',stok:'Stok'}};</script><script src="tabgroup.js"></script><script src="nav.js"></script></body></html>
+<script src="penjualan-x.js"></script><script src="penjualan-tgt.js"></script><script>window.TABG={key:'pj',groups:[['ring','📊 Ringkasan',['ring','tren','tem']],['wil','🗺️ Wilayah',['kec','sf']],['pet','👥 Petugas',['pet','tgt']],['out','🏪 Outlet',['out','kunj']],['stok','📦 Stok',['stok']]],names:{ring:'Ringkasan',tren:'Tren bulanan',tem:'Temuan',kec:'Kecamatan',sf:'SF',pet:'Petugas (SURYA)',tgt:'Target SF',out:'Outlet',kunj:'Kunjungan',stok:'Stok'}};</script><script src="tabgroup.js"></script><script src="nav.js"></script><style>
+.msort{display:none}
+@media(max-width:700px){
+ #app:not(.cap) .msort{display:flex;gap:6px;align-items:center;margin:0 0 8px;font-size:12.5px}
+ #app:not(.cap) .msort select{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);font:inherit}
+ #app:not(.cap) .msort button{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:6px 10px;font:inherit;cursor:pointer}
+ #app:not(.cap) .tw:has(table.mcard),#app:not(.cap) #owrap:has(table.mcard){overflow:visible;max-height:none}
+ #app:not(.cap) table.mcard,#app:not(.cap) table.mcard tbody{display:block;width:100%}
+ #app:not(.cap) table.mcard tr.mh{display:none}
+ #app:not(.cap) table.mcard tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px 8px;margin:8px 10px;padding:9px 10px;background:var(--card);border:1px solid var(--bd);border-radius:12px}
+ #app:not(.cap) table.mcard tr.mspan{display:block}
+ #app:not(.cap) table.mcard tr.tot{background:var(--soft)}
+ #app:not(.cap) table.mcard tr.det{background:var(--soft)}
+ #app:not(.cap) table.mcard td,#app:not(.cap) table.mcard th{display:block;padding:0!important;border:0!important;text-align:left!important;position:static!important;box-shadow:none!important;min-width:0!important;max-width:none!important;width:auto!important;white-space:normal;background:none!important;font-size:12.5px}
+ #app:not(.cap) table.mcard td.mt,#app:not(.cap) table.mcard th.mt{grid-column:1/-1;order:-1;font-size:13.5px;font-weight:650}
+ #app:not(.cap) table.mcard td[data-l]:not(.mt)::before,#app:not(.cap) table.mcard th[data-l]:not(.mt)::before{content:attr(data-l);display:block;font-size:10.5px;font-weight:400;color:var(--mu)}
+ #app:not(.cap) table.mcard td.mu{color:var(--mu)}
+}
+</style>
+<script>
+(function(){
+  var busy=0;
+  function proc(){busy=0;
+    document.querySelectorAll('.panel table').forEach(function(t){
+      var hr=null;for(var i=0;i<t.rows.length;i++){var r=t.rows[i];if(r.cells.length&&[].every.call(r.cells,function(c){return c.tagName==='TH'})){hr=r;break}}
+      var n=hr?hr.cells.length:(t.rows[0]?t.rows[0].cells.length:0);
+      if(n<5){t.classList.remove('mcard');return}
+      var lab=hr?[].map.call(hr.cells,function(c){return c.textContent.replace(/[▲▼]/g,'').trim()}):[];
+      t.classList.add('mcard');
+      [].forEach.call(t.rows,function(r){
+        if(r===hr){r.classList.add('mh');return}
+        if(r.dataset.m)return;r.dataset.m='1';
+        var cs=r.cells,span=[].some.call(cs,function(c){return c.colSpan>1});
+        if(span||cs.length!==n){r.classList.add('mspan');return}
+        var ti=-1;for(var j=0;j<cs.length;j++){if(cs[j].classList.contains('nmc')){ti=j;break}}if(ti<0)ti=0;
+        for(var k=0;k<cs.length;k++){cs[k].setAttribute('data-l',lab[k]||'');if(k===ti)cs[k].classList.add('mt')}
+      });
+    });
+    var ow=document.getElementById('owrap');
+    if(ow&&!document.getElementById('msort')&&typeof OC!=='undefined'){
+      var d=document.createElement('div');d.className='msort';d.id='msort';
+      d.innerHTML='<span>Urut</span><select>'+OC.map(function(c){return '<option value="'+c[0]+'">'+c[1]+'</option>'}).join('')+'</select><button type="button">⇅</button>';
+      ow.parentNode.insertBefore(d,ow);
+      var sel=d.querySelector('select'),bt=d.querySelector('button');
+      sel.onchange=function(){var k=sel.value;S.sk=k;S.sd=['id','nm','rs','kec','sf','pjp'].indexOf(k)>=0?1:(k==='gap'||k==='mom'?1:-1);S.page=0;render()};
+      bt.onclick=function(){S.sd*=-1;render()};
+    }
+    var ms=document.getElementById('msort');if(ms&&typeof S!=='undefined')ms.querySelector('select').value=S.sk;
+  }
+  function q(){if(!busy){busy=1;requestAnimationFrame(proc)}}
+  new MutationObserver(q).observe(document.body,{childList:true,subtree:true});
+  q();
+})();
+</script>
+</body></html>
