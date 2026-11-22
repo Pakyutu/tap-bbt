@@ -126,9 +126,10 @@ def proses(msg):
             PG[0]=ACK
             try:
                 u=json.load(urllib.request.urlopen(f'https://api.telegram.org/bot{T}/getWebhookInfo',timeout=20))['result']['url'].rstrip('/')
-                rq=urllib.request.Request(u+'/notify',data=b'',method='POST',headers={'x-key':T})
+                rq=urllib.request.Request(u+'/notify',data=b'',method='POST',headers={'x-key':T,'User-Agent':'tap-bbt-bot/1.0'})
                 r=json.load(urllib.request.urlopen(rq,timeout=30))
                 pg(f"🔔 Notifikasi dikirim ke {r.get('ok',0)} perangkat" + (f" ({r['del']} langganan mati dibersihkan)" if r.get('del') else '') + '.' + (' Ditolak: '+'; '.join(r['st']) if r.get('st') else ''))
+            except urllib.error.HTTPError as e:pg(f'Gagal kirim notifikasi: HTTP {e.code} {e.read()[:120].decode("utf8","ignore")}')
             except Exception as e:pg(f'Gagal kirim notifikasi: {e}')
             return False
         mm=re.match(r'^/?mulai\s+((?:mom|soh)[\s_]+(?:pv|sa)[\s_]+\d{1,2}(?:[\s_]+\d{1,2})?)\s*$',t,re.I)
