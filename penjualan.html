@@ -271,7 +271,7 @@ h1::before{width:14px;height:13px;border-radius:0;vertical-align:0;margin-right:
   <div class="row" style="justify-content:space-between">
     <div><h1>Dashboard TAP Bagan Batu</h1><div class="sub" id="sub"></div><div id="capinfo"></div></div>
     <div class="row">
-      <span class="lbl">Produk</span><div class="seg" id="prod"><button data-v="PV" class="on">PV</button><button data-v="SA">SA</button><button data-v="NGRS">NGRS<span class="shtx"> TRX</span></button></div>
+      <span class="lbl">Produk</span><div class="seg" id="prod"><button data-v="PV" class="on">PV</button><button data-v="SA">SA</button><button data-v="NGRS">NGRS<span class="shtx"> TRX</span></button></div><span id="pvw" style="display:none"><span class="lbl">Varian</span><div class="seg" id="pvar"></div></span>
       <span class="lbl">Tanggal</span><select id="fa" title="Dari tanggal"></select><span class="mu" style="font-size:12px">s.d.</span><select id="fb" title="Sampai tanggal"></select><div class="gsearch"><input id="gq" type="search" placeholder="Cari outlet, ID, SF…" autocomplete="off" aria-label="Pencarian cepat"><div id="gres" hidden></div></div><button class="btn ftog" id="ftog">Filter</button><button class="btn" id="fsbtn" title="Layar penuh">⛶<span class="shtx"> Layar penuh</span></button><button class="btn" id="wabtn" title="Salin teks laporan untuk WhatsApp">📝<span class="shtx"> Teks WA</span></button><span class="shotw"><button class="btn" id="shot" title="Simpan sebagai gambar">📷<span class="shtx"> Gambar</span></button><div id="shotmenu"><button data-a="share">Bagikan ke WhatsApp…</button><button data-a="copy">Salin gambar</button><button data-a="dl">Unduh JPG</button></div></span>
     </div>
   </div>
@@ -329,7 +329,7 @@ const pc=(n,o)=>{if(!o)return '<td class="mu">–</td>';const v=(n/o-1)*100;retu
 const pcs=(n,o)=>{if(!o)return '–';const v=(n/o-1)*100;return `<span class="${cls(v)}">${v>=0?'+':'−'}${Math.abs(v).toFixed(1).replace('.',',')}%</span>`};
 const gs=v=>`<span class="${cls(v)}">${v>0?'+':(v<0?'−':'')}${f(Math.abs(v))}</span>`;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const CP=D.CP||Array.from({length:D.C},(_,i)=>i+1),DC=CP[CP.length-1],CN=D.CN;const pi=d=>{const k=CP.findIndex(x=>x>=d);return k<0?CP.length-1:k};const NG=()=>S.prod==='NGRS';
+const CP=D.CP||Array.from({length:D.C},(_,i)=>i+1),DC=CP[CP.length-1],CN=D.CN;const pi=d=>{const k=CP.findIndex(x=>x>=d);return k<0?CP.length-1:k};const NG=()=>S.prod==='NGRS';const PVK={PV:{R:'PVR',B:'PVB'},SA:{R:'SAS',B:'SAB'}};const VAR=()=>(S.pvar&&PVK[S.prod])?S.pvar:'';const PKY=()=>VAR()?PVK[S.prod][VAR()]:S.prod;const VNM=()=>VAR()?(VAR()==='B'?'By.U':(S.prod==='PV'?'Reguler':'Simpati')):'';
 const optA=()=>NG()?[1].concat(CN.slice(0,-1).map(c=>c+1)):[1].concat(CP.slice(0,-1).map(c=>c+1));
 const optB=()=>NG()?CN:CP;
 const near=(L,v,up)=>up?(L.find(x=>x>=v)??L[L.length-1]):([...L].reverse().find(x=>x<=v)??L[0]);
@@ -456,13 +456,13 @@ function rTren(rs){
 }
 function rPet(){
   if(S.prod==='NGRS'){$('p-pet').innerHTML=`<div class="note">Laporan petugas tersedia untuk <b>PV</b> dan <b>SA</b>. Pilih produknya di atas.</div>`;return}
-  const PVK={PV:{R:'PVR',B:'PVB'},SA:{R:'SAS',B:'SAB'}},VA=(S.pvar&&PVK[S.prod])?S.pvar:'',PK=VA?PVK[S.prod][VA]:S.prod,VN=VA?(VA==='B'?'By.U':(S.prod==='PV'?'Reguler':'Simpati')):'Semua';
-  const ctl=`<div class="seg" id="pvar" style="margin-bottom:10px">${[['','Semua'],['R',S.prod==='PV'?'Reguler':'Simpati'],['B','By.U']].map(([v,t])=>`<button data-v="${v}" class="${VA===v?'on':''}">${t}</button>`).join('')}</div>`;
-  const bindV=()=>document.querySelectorAll('#pvar button').forEach(x=>x.onclick=()=>{S.pvar=x.dataset.v;rPet()});
+  const VA=VAR(),PK=PKY(),VN=VA?VNM():'Semua';
+  const ctl='';
+  const bindV=()=>{};
   const P=(D.P||{})[PK]||{};const days=Object.keys(P).map(Number).sort((a,b)=>a-b);const N0=rb(),LP=days[days.length-1]||0,N=(N0===DC&&LP>DC)?LP:N0,R=P[N];
   const tc=s=>s.toLowerCase().replace(/(^|[\s(-])(\w)/g,(m,p,c)=>p+c.toUpperCase()).replace(/^Ds - /,'DS ').replace(/^Cs /,'CS ').replace(/Mhd\./,'Mhd.');
   if(!R){$('p-pet').innerHTML=ctl+`<div class="note">Laporan petugas <b>${S.prod}${VA?' '+VN:''}</b> untuk tanggal <b>${N} Nov</b> belum ada. Laporan yang tersedia: <b>${days.map(d=>d+' Nov').join(', ')||'–'}</b>. Pilih tanggal itu sebagai tanggal akhir (s.d.).</div>`;bindV();return}
-  const lead=N>N0?`<div class="note" style="margin-bottom:10px">Laporan petugas memakai cutoff terbaru <b>${N} Nov</b>. Data outlet di tab lain masih s.d. <b>${DC} Nov</b>.</div>`:'';const prev=P[N-1];const pm={};if(prev)prev.rows.forEach(r=>pm[r.nm]=r);
+  const lead=N>N0?`<div class="note" style="margin-bottom:10px">Laporan petugas memakai cutoff terbaru <b>${N} Nov</b>. Data outlet di tab lain masih s.d. <b>${DC} Nov</b>.</div>`:'';const prev=P[N-1];const A0=ra(),pa=(A0>1&&A0<=N)?P[A0-1]:null,am={};if(pa)pa.rows.forEach(r=>am[r.nm]=r);const rng=r=>r._ds?r.mtd-ds.reduce((s,x)=>s+((am[x.nm]||{}).mtd||0),0):r.mtd-((am[r.nm]||{}).mtd||0);const hasR=A0>1&&A0<=N;const noR=hasR&&!pa;const pm={};if(prev)prev.rows.forEach(r=>pm[r.nm]=r);
   const rows=R.rows.filter(r=>!/^(BO |DS BAGAN|HELPER)/.test(r.nm)&&(r.mtd||r.m1||r.full||r.stok));
   const ds=rows.filter(r=>/^DS - /.test(r.nm)),main=rows.filter(r=>!/^DS - /.test(r.nm));
   const sum=(a,k)=>a.reduce((s,r)=>s+(r[k]||0),0);
@@ -472,12 +472,12 @@ function rPet(){
   const list=main.concat([dsRow]).sort((a,b)=>z?b.mtd-a.mtd:(a.mtd-a.m1)-(b.mtd-b.m1));
   const bo=R.rows.find(r=>/^BO /.test(r.nm));const T=R.tap;
   const sd=r=>r.days==null?'<td class="mu">–</td>':`<td class="${r.days<=2||r.days>=15?'dn':''}">${r.days} hari</td>`;
-  const tr=(r,sub)=>`<tr${sub?' class="mu" style="font-size:12px"':''}><td>${sub?'&nbsp;&nbsp;↳ ':''}${esc(r._ds?r.nm:tc(r.nm))}</td><td>${f(r.full)}</td><td>${f(r.m1)}</td><td>${f(r.mtd)}</td>${gg(r.mtd-r.m1)}${r.m1?pc(r.mtd,r.m1):`<td class="mu">${T.m1===0?'–':'baru'}</td>`}${prev?(()=>{const v=today(r);return `<td>${v>0?f(v):'<span class="mu">0</span>'}</td>`})():''}<td>${f(r.stok)}</td>${sd(r)}</tr>`;
+  const tr=(r,sub)=>`<tr${sub?' class="mu" style="font-size:12px"':''}><td>${sub?'&nbsp;&nbsp;↳ ':''}${esc(r._ds?r.nm:tc(r.nm))}</td><td>${f(r.full)}</td><td>${f(r.m1)}</td><td>${f(r.mtd)}</td>${gg(r.mtd-r.m1)}${r.m1?pc(r.mtd,r.m1):`<td class="mu">${T.m1===0?'–':'baru'}</td>`}${prev?(()=>{const v=today(r);return `<td>${v>0?f(v):'<span class="mu">0</span>'}</td>`})():''}${pa?`<td>${f(rng(r))}</td>`:''}<td>${f(r.stok)}</td>${sd(r)}</tr>`;
   const body=list.map(r=>tr(r)+(r._ds?ds.map(x=>tr(x,true)).join(''):'')).join('');
   const tt=today({nm:'__',mtd:T.mtd});
-  $('p-pet').innerHTML=`${ctl}${lead}<div class="note">Sumber: laporan <b>MoM Sales Tap</b> per petugas, <b>${S.prod}${VA?' '+VN:''}</b> cutoff <b>${N} Nov</b>.${T.m1===0?' <b>M-1 (Oktober) kosong di laporan ini</b>, jadi gap dan MoM tidak bisa dibaca.':''} Ikut tanggal akhir (s.d.). Laporan tersedia: ${days.map(d=>d+' Nov').join(', ')}. Angkanya selalu MTD 1–${N} Nov, tidak ikut tanggal awal. Tidak ikut filter, dan beda sumber dari data outlet: laporan ini mencatat siapa yang menjual.</div>
+  $('p-pet').innerHTML=`${ctl}${lead}<div class="note">Sumber: laporan <b>MoM Sales Tap</b> per petugas, <b>${S.prod}${VA?' '+VN:''}</b> cutoff <b>${N} Nov</b>.${T.m1===0?' <b>M-1 (Oktober) kosong di laporan ini</b>, jadi gap dan MoM tidak bisa dibaca.':''} Ikut tanggal akhir (s.d.); kalau tanggal awal diisi, ada kolom penjualan rentang ${A0}–${N} Nov${noR?' (laporan '+(A0-1)+' Nov belum ada, kolom tidak tampil)':''}. Laporan tersedia: ${days.map(d=>d+' Nov').join(', ')}. Kolom 1–${N} = MTD sejak tgl 1. Tidak ikut filter, dan beda sumber dari data outlet: laporan ini mencatat siapa yang menjual.</div>
   <div class="kpi" style="margin-top:12px"><div class="k"><div class="t">Total TAP 1–${N} Nov</div><div class="v">${f(T.mtd)}</div><div class="s">${f(T.daily)}/hari</div></div><div class="k"><div class="t">1–${N} Okt</div><div class="v">${f(T.m1)}</div><div class="s">Okt full ${f(T.full)}</div></div><div class="k"><div class="t">Gap</div><div class="v ${z?'mu':cls(T.mtd-T.m1)}">${z?'–':(T.mtd-T.m1>0?'+':'−')+f(Math.abs(T.mtd-T.m1))}</div><div class="s">${z?'M-1 kosong':pcs(T.mtd,T.m1)}</div></div>${prev?`<div class="k"><div class="t">Jual tanggal ${N} Nov</div><div class="v">${f(T.mtd-prev.tap.mtd)}</div><div class="s">vs laporan ${N-1} Nov</div></div>`:''}<div class="k"><div class="t">Stok gudang</div><div class="v">${f(T.stok)}</div><div class="s">${T.days} hari${bo?' · BO '+f(bo.stok):''}</div></div></div>
-  <div class="card tw"><table><tr><th>Petugas</th><th>Okt full</th><th>1–${N} Okt</th><th>1–${N} Nov</th><th>Gap (pcs)</th><th>MoM</th>${prev?`<th>Jual ${N} Nov</th>`:''}<th>Stok SF</th><th>Stock days</th></tr>${body}<tr class="tot"><td>Total TAP</td><td>${f(T.full)}</td><td>${f(T.m1)}</td><td>${f(T.mtd)}</td>${gg(T.mtd-T.m1)}${pc(T.mtd,T.m1)}${prev?`<td>${f(T.mtd-prev.tap.mtd)}</td>`:''}<td></td><td></td></tr></table></div>
+  <div class="card tw"><table><tr><th>Petugas</th><th>Okt full</th><th>1–${N} Okt</th><th>1–${N} Nov</th><th>Gap (pcs)</th><th>MoM</th>${prev?`<th>Jual ${N} Nov</th>`:''}${pa?`<th>Jual ${A0}–${N} Nov</th>`:''}<th>Stok SF</th><th>Stock days</th></tr>${body}<tr class="tot"><td>Total TAP</td><td>${f(T.full)}</td><td>${f(T.m1)}</td><td>${f(T.mtd)}</td>${gg(T.mtd-T.m1)}${pc(T.mtd,T.m1)}${prev?`<td>${f(T.mtd-prev.tap.mtd)}</td>`:''}${pa?`<td>${f(T.mtd-pa.tap.mtd)}</td>`:''}<td></td><td></td></tr></table></div>
   <div class="sub">Stock days merah = ≤2 hari (rawan habis) atau ≥15 hari (lambat jalan).</div>`;bindV();
 }
 function rStok(){
@@ -529,15 +529,15 @@ function rTem(rs){
   const nol=rs.filter(r=>r.m[8]===0&&r.m[9]===0&&r.n===0).length;if(nol)li.push(`${f(nol)} outlet nol 3 bulan (Sep, Okt, Nov).`);
   const m=a.m,j=m[0],ok=m[9];if(j)li.push(`<b>Tren tahunan:</b> Jan ${f(j)} jadi Okt ${f(ok)} (${sp(ok,j)}). Okt vs Sep ${sp(ok,m[8])}.`);
   let h=`<div class="card"><h3>Temuan otomatis: ${S.prod} ${P1} vs ${P0}${[S.kec,S.sf,S.kat,S.pjp].filter(Boolean).length?' (filter: '+[S.kec,S.sf,S.kat,S.pjp].filter(Boolean).map(esc).join(', ')+')':''}</h3><div class="sub" style="margin-bottom:6px">Dihitung ulang otomatis dari data outlet setiap kali produk, tanggal, atau filter diganti.</div><ul class="f">${li.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
-  const PP=((D.P||{})[S.prod]||{})[rb()];
+  const PP=((D.P||{})[PKY()]||{})[rb()];
   if(PP&&S.prod!=='NGRS'){const z=PP.tap.m1===0,rw=PP.rows.filter(r=>!/^(BO |DS BAGAN|HELPER)/.test(r.nm)&&(r.mtd||r.m1||r.full||r.stok));const tc=s=>s.toLowerCase().replace(/(^|[\s(-])(\w)/g,(m,p,c)=>p+c.toUpperCase()).replace(/^Ds - /,'DS ').replace(/^Cs /,'CS ');
-    const L2=[];L2.push(`<b>TAP ${S.prod} 1–${rb()} Nov:</b> ${f(PP.tap.mtd)} vs ${f(PP.tap.m1)}${z?' (M-1 kosong di laporan)':`: gap ${sg(PP.tap.mtd-PP.tap.m1)} (${sp(PP.tap.mtd,PP.tap.m1)})`}. Stok gudang ${f(PP.tap.stok)} (${PP.tap.days} hari).`);
+    const L2=[];L2.push(`<b>TAP ${S.prod}${VAR()?' '+VNM():''} 1–${rb()} Nov:</b> ${f(PP.tap.mtd)} vs ${f(PP.tap.m1)}${z?' (M-1 kosong di laporan)':`: gap ${sg(PP.tap.mtd-PP.tap.m1)} (${sp(PP.tap.mtd,PP.tap.m1)})`}. Stok gudang ${f(PP.tap.stok)} (${PP.tap.days} hari).`);
     if(!z){const mn=[...rw].sort((x,y)=>(x.mtd-x.m1)-(y.mtd-y.m1)).filter(r=>r.mtd-r.m1<0).slice(0,3);if(mn.length)L2.push(`<b>Petugas minus terbesar:</b> ${mn.map(r=>`${esc(tc(r.nm))} ${sg(r.mtd-r.m1)}`).join(', ')}.`);
       const pl=[...rw].sort((x,y)=>(y.mtd-y.m1)-(x.mtd-x.m1)).filter(r=>r.mtd-r.m1>0&&r.m1>0).slice(0,3);if(pl.length)L2.push(`<b>Petugas tumbuh:</b> ${pl.map(r=>`${esc(tc(r.nm))} ${sg(r.mtd-r.m1)}`).join(', ')}.`);}
     const lo=rw.filter(r=>r.days!=null&&r.days<=2&&(r.mtd||r.full)),hi=rw.filter(r=>r.days!=null&&r.days>=15);
     if(lo.length)L2.push(`<b>Stok rawan habis (≤2 hari):</b> ${lo.map(r=>`${esc(tc(r.nm))} (${r.days} hari)`).join(', ')}.`);
     if(hi.length)L2.push(`<b>Stok lambat jalan (≥15 hari):</b> ${hi.map(r=>`${esc(tc(r.nm))} (${r.days} hari)`).join(', ')}.`);
-    h+=`<div class="card"><h3>Dari laporan petugas ${S.prod} ${rb()} Nov</h3><ul class="f">${L2.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;}
+    h+=`<div class="card"><h3>Dari laporan petugas ${S.prod}${VAR()?' '+VNM():''} ${rb()} Nov</h3><ul class="f">${L2.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;}
   h+=`<div class="card"><h3>Catatan manual</h3><ul class="f">
   <li>Lisbet (6001218887) dan Swara Mas Cell (1200014523) = 1 toko (sudah dikonfirmasi).</li>
   <li>Penjualan Top 20 biasanya masuk ke akun Asman, bukan ke pencapaian petugas.</li>
@@ -561,7 +561,7 @@ function ins(rs){
   const bl=rs.filter(r=>r.n===0&&r.o>0);
   const dn5=[...rs].filter(r=>r.n-r.o<0).sort((x,y)=>(x.n-x.o)-(y.n-y.o)).slice(0,5);
   const o6=hasD()?rs.filter(r=>r.d6>0):[],neg=hasD()?rs.filter(r=>r.d6<0):[];
-  const PP=NG()?null:((D.P||{})[S.prod]||{})[rb()];
+  const PP=NG()?null:((D.P||{})[PKY()]||{})[rb()];
   let lo=[],hi=[];if(PP){const pr=prows(PP);lo=pr.filter(r=>r.days!=null&&r.days<=2&&(r.mtd||r.full));hi=pr.filter(r=>r.days!=null&&r.days>=15)}
   return {a,K,SS,ta:agg(T),ra:agg(R),tN:T.length,tb,bl,dn5,o6,neg,PP,lo,hi};
 }
@@ -745,11 +745,13 @@ function render(){
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===S.tab));
   document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+S.tab));
   $('sub').textContent=`${NG()?'NGRS TRX':S.prod} · data ${per('Nov')} 2026${NG()?' (NGRS cutoff '+CN.join(', ')+' Nov)':''} · MoM ${per('Nov')} vs ${per('Okt')}`;
+  {const w=$('pvw');w.style.display=PVK[S.prod]?'':'none';if(PVK[S.prod])$('pvar').innerHTML=[['','Semua'],['R',S.prod==='PV'?'Reguler':'Simpati'],['B','By.U']].map(([v,t])=>`<button data-v="${v}" class="${VAR()===v?'on':''}">${t}</button>`).join('')}
   fillSel();const rs=rows();
   rRing(rs);$('p-kec').innerHTML=grpTable(rs,'kec','Kecamatan')+redeemCard();$('p-sf').innerHTML=rankCard(rs)+`<div class="note">Outlet <b>Top 20</b> dipisah jadi baris <b>${T20}</b>, karena penjualannya biasanya masuk ke akun Asman, bukan ke pencapaian petugas. Angka SF di sini cuma outlet reguler miliknya.</div>`+grpTable(rs.map(r=>r.kat==='Top 20'?Object.assign({},r,{sf:T20}):r),'sf','SF (pemilik outlet)');rOut(rs);rTren(rs);rPet();rTem(rs);if(S.tab==='kunj')rKunj();countUp();
 }
 document.addEventListener('click',e=>{
   const b=e.target.closest('button');
+  if(b&&b.parentElement.id==='pvar'){S.pvar=b.dataset.v;render();return}
   if(b&&b.parentElement.id==='prod'){S.prod=b.dataset.v;S.page=0;S.open=null;render();return}
   if(b&&b.parentElement.id==='tabs'){S.tab=b.dataset.t;try{localStorage.setItem('vfbbt_tab',S.tab)}catch(e){};render();window.scrollTo(0,0);return}
   const th=e.target.closest('th.s');if(th){const k=th.dataset.s;if(S.sk===k)S.sd*=-1;else{S.sk=k;S.sd=['id','nm','rs','kec','sf','pjp'].includes(k)?1:(k==='gap'||k==='mom'?1:-1)}S.page=0;render();return}
