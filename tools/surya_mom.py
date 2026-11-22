@@ -1,5 +1,6 @@
 # Masukkan paste "Dashboard SURYA" (MoM Sales Tap per petugas) ke penjualan.html D.P + penjualan-x.js X (TM/TI/PM/INJ/SV).
-# Pakai (dari folder repo): python3 tools/surya_mom.py <paste.txt> PV|SA <hari_cutoff>
+# Pakai (dari folder repo): python3 tools/surya_mom.py <paste.txt> PV|SA <hari_cutoff> [R|B|S]
+# Argumen ke-4 = varian (PV: R=Reguler,B=By.U; SA: S=Simpati,B=By.U) -> D.P['PVR'|'PVB'|'SAS'|'SAB'] saja (tanpa mengubah TM/TI/SV).
 import sys,json,re
 L=open(sys.argv[1],encoding='utf-8').read().split('\n');PR=sys.argv[2].upper();DAY=sys.argv[3]
 N=lambda v:None if v.strip() in('–','-','—','') else int(v.strip().replace(',',''))
@@ -11,10 +12,11 @@ def prow(l):
 h=[k for k,l in enumerate(L) if l.startswith('LOKASI (TAP / SF)')][0]
 tap=prow(L[h+1]);rows=[prow(L[k]) for k in range(h+3,len(L)) if L[k].strip() and '\t' in L[k]]
 f='penjualan.html';s=open(f).read();i=s.find('const D=')+8;D,e=json.JSONDecoder().raw_decode(s[i:])
-D['P'][PR][DAY]={"tap":tap,"rows":rows}
+VAR=(sys.argv[4].upper() if len(sys.argv)>4 else '');KEY=PR+VAR
+D['P'].setdefault(KEY,{})[DAY]={"tap":tap,"rows":rows}
 s=s[:i]+json.dumps(D,ensure_ascii=False,separators=(',',':'))+s[i+e:];open(f,'w').write(s)
 print(PR,DAY,'tap',tap,'| petugas',len(rows),'sum mtd',sum(r['mtd'] for r in rows))
-if PR=='PV':
+if PR=='PV' and not VAR:
     x=open('penjualan-x.js').read();j=x.find('const X=')+8;X,e=json.JSONDecoder().raw_decode(x[j:])
     X['cut']=int(DAY)
     for k,l in enumerate(L):
