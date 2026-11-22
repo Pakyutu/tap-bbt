@@ -119,7 +119,21 @@ def proses(msg):
     if doc:
         nm=doc['file_name'];spec=re.sub(r'\.txt$','',nm,flags=re.I)
     else:
-        t=(msg.get('text') or '').strip();nm,_,body=t.partition('\n');spec=nm.strip()
+        t=(msg.get('text') or '').strip()
+        # paste panjang dipecah beberapa pesan: "mulai mom pv 21" -> bagian-bagian paste -> "selesai"
+        BUF=R/'.inbox'/'paste.txt';BUF.parent.mkdir(exist_ok=True)
+        mm=re.match(r'^/?mulai\s+((?:mom|soh)[\s_]+(?:pv|sa)[\s_]+\d{1,2}(?:[\s_]+\d{1,2})?)\s*$',t,re.I)
+        if mm:
+            BUF.write_text(mm.group(1)+'\n');PG[0]=ACK
+            pg('📋 Siap menerima paste. Kirim bagian-bagiannya satu per satu (urut), lalu kirim: selesai');return False
+        if BUF.exists() and re.match(r'^/?(selesai|proses|done)$',t,re.I):
+            t=BUF.read_text();BUF.unlink()
+        elif BUF.exists() and not (CMD.match(t) or QRY.match(t) or LNK.match(t) or t.lower()=='batal'):
+            BUF.write_text(BUF.read_text()+t+'\n');n=BUF.read_text().count('\n');PG[0]=ACK
+            pg(f'📋 Bagian diterima (total {len(BUF.read_text())} karakter). Kirim bagian berikutnya, atau: selesai');return False
+        elif BUF.exists() and t.lower()=='batal':
+            BUF.unlink();PG[0]=ACK;pg('Paste dibatalkan.');return False
+        nm,_,body=t.partition('\n');spec=nm.strip()
         lm=LNK.match(t)
         if lm:
             nm=lm.group(2);body=None
@@ -137,7 +151,7 @@ def proses(msg):
         qm=QRY.match(t) if not lm else None
         if qm:kueri(msg,qm.group(1).lower(),qm.group(2));return False
         if not lm and not CMD.match(spec):
-            PG[0]=ACK;pg('Kirim FILE (xlsx/csv), atau perintah: status · sn <nomor> · outlet <id/nama> · mom pv 20 · soh sa 19 · tempel link Drive saja');return False
+            PG[0]=ACK;pg('Kirim FILE (xlsx/csv), atau perintah: status · sn <nomor> · outlet <id/nama> · mom pv 20 · soh sa 19 · mulai mom pv 21 (paste panjang) · tempel link Drive saja');return False
     low=re.sub(r'[\s]+','_',nm.lower());cap=msg.get('caption')
     d,mo,iso=tgl(cap);fd=re.search(r'(\d{4})-(\d\d)-(\d\d)',nm)
     if fd and not cap:iso=fd.group(0);d=int(fd.group(3));mo=int(fd.group(2))
