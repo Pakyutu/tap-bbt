@@ -19,3 +19,4 @@
 - Biometrik & FR Top 20 (file Outlet_Biometrik_Sumbagteng_2026_*.xlsx, sheet trx + Sheet1): `python3 tools/biometrik.py <file.xlsx> "DD Nov"` -> CV.v[4] di digipos-cvm.js + D.FR di digipos.html, update status.json (Biometrik, FR Biometric).
 - Umur SN belum ST (Cek WL): peta tanggal drop CK.DM dibuat otomatis oleh cekst_build.py; tanpa build ulang: `python3 tools/cekst_dm.py --wl ... --add ...`.
 - MoM per varian (tab Petugas, pilihan Semua/Reguler/By.U): `python3 tools/surya_mom.py <paste.txt> PV|SA <hari> R|B|S` (PV: R=Reguler,B=By.U; SA: S=Simpati,B=By.U) -> D.P['PVR'|'PVB'|'SAS'|'SAB']; tidak mengubah TM/TI/SV. Sumber: dashboard SURYA, filter Produk di "MoM Sales Tap" (URL `?mom_date=YYYY-MM-DD&mom_product=pv_reg|pv_byu|sa_simpati|sa_byu`).
+- Rasio ST to Redeem per varian (By.U, Simpati 357, Unlimited; laporan Branch "VF <tgl>", tab Kecamatan > Redeem vs ST): `python3 tools/rv_varian.py <paste.txt> <hari>` -> RX[hari] di digipos-x.js (Reguler tetap lewat RV).
