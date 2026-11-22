@@ -39,7 +39,6 @@ def run(cmd):
     return r.returncode,(r.stdout+r.stderr).strip()
 LNK=re.compile(r'^/?(?:link\s+)?(https?://\S+)(?:\s+(\S+\.(?:xlsx|csv|txt)))?\s*$',re.I)
 def ambil(url,out):
-    import shutil
     if 'drive.google.com' in url or 'docs.google.com' in url:
         import gdown
         m=re.search(r'/d/([\w-]{20,})',url) or re.search(r'[?&]id=([\w-]{20,})',url)
@@ -181,7 +180,6 @@ def proses(msg):
     else:dst.write_text(body,encoding='utf-8')
     pg(f'⏳ 25% · {nm} terunduh')
     if kind=='inbox':
-        import shutil
         INB=R/'.inbox';INB.mkdir(exist_ok=True)
         if extra[0]=='wlx':  # tentukan WL utama / tambahan dari isi (nama sheet), bukan nama file
             import openpyxl
