@@ -55,7 +55,7 @@ export default {
     if (!m || String(m.chat.id) !== String(env.TG_CHAT)) return new Response("ok");
     const tg = (method, body) => fetch(`https://api.telegram.org/bot${env.TG_TOKEN}/${method}`, {
       method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-    const r = await tg("sendMessage", { chat_id: m.chat.id, text: `📥 ${m.document ? m.document.file_name : (m.text || "").split("\n")[0]} diterima, mengantre diproses…` });
+    const r = await tg("sendMessage", { chat_id: m.chat.id, text: `📥 ${m.document ? m.document.file_name : (m.text || "").split("\n")[0].slice(0, 80)} diterima, mengantre diproses…` });
     const mid = (await r.json()).result?.message_id;
     await fetch("https://api.github.com/repos/Pakyutu/tap-bbt/dispatches", {
       method: "POST",
