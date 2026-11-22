@@ -17,7 +17,7 @@ def pg(t):
         else:PG[0]=say(t)
     except Exception:pass
 # (kata kunci nama file, skrip, nama status.json)
-RT=[('biometrik','biometrik.py',['Biometrik','FR Biometric']),
+RT=[('monitoring_program_klik_misi','klik_misi.py',['Klik Misi']),('biometrik','biometrik.py',['Biometrik','FR Biometric']),
     ('sultan','sultan_so.py',['Sultan Spesial SO']),
     ('dealing_extra','extra_dealing.py',['Extra Dealing']),('extra','extra_dealing.py',['Extra Dealing']),
     ('cuan_pv','cuan_pv.py',['Cuan PV Redeem']),
