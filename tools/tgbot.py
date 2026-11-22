@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Bot Telegram update dashboard (tanpa AI). Jalan dari GitHub Actions.
 Kirim FILE ke bot (caption opsional "19 Nov"; kosong = hari ini WIB). Hanya chat TG_CHAT yang dilayani."""
-import os,sys,json,re,subprocess,urllib.request,urllib.parse,datetime,pathlib
+import shutil,os,sys,json,re,subprocess,urllib.request,urllib.parse,datetime,pathlib
 T=os.environ['TG_TOKEN'];CH=str(os.environ['TG_CHAT'])
 API=f'https://api.telegram.org/bot{T}/';R=pathlib.Path(__file__).resolve().parent.parent
 OFF=R/'tools/.tg_offset'
@@ -37,7 +37,7 @@ def tgl(cap):
 def run(cmd):
     r=subprocess.run(cmd,cwd=R,capture_output=True,text=True)
     return r.returncode,(r.stdout+r.stderr).strip()
-LNK=re.compile(r'^/?link\s+(https?://\S+)\s+(\S+\.(?:xlsx|csv|txt))\s*$',re.I)
+LNK=re.compile(r'^/?(?:link\s+)?(https?://\S+)(?:\s+(\S+\.(?:xlsx|csv|txt)))?\s*$',re.I)
 def ambil(url,out):
     import shutil
     if 'drive.google.com' in url or 'docs.google.com' in url:
@@ -123,11 +123,22 @@ def proses(msg):
         t=(msg.get('text') or '').strip();nm,_,body=t.partition('\n');spec=nm.strip()
         lm=LNK.match(t)
         if lm:
-            nm=lm.group(2);spec=nm;doc={'file_name':nm,'_url':lm.group(1)};body=None
+            nm=lm.group(2);body=None
+            if not nm:  # nama file tidak diberikan: ambil nama asli dari Drive
+                try:
+                    import gdown
+                    mid=re.search(r'/d/([\w-]{20,})',lm.group(1)) or re.search(r'[?&]id=([\w-]{20,})',lm.group(1))
+                    pre=pathlib.Path('/tmp/lnk');shutil.rmtree(pre,ignore_errors=True);pre.mkdir()
+                    PG[0]=ACK;pg('⏳ 3% · membaca nama file dari link')
+                    r=gdown.download(f'https://drive.google.com/uc?id={mid.group(1)}',str(pre)+'/',quiet=True)
+                    nm=pathlib.Path(r).name
+                except Exception as e:
+                    PG[0]=ACK;pg('❌ link tidak terbaca: '+str(e)[:150]+' (pastikan akses "siapa saja yang memiliki link")');return False
+            spec=nm;doc={'file_name':nm,'_url':lm.group(1),'_pre':(r if not lm.group(2) else None)}
         qm=QRY.match(t) if not lm else None
         if qm:kueri(msg,qm.group(1).lower(),qm.group(2));return False
         if not lm and not CMD.match(spec):
-            PG[0]=ACK;pg('Kirim FILE (xlsx/csv), atau perintah: status · sn <nomor> · outlet <id/nama> · mom pv 20 · soh sa 19 · link <url Drive> <namafile.xlsx>');return False
+            PG[0]=ACK;pg('Kirim FILE (xlsx/csv), atau perintah: status · sn <nomor> · outlet <id/nama> · mom pv 20 · soh sa 19 · tempel link Drive saja');return False
     low=re.sub(r'[\s]+','_',nm.lower());cap=msg.get('caption')
     d,mo,iso=tgl(cap);fd=re.search(r'(\d{4})-(\d\d)-(\d\d)',nm)
     if fd and not cap:iso=fd.group(0);d=int(fd.group(3));mo=int(fd.group(2))
@@ -160,7 +171,9 @@ def proses(msg):
     dst=pathlib.Path('/tmp')/('in_'+re.sub(r'[^\w.\-]','_',nm or 'paste')+('' if doc else '.txt'))
     if doc and doc.get('_url'):
         pg(f'⏳ 10% · mengunduh dari link')
-        try:ambil(doc['_url'],dst)
+        try:
+            if doc.get('_pre'):shutil.copy(doc['_pre'],dst)
+            else:ambil(doc['_url'],dst)
         except Exception as e:pg(f'❌ gagal unduh: {str(e)[:200]}');return False
     elif doc:
         fp=call('getFile',file_id=doc['file_id'])['result']['file_path']
