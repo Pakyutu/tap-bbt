@@ -1,5 +1,5 @@
 // Versi cache: naikkan angka ini kalau ada perubahan besar pada file app.
-const V = "tap-bbt-v155";
+const V = "tap-bbt-v156";
 const SAME = self.location.origin;
 const SHELL = [
   "./", "index.html", "digipos.html", "penjualan.html", "wl.html","kalkulator.html","backup.html","cekst.html","cekst-data.js","c128.js", "manifest.json",
@@ -66,5 +66,28 @@ self.addEventListener("fetch", e => {
     } catch {
       return Response.error();
     }
+  })());
+});
+
+// Notifikasi data baru (push tanpa isi: ambil status.json lalu tampilkan item terbaru)
+self.addEventListener("push", e => {
+  e.waitUntil((async () => {
+    let body = "Buka aplikasi untuk melihat.";
+    try {
+      const j = await (await fetch("status.json", { cache: "no-store" })).json();
+      const mx = j.items.reduce((m, x) => x.d > m ? x.d : m, "");
+      const nm = j.items.filter(x => x.d === mx).map(x => x.n);
+      const tg = new Date(mx + "T00:00:00");
+      body = nm.slice(0, 5).join(", ") + (nm.length > 5 ? " +" + (nm.length - 5) : "") + " · " + tg.getDate() + "/" + (tg.getMonth() + 1);
+    } catch {}
+    await self.registration.showNotification("TAP BBT · Data baru masuk", { body, icon: "icon-192.png", badge: "icon-192.png", tag: "data-baru" });
+  })());
+});
+self.addEventListener("notificationclick", e => {
+  e.notification.close();
+  e.waitUntil((async () => {
+    const L = await clients.matchAll({ type: "window", includeUncontrolled: true });
+    if (L.length) return L[0].focus();
+    return clients.openWindow("./");
   })());
 });

@@ -104,6 +104,7 @@ a.mc.wide{grid-column:1/-1;flex-direction:row;align-items:center}
   <h2 class="sec">Status data <span id="dsts"></span></h2>
   <section class="box" id="dst"><div id="dstl"><div class="it"><span class="mu">Memuat…</span></div></div></section>
 
+  <button class="install" id="notif" style="display:none">🔔 Aktifkan notifikasi data baru</button>
   <button class="install" id="inst">＋ Pasang aplikasi di layar utama</button>
   <div class="foot">TAP Bagan Batu · v4</div>
 </main>
@@ -150,4 +151,20 @@ fetch("status.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{const t=new D
 (function(){const M=[[5,10,'☕','Selamat pagi! Jangan lupa input <b>SURYA</b> nya yaaa 😊'],[10,12,'📊','Jangan lupa input <b>SURYA</b> nya yaaa, ST Digipos & Klik Misi juga ya!'],[12,15,'🍛','Udah makan siang? Jangan lupa input <b>SURYA</b> nya yaaa'],[15,18,'📦','Sore! Cek stok SF & jangan lupa input <b>SURYA</b> nya yaaa'],[18,22,'📝','Jangan lupa input <b>SURYA</b> nya yaaa, sekalian rekap jualan hari ini'],[22,29,'🌙','Udah malam, istirahat ya. Besok jangan lupa input <b>SURYA</b> nya yaaa']];
 function up(){let h=new Date().getHours();if(h<5)h+=24;const m=M.find(x=>h>=x[0]&&h<x[1])||M[0];const el=document.getElementById('nudge');if(el)el.innerHTML='<span class="e">'+m[2]+'</span><span>'+m[3]+'</span>'}
 up();setInterval(up,60000)})();
+</script>
+<script>
+(function(){var b=document.getElementById("notif");if(!b||!("serviceWorker" in navigator)||!("PushManager" in window))return;
+var L=function(k,v){try{if(v===undefined)return localStorage.getItem(k);v===null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
+function u8(s){s=s.replace(/-/g,"+").replace(/_/g,"/");var r=atob(s+"=".repeat((4-s.length%4)%4));return Uint8Array.from(r,function(c){return c.charCodeAt(0)})}
+function lab(){b.textContent=L("pushOn")==="1"?"🔔 Notifikasi aktif (ketuk untuk matikan)":"🔔 Aktifkan notifikasi data baru"}
+b.style.display="";lab();
+b.onclick=async function(){try{var reg=await navigator.serviceWorker.ready;
+ if(L("pushOn")==="1"){var s0=await reg.pushManager.getSubscription();if(s0)await s0.unsubscribe();L("pushOn","0");lab();return}
+ var url=L("pushUrl");if(!url){url=(prompt("Alamat Worker (contoh https://nama.akun.workers.dev):")||"").trim().replace(/\/+$/,"");if(!/^https:\/\//.test(url))return;}
+ if(await Notification.requestPermission()!=="granted"){alert("Izin notifikasi ditolak.");return}
+ var pub=await (await fetch(url+"/vapid")).text();
+ var sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(pub.trim())});
+ var r=await fetch(url+"/sub",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(sub)});
+ if(!r.ok)throw new Error("simpan gagal");L("pushUrl",url);L("pushOn","1");lab();alert("Notifikasi aktif.")}
+ catch(e){alert("Gagal mengaktifkan: "+e.message)}}})();
 </script><script src="nav.js"></script></body></html>

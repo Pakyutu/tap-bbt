@@ -37,3 +37,10 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -qm "Update data via bot"
           for i in 1 2 3; do git pull -q --rebase && git push && break; sleep 5; done
+      - name: Notifikasi push (kalau ada data baru)
+        if: success()
+        env: {TG_TOKEN: '${{ secrets.TG_TOKEN }}'}
+        run: |
+          [ "$(git log -1 --format=%s)" = "Update data via bot" ] && [ "$(git log -1 --format=%ct)" -gt $(( $(date +%s) - 300 )) ] || exit 0
+          U=$(curl -s "https://api.telegram.org/bot$TG_TOKEN/getWebhookInfo" | python3 -c "import sys,json;print(json.load(sys.stdin)['result']['url'])") || exit 0
+          curl -s -m 20 -X POST "${U%/}/notify" -H "x-key: $TG_TOKEN" || true
