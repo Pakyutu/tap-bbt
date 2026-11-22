@@ -4,58 +4,58 @@
    menang atas :root di <style> halaman tanpa !important. */
 html:root{
   color-scheme:light;
-  --brand:#6554e0;--brand-hover:#5443cc;--on-brand:#fff;
-  --surface:#fff;--surface-soft:#f1eefb;--text:#241f3d;--muted:#645f82;--line:#e6e2f5;
+  --brand:#d9334a;--brand-hover:#c02840;--on-brand:#fff;
+  --surface:#fff;--surface-soft:#f7eff2;--text:#221b26;--muted:#675f6e;--line:#efe4e9;
   --positive:#0f8a63;--positive-bg:#e4f6ef;--warning:#8a5a00;--warning-bg:#fff2d9;
-  --negative:#c8304f;--negative-bg:#fdebf0;--info:#3f63d6;--info-bg:#eaf0ff;
+  --negative:#c8304f;--negative-bg:#fdebf0;--info:#2f6be0;--info-bg:#e8f0ff;
   --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --radius-md:14px;--radius-lg:20px;
-  --shadow-sm:0 1px 3px rgb(80 60 160 / .06);--shadow-card:0 10px 30px -8px rgb(80 60 160 / .14);
+  --shadow-sm:0 1px 3px rgb(120 40 70 / .06);--shadow-card:0 10px 30px -8px rgb(120 40 70 / .13);
   --nav-h:64px;
-  --bg:#f6f4ff;--bg2:#ece9ff;--card:#fff;--tx:#241f3d;--ink:#241f3d;--mu:#645f82;--mute:#645f82;--bd:#e6e2f5;--soft:#f1eefb;
-  --ac:#6554e0;--ac2:#8574f5;--red:#6554e0;--red2:#8574f5;--ok:#0f8a63;--up:#0f8a63;--dn:#c8304f;
-  --wr:#8a5a00;--wn:#8a5a00;--warn:#8a5a00;--blue:#3f63d6;
-  --okbg:#e4f6ef;--nobg:#fdebf0;--midbg:#fff2d9;--bar:#b4a9f0;--bar2:#6554e0;--tg:#a8a3c4;
-  --hero:#5b4fd6;--herotx:#fff;--heromu:rgba(255,255,255,.84);--glow:rgba(101,84,224,.14);
-  --sh:0 1px 3px rgb(80 60 160 / .06),0 10px 30px -10px rgb(80 60 160 / .14);
+  --bg:#fcf6f8;--bg2:#f6e9ee;--card:#fff;--tx:#221b26;--ink:#221b26;--mu:#675f6e;--mute:#675f6e;--bd:#efe4e9;--soft:#f7eff2;
+  --ac:#d9334a;--ac2:#f0675a;--red:#d9334a;--red2:#f0675a;--ok:#0f8a63;--up:#0f8a63;--dn:#c8304f;
+  --wr:#8a5a00;--wn:#8a5a00;--warn:#8a5a00;--blue:#2f6be0;
+  --okbg:#e4f6ef;--nobg:#fdebf0;--midbg:#fff2d9;--bar:#a9c1f5;--bar2:#d9334a;--tg:#b3a9b2;
+  --hero:#d9334a;--herotx:#fff;--heromu:rgba(255,255,255,.88);--glow:rgba(217,51,74,.14);
+  --sh:0 1px 3px rgb(120 40 70 / .06),0 10px 30px -10px rgb(120 40 70 / .13);
   --fd:var(--font);--fb:var(--font);--fm:var(--mono);
-  --band:#3b3490;--band2:#4a42ad;--band-bd:#6a60d0;--band-fg:#fff;--band-mu:rgba(255,255,255,.8);
-  --grad-hero:linear-gradient(135deg,#7a6cf2 0%,#5f72ee 55%,#4a9ad6 100%);
+  --band:#c42a42;--band2:#d9475b;--band-bd:#e8707f;--band-fg:#fff;--band-mu:rgba(255,255,255,.8);
+  --grad-hero:radial-gradient(130% 120% at 105% 110%,rgba(61,125,245,.92) 0%,rgba(61,125,245,0) 58%),linear-gradient(135deg,#e0364e 0%,#ef5a5e 60%,#f27763 100%);
 }
 @media (prefers-color-scheme:dark){
   html:root:not([data-theme="light"]){
     color-scheme:dark;
-    --surface:#1a1730;--surface-soft:#241f3e;--text:#f0eeff;--muted:#b0abd0;--line:#2e2950;
+    --surface:#181b2c;--surface-soft:#222639;--text:#f4f0f5;--muted:#b5b0c0;--line:#2c3048;
     --positive:#62e0b4;--positive-bg:#12372e;--warning:#ffd58a;--warning-bg:#3a2e17;
-    --negative:#ff8fa9;--negative-bg:#40202f;--info:#a3beff;--info-bg:#1b2d54;
+    --negative:#ff8fa9;--negative-bg:#40202f;--info:#8fb2ff;--info-bg:#1b2d54;
     --shadow-sm:0 1px 3px rgb(0 0 0 / .25);--shadow-card:0 10px 30px -8px rgb(0 0 0 / .4);
-    --bg:#110f22;--bg2:#171430;--card:#1a1730;--tx:#f0eeff;--ink:#f0eeff;--mu:#b0abd0;--mute:#b0abd0;--bd:#2e2950;--soft:#241f3e;
-    --ac:#a093ff;--ac2:#7ea6ff;--red:#a093ff;--red2:#7ea6ff;--ok:#62e0b4;--up:#62e0b4;--dn:#ff8fa9;
-    --wr:#ffd58a;--wn:#ffd58a;--warn:#ffd58a;--blue:#a3beff;
-    --okbg:#12372e;--nobg:#40202f;--midbg:#3a2e17;--bar:#6e63c4;--bar2:#a093ff;--tg:#5d5885;
-    --hero:#231d5c;--herotx:#f0eeff;--heromu:rgba(240,238,255,.78);--glow:rgba(160,147,255,.2);
-    --band:#171335;--band2:#1f1a45;--band-bd:#2e2950;--band-fg:#f0eeff;--band-mu:#b0abd0;
+    --bg:#0f1220;--bg2:#151a2d;--card:#181b2c;--tx:#f4f0f5;--ink:#f4f0f5;--mu:#b5b0c0;--mute:#b5b0c0;--bd:#2c3048;--soft:#222639;
+    --ac:#ff6b7f;--ac2:#ff9a76;--red:#ff6b7f;--red2:#ff9a76;--ok:#62e0b4;--up:#62e0b4;--dn:#ff8fa9;
+    --wr:#ffd58a;--wn:#ffd58a;--warn:#ffd58a;--blue:#8fb2ff;
+    --okbg:#12372e;--nobg:#40202f;--midbg:#3a2e17;--bar:#5b78c9;--bar2:#ff6b7f;--tg:#5d6280;
+    --hero:#7a2036;--herotx:#f4f0f5;--heromu:rgba(244,240,245,.8);--glow:rgba(255,107,127,.2);
+    --band:#161a30;--band2:#1f2440;--band-bd:#2c3048;--band-fg:#f4f0f5;--band-mu:#b5b0c0;
     --sh:0 1px 3px rgb(0 0 0 / .25),0 10px 30px -10px rgb(0 0 0 / .4);
-    --grad-hero:linear-gradient(135deg,#2c2373 0%,#27346f 60%,#1f4670 100%);
+    --grad-hero:radial-gradient(130% 120% at 105% 110%,rgba(61,110,230,.8) 0%,rgba(61,110,230,0) 58%),linear-gradient(135deg,#8c2238 0%,#6a2140 60%,#4a2250 100%);
   }
 }
 html[data-theme="dark"]:root{
   color-scheme:dark;
-  --surface:#1a1730;--surface-soft:#241f3e;--text:#f0eeff;--muted:#b0abd0;--line:#2e2950;
+  --surface:#181b2c;--surface-soft:#222639;--text:#f4f0f5;--muted:#b5b0c0;--line:#2c3048;
   --positive:#62e0b4;--positive-bg:#12372e;--warning:#ffd58a;--warning-bg:#3a2e17;
-  --negative:#ff8fa9;--negative-bg:#40202f;--info:#a3beff;--info-bg:#1b2d54;
-  --bg:#110f22;--bg2:#171430;--card:#1a1730;--tx:#f0eeff;--ink:#f0eeff;--mu:#b0abd0;--mute:#b0abd0;--bd:#2e2950;--soft:#241f3e;
-  --ac:#a093ff;--ac2:#7ea6ff;--red:#a093ff;--red2:#7ea6ff;--ok:#62e0b4;--up:#62e0b4;--dn:#ff8fa9;
-  --wr:#ffd58a;--wn:#ffd58a;--warn:#ffd58a;--blue:#a3beff;
-  --okbg:#12372e;--nobg:#40202f;--midbg:#3a2e17;--bar:#6e63c4;--bar2:#a093ff;--tg:#5d5885;
-  --hero:#231d5c;--herotx:#f0eeff;--heromu:rgba(240,238,255,.78);--glow:rgba(160,147,255,.2);
-  --band:#171335;--band2:#1f1a45;--band-bd:#2e2950;--band-fg:#f0eeff;--band-mu:#b0abd0;
+  --negative:#ff8fa9;--negative-bg:#40202f;--info:#8fb2ff;--info-bg:#1b2d54;
+  --bg:#0f1220;--bg2:#151a2d;--card:#181b2c;--tx:#f4f0f5;--ink:#f4f0f5;--mu:#b5b0c0;--mute:#b5b0c0;--bd:#2c3048;--soft:#222639;
+  --ac:#ff6b7f;--ac2:#ff9a76;--red:#ff6b7f;--red2:#ff9a76;--ok:#62e0b4;--up:#62e0b4;--dn:#ff8fa9;
+  --wr:#ffd58a;--wn:#ffd58a;--warn:#ffd58a;--blue:#8fb2ff;
+  --okbg:#12372e;--nobg:#40202f;--midbg:#3a2e17;--bar:#5b78c9;--bar2:#ff6b7f;--tg:#5d6280;
+  --hero:#7a2036;--herotx:#f4f0f5;--heromu:rgba(244,240,245,.8);--glow:rgba(255,107,127,.2);
+  --band:#161a30;--band2:#1f2440;--band-bd:#2c3048;--band-fg:#f4f0f5;--band-mu:#b5b0c0;
   --sh:0 1px 3px rgb(0 0 0 / .25),0 10px 30px -10px rgb(0 0 0 / .4);
-  --grad-hero:linear-gradient(135deg,#2c2373 0%,#27346f 60%,#1f4670 100%);
+  --grad-hero:radial-gradient(130% 120% at 105% 110%,rgba(61,110,230,.8) 0%,rgba(61,110,230,0) 58%),linear-gradient(135deg,#8c2238 0%,#6a2140 60%,#4a2250 100%);
 }
 /* suasana: latar berpendar halus, header gradasi lembut */
-html body{background-image:radial-gradient(900px 520px at 100% -8%,color-mix(in srgb,var(--ac) 12%,transparent),transparent 70%),radial-gradient(760px 520px at -10% 28%,color-mix(in srgb,#35c9a4 11%,transparent),transparent 70%);background-attachment:fixed}
+html body{background-image:radial-gradient(900px 520px at 100% -8%,color-mix(in srgb,var(--ac) 12%,transparent),transparent 70%),radial-gradient(760px 520px at -10% 28%,color-mix(in srgb,#3d7df5 11%,transparent),transparent 70%);background-attachment:fixed}
 html body .top,html body .tabbar{background:var(--grad-hero) fixed!important;border-bottom:0!important}
 html body .top{box-shadow:none!important}
 html body .tabbar{border-radius:0 0 24px 24px;box-shadow:0 16px 34px -16px color-mix(in srgb,var(--ac) 55%,transparent)!important}
@@ -67,13 +67,13 @@ html body .top select,html body .top .btn,html body .top input{border-radius:12p
 html body .top select,html body .top .btn{background:rgba(255,255,255,.16)!important;border-color:rgba(255,255,255,.28)!important;color:#fff}
 html body .top input{background:rgba(255,255,255,.14)!important;border-color:rgba(255,255,255,.28)!important;color:#fff}
 html body .top input::placeholder{color:rgba(255,255,255,.75)}
-html body .card{border:1px solid var(--bd);box-shadow:var(--shadow-sm),0 12px 30px -16px rgb(80 60 160 / .16);transition:box-shadow .2s,transform .2s}
+html body .card{border:1px solid var(--bd);box-shadow:var(--shadow-sm),0 12px 30px -16px rgb(120 40 70 / .15);transition:box-shadow .2s,transform .2s}
 html body .k{border-radius:16px;box-shadow:var(--shadow-sm)}
 html body .seg{border-radius:12px}
 html body .seg button{transition:background .15s,color .15s,transform .1s}
 html body .seg button:active,html body .btn:active,html body #bbtnav .it:active{transform:scale(.96)}
 html body .seg button.on{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff}
-html body #bbtnav{border-top:0;box-shadow:0 -10px 30px -12px rgb(80 60 160 / .22);border-radius:20px 20px 0 0}
+html body #bbtnav{border-top:0;box-shadow:0 -10px 30px -12px rgb(120 40 70 / .2);border-radius:20px 20px 0 0}
 html body #bbtnav .it{border-radius:16px}
 html body ::selection{background:color-mix(in srgb,var(--ac) 28%,transparent)}
 html body table th{font-weight:650}
