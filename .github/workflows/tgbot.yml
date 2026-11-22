@@ -2,12 +2,20 @@ name: Bot update data
 on:
   workflow_dispatch:
   repository_dispatch: {types: [tg]}
-permissions: {contents: write}
-concurrency: {group: tgbot, cancel-in-progress: false}
+permissions: {contents: write, actions: read}
 jobs:
   go:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
+      - name: Antre (proses berurutan sesuai urutan kirim)
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          for i in $(seq 1 400); do
+            n=$(gh api "repos/${{ github.repository }}/actions/workflows/tgbot.yml/runs?per_page=30" --jq "[.workflow_runs[]|select(.id<${{ github.run_id }} and (.status==\"in_progress\" or .status==\"queued\" or .status==\"waiting\" or .status==\"pending\"))]|length")
+            [ "$n" = "0" ] && exit 0
+            sleep 15
+          done
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
