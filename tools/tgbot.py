@@ -103,6 +103,18 @@ def ver_label(d,iso):
     t=re.sub(r'update \d+ Nov 2026',f'update {d} Nov 2026',t)
     now=datetime.datetime.utcnow()+datetime.timedelta(hours=7)
     t=re.sub(r'"VER":"[^"]*"',f'"VER":"{iso}-{now:%H%M}"',t,count=1);f.write_text(t)
+def run_p(cmd,label,a=30,b=92):
+    # jalankan perintah sambil menaikkan persen 1-demi-1 di pesan Telegram supaya terlihat berjalan
+    import threading,time
+    st=threading.Event()
+    def tick():
+        p=a
+        while not st.wait(2.5):
+            if p<b:p+=1
+            pg(f'⏳ {p}% · {label}')
+    th=threading.Thread(target=tick,daemon=True);th.start()
+    try:return run(cmd)
+    finally:st.set();th.join(timeout=5)
 def proses(msg):
     doc=msg.get('document');body=None
     if doc:
@@ -144,17 +156,17 @@ def proses(msg):
     if kind=='st' and re.search(r'oct|okt|sep|agu|aug',low):
         PG[0]=ACK;pg(f'➖ {nm}: ini file bulan lalu, bukan data berjalan. Tidak dimasukkan supaya data Nov tidak tertimpa (kalau perlu, lewat sesi Claude).');return False
     if doc and not doc.get('_url') and doc.get('file_size',0)>19*1024*1024:say('File >20MB, batas Telegram. Kirim lewat sesi Claude.');return False
-    PG[0]=ACK;pg(f'⏳ 10% · {nm} diterima, mulai diproses')
+    PG[0]=ACK;pg(f'⏳ 5% · {nm} diterima, mulai diproses')
     dst=pathlib.Path('/tmp')/('in_'+re.sub(r'[^\w.\-]','_',nm or 'paste')+('' if doc else '.txt'))
     if doc and doc.get('_url'):
-        pg(f'⏳ 20% · mengunduh dari link')
+        pg(f'⏳ 10% · mengunduh dari link')
         try:ambil(doc['_url'],dst)
         except Exception as e:pg(f'❌ gagal unduh: {str(e)[:200]}');return False
     elif doc:
         fp=call('getFile',file_id=doc['file_id'])['result']['file_path']
         dst.write_bytes(urllib.request.urlopen(f'https://api.telegram.org/file/bot{T}/{fp}',timeout=120).read())
     else:dst.write_text(body,encoding='utf-8')
-    pg(f'⏳ 40% · {nm} terunduh')
+    pg(f'⏳ 25% · {nm} terunduh')
     if kind=='inbox':
         import shutil
         INB=R/'.inbox';INB.mkdir(exist_ok=True)
@@ -169,7 +181,7 @@ def proses(msg):
             miss=[n for n,v in (('WL dasar',wl or wln),('raw ST PV',pvs),('raw ST SA',sas)) if not v]
             pg(f'📦 {nm} tersimpan. Cek WL belum dibangun, masih kurang: '+', '.join(miss));return False
         cmd=[PY,sc]+(['--wl',wl[-1]] if wl else [])+(['--wlnov',wln[-1]] if wln else [])+(['--add']+adds if adds else [])+(['--byu',byu[-1]] if byu else [])+['--pv']+pvs+['--sa']+sas
-        pg('⏳ 60% · membangun Cek WL (beberapa menit)');rc,out=run(cmd)
+        rc,out=run_p(cmd,'membangun Cek WL (beberapa menit)')
         if rc:pg(f'❌ {nm}\n'+(out.splitlines()[-1][:300] if out else 'gagal'));return False
         t=(R/'cekst-data.js').read_text();CK=json.JSONDecoder().raw_decode(t[t.index('const CK=')+9:])[0]
         iso=CK.get('cutVF') or iso;stat(st,iso)
@@ -180,7 +192,7 @@ def proses(msg):
     elif kind=='o':cmd=[PY,sc,extra[0],str(dst)]
     elif kind=='d':cmd=[PY,sc,str(dst),str(d)]
     else:cmd=[PY,sc,str(dst)]+extra
-    pg('⏳ 60% · menghitung data');rc,out=run(cmd)
+    rc,out=run_p(cmd,'menghitung data')
     if rc:pg(f'❌ {nm}\n'+(out.splitlines()[-1][:300] if out else 'gagal')+'\n(paste tidak sesuai format? Kalau ragu, lewat sesi Claude)');return False
     if sc.endswith('sultan_so.py'):
         if '"per":""' in (R/'digipos-sso.js').read_text():
@@ -189,7 +201,7 @@ def proses(msg):
         dm=[int(x) for x in re.findall(r'(\d{1,2}) Nov 2026',out)]
         if dm:d=max(dm);iso=f'2026-11-{d:02d}';lab=f'{d} Nov'
         ver_label(d,iso)
-    pg('⏳ 85% · menyimpan & deploy');stat(st,iso)
+    pg('⏳ 96% · menyimpan & deploy');stat(st,iso)
     ok,_=run(['git','diff','--quiet'])
     if ok==0:pg(f'➖ {nm}: tidak ada perubahan data (file sama?).');return False
     pg(f'✅ 100% · {nm} masuk · {lab} (tayang ±1 mnt)');return True
