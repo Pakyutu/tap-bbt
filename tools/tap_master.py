@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Master outlet per TAP (Outletlist_*.xlsx, sheet OutletList, KET PJP=1) -> data-tap.js.
-BBT tetap di digipos.html (D.O); file ini hanya BSA & UJT. Target SF = rasio BBT (perkiraan)."""
+BBT tetap di digipos.html (D.O); file ini hanya BAA & UJT. Target SF = rasio BBT (perkiraan)."""
 import sys,json,openpyxl,collections
 f=sys.argv[1]
 ws=openpyxl.load_workbook(f,read_only=True)['OutletList']
 R=list(ws.iter_rows(values_only=True));ix={k:i for i,k in enumerate(R[0])}
-SH={'BAGAN SIAPI-API':'BSA','UJUNG TANJUNG':'UJT'}
+SH={'BAGAN SIAPI-API':'BAA','UJUNG TANJUNG':'UJT'}
 RT=[.959,.314,.796,.365]  # Reg, By.U (VF) ; Simpati, By.U (SA) dibanding jumlah outlet
 O={};U={}
 for r in R[1:]:
