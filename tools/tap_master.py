@@ -18,5 +18,11 @@ out={}
 for t,L in O.items():
     c=collections.Counter(o[4] for o in L)
     out[t]={'O':L,'T':{s:[round(n*RT[0]),round(n*RT[1])] for s,n in c.items()},'TS':{s:[round(n*RT[2]),round(n*RT[3])] for s,n in c.items()},'U':{o[0]:U[o[0]] for o in L if o[0] in U}}
+import os,re
+if os.path.exists('data-tap.js'):  # pertahankan ST yang sudah terisi
+    old=json.loads(open('data-tap.js').read()[12:].rstrip().rstrip(';'));M={o[0]:o[6:] for x in old.values() for o in x['O']}
+    for x in out.values():
+        for o in x['O']:
+            if o[0] in M:o[6:]=M[o[0]]
 open('data-tap.js','w').write('window.TAPD='+json.dumps(out,ensure_ascii=False,separators=(',',':'))+';\n')
 print({t:len(v['O']) for t,v in out.items()})

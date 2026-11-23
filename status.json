@@ -87,8 +87,13 @@
 },
 {
 "g": "DIGIPOS",
-"n": "Master outlet BSA & UJT",
+"n": "Master outlet BAA & UJT",
 "d": "2026-11-05"
+},
+{
+"g": "DIGIPOS",
+"n": "ST BAA & UJT",
+"d": "2026-11-20"
 }
 ]
 }
