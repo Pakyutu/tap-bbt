@@ -1,6 +1,6 @@
 // Tab "Target SF": target bulanan VF per SF = jumlah target semua validity (SURYA, data Stock on Hand per validity X.SOHV).
 // Target/hari normal = target ÷ total HK bulan; Kejar/hari = sisa target ÷ sisa HK (angka SURYA); Rata jual/hari = MTD ÷ HK lewat.
-(function(){
+(function(){if(window.TAPSEL&&TAPSEL!=="BBT")return;
   if(typeof X==='undefined'||!X.SOHV)return;
   const V=X.SOHV,VL=[1,2,3,5,7,28],nf=v=>Math.round(v).toLocaleString('id-ID'),es=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const hkN=(d)=>{let n=0;for(let i=1;i<=d;i++){if(new Date(2026,10,i).getDay()!==0)n++}return n};
