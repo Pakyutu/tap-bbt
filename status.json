@@ -3,12 +3,12 @@
 {
 "g": "DIGIPOS",
 "n": "ST VF & SA",
-"d": "2026-11-22"
+"d": "2026-11-20"
 },
 {
 "g": "DIGIPOS",
 "n": "Klik Misi",
-"d": "2026-11-22"
+"d": "2026-11-20"
 },
 {
 "g": "DIGIPOS",
@@ -84,46 +84,6 @@
 "g": "Cek WL",
 "n": "WL vs ST (VF & SA)",
 "d": "2026-11-20"
-},
-{
-"g": "DIGIPOS",
-"n": "Master outlet BAA & UJT",
-"d": "2026-11-05"
-},
-{
-"g": "DIGIPOS",
-"n": "ST BAA & UJT",
-"d": "2026-11-20"
-},
-{
-"g": "DIGIPOS",
-"n": "Klik Misi BAA & UJT",
-"d": "2026-11-20"
-},
-{
-"g": "Penjualan",
-"n": "Outlet BAA & UJT",
-"d": "2026-11-20"
-},
-{
-"g": "Penjualan",
-"n": "MoM Petugas BAA & UJT",
-"d": "2026-11-21"
-},
-{
-"g": "Penjualan",
-"n": "Stock Gudang BAA & UJT",
-"d": "2026-11-23"
-},
-{
-"g": "Penjualan",
-"n": "Stock on Hand BAA & UJT",
-"d": "2026-11-23"
-},
-{
-"g": "Penjualan",
-"n": "Stok SF lengkap BAA & UJT",
-"d": "2026-11-23"
 }
 ]
 }

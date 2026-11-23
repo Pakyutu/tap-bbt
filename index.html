@@ -144,7 +144,7 @@ fetch("status.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{const t=new D
   h+=`<div class="it"><span>${x.n}<small>${d.getDate()} ${B[d.getMonth()]}${a>0?" · "+a+" hari lalu":" · hari ini"}</small></span><span class="pill ${c}">${lb}</span></div>`});
  document.getElementById("dstl").innerHTML=h;
  document.getElementById("dsts").innerHTML=late?`<span class="pill bd">${late} perlu update</span>`:`<span class="pill ok">Semua terbaru</span>`;
- document.getElementById("hchips").innerHTML=`<span class="pill ${late?"wn":"ok"}"><span class="dot"></span>${n-late}/${n} data terbaru</span><span class="pill in">${(()=>{let t="BBT";try{t=localStorage.getItem("tap")||"BBT"}catch(e){}return ({BBT:9,BAA:3,UJT:8,ALL:20}[t]||9)})()} sales force</span>`;
+ document.getElementById("hchips").innerHTML=`<span class="pill ${late?"wn":"ok"}"><span class="dot"></span>${n-late}/${n} data terbaru</span><span class="pill in">20 sales force</span>`;
 }).catch(()=>{document.getElementById("dstl").innerHTML='<div class="it"><span class="mu">Status data tidak bisa dimuat (offline?).</span></div>'})})();
 </script><script>
 (function(){const M=[[5,10,'☕','Selamat pagi! Jangan lupa input <b>SURYA</b> nya yaaa 😊'],[10,12,'📊','Jangan lupa input <b>SURYA</b> nya yaaa, ST Digipos & Klik Misi juga ya!'],[12,15,'🍛','Udah makan siang? Jangan lupa input <b>SURYA</b> nya yaaa'],[15,18,'📦','Sore! Cek stok SF & jangan lupa input <b>SURYA</b> nya yaaa'],[18,22,'📝','Jangan lupa input <b>SURYA</b> nya yaaa, sekalian rekap jualan hari ini'],[22,29,'🌙','Udah malam, istirahat ya. Besok jangan lupa input <b>SURYA</b> nya yaaa']];

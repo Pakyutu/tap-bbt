@@ -17,7 +17,7 @@ def pg(t):
         else:PG[0]=say(t)
     except Exception:pass
 # (kata kunci nama file, skrip, nama status.json)
-RT=[('monitoring_program_klik_misi','klik_misi.py',['Klik Misi','Klik Misi BAA & UJT']),('biometrik','biometrik.py',['Biometrik','FR Biometric']),
+RT=[('monitoring_program_klik_misi','klik_misi.py',['Klik Misi']),('biometrik','biometrik.py',['Biometrik','FR Biometric']),
     ('sultan','sultan_so.py',['Sultan Spesial SO']),
     ('dealing_extra','extra_dealing.py',['Extra Dealing']),('extra','extra_dealing.py',['Extra Dealing']),
     ('cuan_pv','cuan_pv.py',['Cuan PV Redeem']),
@@ -182,7 +182,7 @@ def proses(msg):
         role=next(r for k,r in (('raw_st_pv','pv'),('raw_st_sp','sa'),('wl_sa_byu','byu'),('dropingan','wlx'),('wl_st_vf','wlx')) if k in low)
         sc,st,extra,kind='tools/cekst_build.py',['WL vs ST (VF & SA)'],[role],'inbox'
     elif ext=='.xlsx' and 'st_digipos' in low:sc,st,extra,kind='tools/st_digipos.py',['ST VF & SA'],[],'st'
-    elif ext=='.xlsx' and ('st_product' in low or 'monitoring_st' in low):sc,st,extra,kind='tools/st_product.py',['ST VF & SA','ST BAA & UJT'],[],'st'
+    elif ext=='.xlsx' and ('st_product' in low or 'monitoring_st' in low):sc,st,extra,kind='tools/st_product.py',['ST VF & SA'],[],'st'
     else:
         rt=next((x for x in RT if x[0] in low),None)
         if not rt:say(f'File "{nm}" belum dikenali bot (butuh sesi Claude).');return False
