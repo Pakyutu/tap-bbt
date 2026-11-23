@@ -1,9 +1,9 @@
 # Klik Misi (file "Monitoring_Program_Klik_Misi_<DD>_<Bln>_2026_SB_Dumai.xlsx"): sheet "misi reguler dumai" (Reguler) + "BYU Dumai" (By.U).
 # Pakai: python3 tools/klik_misi.py <file.xlsx> ["DD Nov"]  -> D.K di digipos.html (hanya outlet PJP di D.O) + label "Data per ..." + status.json
-# BAA & UJT selalu diisi ke data-tap.js (K); BBT (D.K) hanya dengan --bbt.
+# BAA & UJT diisi ke data-tap.js (K); BBT (D.K) ikut kecuali pakai --nobbt.
 # Format D.K[id]: r=[targetFix,ach,klik,runrate,status,rataRata,sultan]  b=[targetFix,ach,klik,runrate,ketProgram]
 import sys,json,re,os,openpyxl,datetime
-H='digipos.html';s=open(H).read();i=s.index('const D=')+8;D,_=json.JSONDecoder().raw_decode(s[i:]);BBT='--bbt' in sys.argv;sys.argv=[a for a in sys.argv if a!='--bbt']
+H='digipos.html';s=open(H).read();i=s.index('const D=')+8;D,_=json.JSONDecoder().raw_decode(s[i:]);BBT='--nobbt' not in sys.argv;sys.argv=[a for a in sys.argv if a!='--nobbt']
 TD=json.loads(open('data-tap.js').read()[12:].rstrip().rstrip(';'));ids={o[0] for o in D['O']}|{o[0] for x in TD.values() for o in x['O']};IB={o[0] for o in D['O']}
 fn=os.path.basename(sys.argv[1]);m=re.search(r'(\d{1,2})_([A-Za-z]{3})[a-z]*_(20\d\d)',fn)
 lab=(f'{int(m.group(1))} {m.group(2).title()}' if m else (sys.argv[2] if len(sys.argv)>2 else ''))

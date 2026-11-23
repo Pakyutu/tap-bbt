@@ -1,15 +1,17 @@
 # Update ST VF/SA per outlet dari file "Monitoring ST Product <bulan> Cluster Rohil" (sheet "ST Product VF" & "ST Product SA").
-# Tambahan: ST BAA & UJT (data-tap.js) selalu ikut diisi; BBT (D.O) hanya kalau pakai --bbt (jangan timpa data BBT yang lebih baru).
+# Tambahan: ST BAA & UJT (data-tap.js) selalu ikut diisi; BBT (D.O) ikut diisi kecuali pakai --nobbt (kalau data BBT lebih baru).
 # Pakai: python3 tools/st_product.py <file.xlsx>   -> kolom vr/vb/ss/sb D.O di digipos.html (SF/PJP tidak diubah)
 import sys,json,re,openpyxl
-BBT='--bbt' in sys.argv
+BBT='--nobbt' not in sys.argv
 wb=openpyxl.load_workbook([a for a in sys.argv[1:] if a[0]!='-'][0],read_only=True,data_only=True)
 n=lambda x:int(x) if isinstance(x,(int,float)) else 0
 def load(sh):
     M={};upd=''
-    for r in wb[sh].iter_rows(min_row=3,max_col=15,values_only=True):
+    for r in wb[sh].iter_rows(min_row=3,max_col=18,values_only=True):
         if r[0] and str(r[0]).isdigit():M[str(r[0])]=(n(r[6]),n(r[7]))
-        if not upd and r[14] and 'update tanggal' in str(r[14]):upd=str(r[14]).replace('update tanggal ','')
+        if not upd:
+            for c in r[14:18]:
+                if c and 'update tanggal' in str(c):upd=str(c).replace('update tanggal ','');break
     return M,upd
 V,uv=load('ST Product VF');A,ua=load('ST Product SA')
 f='digipos.html';s=open(f).read();a=s.find('const D=')+8;D,e=json.JSONDecoder().raw_decode(s[a:])
