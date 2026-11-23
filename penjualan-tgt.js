@@ -1,7 +1,8 @@
 // Tab "Target SF": target bulanan VF per SF = jumlah target semua validity (SURYA, data Stock on Hand per validity X.SOHV).
 // Target/hari normal = target ÷ total HK bulan; Kejar/hari = sisa target ÷ sisa HK (angka SURYA); Rata jual/hari = MTD ÷ HK lewat.
-(function(){if(window.TAPSEL&&TAPSEL!=="BBT")return;
+(function(){
   if(typeof X==='undefined'||!X.SOHV)return;
+  const TL=(window.TAPSEL&&window.TAPSEL!=="BBT"&&typeof TAPS!=='undefined')?(TAPSEL==='ALL'?'Cluster Rohil':'TAP '+TAPS[TAPSEL]):'TAP BBT';
   const V=X.SOHV,VL=[1,2,3,5,7,28],nf=v=>Math.round(v).toLocaleString('id-ID'),es=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const hkN=(d)=>{let n=0;for(let i=1;i<=d;i++){if(new Date(2026,10,i).getDay()!==0)n++}return n};
   const HKT=hkN(30),HKL=hkN(V.ad),HKS=V.sisa;
@@ -19,12 +20,12 @@
   const pcell=(a,t)=>{const p=pc(a,t);return `<span class="tg-p" style="color:${col(p)}">${p}%</span>`};
   function sfTable(){return `<div class="tg-w"><table class="tg-t"><tr><th>SF</th><th>Target bulan</th><th>Jual MTD</th><th>Ach</th><th>Sisa</th><th>Target/hari</th><th>Kejar/hari</th><th>Rata jual/hari</th></tr>
     ${SF.map(r=>`<tr><td>${es(sn(r.sf))}</td><td>${nf(r.tg)}</td><td>${nf(r.act)}</td><td>${pcell(r.act,r.tg)}</td><td>${nf(Math.max(0,r.tg-r.act))}</td><td>${nf(r.tg/HKT)}</td><td><b>${nf(r.td)}</b></td><td>${nf(r.act/HKL)}</td></tr>`).join('')}
-    <tr class="tt"><td>TAP BBT</td><td>${nf(T.tg)}</td><td>${nf(T.act)}</td><td>${pcell(T.act,T.tg)}</td><td>${nf(Math.max(0,T.tg-T.act))}</td><td>${nf(T.tg/HKT)}</td><td>${nf(T.td)}</td><td>${nf(T.act/HKL)}</td></tr></table></div>`}
+    <tr class="tt"><td>${TL}</td><td>${nf(T.tg)}</td><td>${nf(T.act)}</td><td>${pcell(T.act,T.tg)}</td><td>${nf(Math.max(0,T.tg-T.act))}</td><td>${nf(T.tg/HKT)}</td><td>${nf(T.td)}</td><td>${nf(T.act/HKL)}</td></tr></table></div>`}
   function valTable(){const cell=c=>c&&c.tg?`${nf(c.act)}/${nf(c.tg)} ${pcell(c.act,c.tg)}<span class="tg-s">target/hari ${nf(c.tg/HKT)} · kejar ${nf(c.td)}</span>`:c&&c.act?`${nf(c.act)} <span class="tg-s">tanpa target</span>`:'–';
     return `<div class="tg-w"><table class="tg-t"><tr><th>SF</th>${VL.map(v=>`<th>${v} hari</th>`).join('')}</tr>
     ${SF.map(r=>`<tr><td>${es(sn(r.sf))}</td>${VL.map(v=>`<td>${cell(r.c[v])}</td>`).join('')}</tr>`).join('')}
-    <tr class="tt"><td>TAP BBT</td>${VL.map(v=>`<td>${cell(T.c[v])}</td>`).join('')}</tr></table></div>`}
-  function waTxt(){return `*Target VF per SF – TAP BBT*\nData SURYA s/d ${V.ad} Nov · HK ${HKL}/${HKT} (ideal ${exp}%)\n\n`+SF.map((r,i)=>`${i+1}. ${tc(r.sf)}\nTarget ${nf(r.tg)} · MTD ${nf(r.act)} (${pc(r.act,r.tg)}%)\nTarget/hari ${nf(r.tg/HKT)} · kejar/hari ${nf(r.td)}\n`+VL.filter(v=>r.c[v]&&r.c[v].tg).map(v=>{const c=r.c[v];return `  ${v}H: ${nf(c.act)}/${nf(c.tg)} (${pc(c.act,c.tg)}%) · kejar ${nf(c.td)}/hari`}).join('\n')).join('\n\n')+`\n\nTotal: ${nf(T.act)}/${nf(T.tg)} (${pc(T.act,T.tg)}%) · kejar ${nf(T.td)}/hari`}
+    <tr class="tt"><td>${TL}</td>${VL.map(v=>`<td>${cell(T.c[v])}</td>`).join('')}</tr></table></div>`}
+  function waTxt(){return `*Target VF per SF – ${TL}*\nData SURYA s/d ${V.ad} Nov · HK ${HKL}/${HKT} (ideal ${exp}%)\n\n`+SF.map((r,i)=>`${i+1}. ${tc(r.sf)}\nTarget ${nf(r.tg)} · MTD ${nf(r.act)} (${pc(r.act,r.tg)}%)\nTarget/hari ${nf(r.tg/HKT)} · kejar/hari ${nf(r.td)}\n`+VL.filter(v=>r.c[v]&&r.c[v].tg).map(v=>{const c=r.c[v];return `  ${v}H: ${nf(c.act)}/${nf(c.tg)} (${pc(c.act,c.tg)}%) · kejar ${nf(c.td)}/hari`}).join('\n')).join('\n\n')+`\n\nTotal: ${nf(T.act)}/${nf(T.tg)} (${pc(T.act,T.tg)}%) · kejar ${nf(T.td)}/hari`}
   function draw(){const p=document.getElementById('p-tgt');if(!p)return;
     p.innerHTML=`<div class="card"><h3 style="margin:0 0 4px">🎯 Target VF per SF · November</h3><div class="sub">Target bulanan = jumlah target semua validity dari SURYA. Data jual s/d <b>${V.ad} Nov</b> · HK lewat ${HKL} dari ${HKT} (ideal ach <b>${exp}%</b>).</div>
       <div class="tg-b">${[['sf','Per SF'],['val','Per validity']].map(([k,t])=>`<button data-tgm="${k}" class="${mode===k?'on':''}">${t}</button>`).join('')}<button data-tgw="1">Teks WA</button></div>

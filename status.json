@@ -114,6 +114,11 @@
 "g": "Penjualan",
 "n": "Stock Gudang BAA & UJT",
 "d": "2026-11-23"
+},
+{
+"g": "Penjualan",
+"n": "Stock on Hand BAA & UJT",
+"d": "2026-11-23"
 }
 ]
 }
