@@ -50,7 +50,7 @@ const fname=()=>`TAP-BBT-backup-${new Date().toISOString().slice(0,10)}.json`;
 function download(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([pack()],{type:'application/json'}));a.download=fname();document.body.appendChild(a);a.click();a.remove();$('m1').innerHTML='<span class="ok">✓ File backup diunduh ('+fname()+').</span>'}
 $('dl').onclick=download;
 $('sh').onclick=async()=>{const f=new File([pack()],fname(),{type:'application/json'});
-  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Backup TAP BBT'});$('m1').innerHTML='<span class="ok">✓ File backup dikirim.</span>'}catch(e){if(e.name!=='AbortError')download()}}else download()};
+  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Backup Cluster Rohil'});$('m1').innerHTML='<span class="ok">✓ File backup dikirim.</span>'}catch(e){if(e.name!=='AbortError')download()}}else download()};
 let IN=null;
 $('up').onclick=()=>$('fi').click();
 $('fi').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;$('m2').textContent='';

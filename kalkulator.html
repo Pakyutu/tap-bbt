@@ -111,7 +111,7 @@ function showStruk(i){const h=HL[i];if(!h)return;SI=i;const x=hx(h),L=(a,b,st=''
       ${x.R.map(r=>`<div style="padding:5px 0"><div style="font-weight:700">${esc(r.n)}</div><div style="display:flex;justify-content:space-between;color:#5b6b85;font-size:13px"><span>${nf(r.q)} × ${rp(r.h)}</span><span style="color:#14213d;font-weight:600">${rp(r.q*r.h)}</span></div></div>`).join('')}
       <div style="border-top:1px dashed #cfd6e2;margin:8px 0"></div>
       ${L('Subtotal',rp(x.sub))}${x.ds?L('Diskon','− '+rp(x.ds)):''}${L('<b style="color:#14213d">Total bayar</b>','<b style="font-size:16px">'+rp(x.tt)+'</b>')}${x.by?L('Bayar',rp(x.by))+L(x.by>=x.tt?'Kembali':'Kurang',rp(Math.abs(x.by-x.tt))):''}
-      <div style="text-align:center;color:#98a2b6;font-size:11.5px;margin:10px 0 6px">TAP Bagan Batu · Terima kasih</div></div>
+      <div style="text-align:center;color:#98a2b6;font-size:11.5px;margin:10px 0 6px">Cluster Rokan Hilir · Terima kasih</div></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px">
       <button data-sk="sh" style="grid-column:1/-1;padding:13px;border:0;border-radius:12px;background:#c8102e;color:#fff;font-weight:800;font-size:15.5px">📤 Teruskan / Bagikan</button>
       <button data-sk="cp" style="padding:11px;border:1px solid #cfd6e2;border-radius:12px;background:#f4f6fa;color:#14213d;font-weight:700">Salin teks</button>
@@ -130,7 +130,7 @@ function strukPNG(h){const x=hx(h),W=720,P=44,lines=[];const c=document.createEl
   row('No. nota',noStr(h));row('Outlet',h.on||'-');row('Total item',nf(x.q)+' pcs');dash();
   x.R.forEach(r=>{g.textAlign='left';g.fillStyle='#14213d';g.font='700 25px system-ui,sans-serif';g.fillText(r.n,P,y);y+=34;row(nf(r.q)+' × '+rp(r.h),rp(r.q*r.h));y+=4});
   dash();row('Subtotal',rp(x.sub));if(x.ds)row('Diskon','− '+rp(x.ds));row('Total bayar',rp(x.tt),true,28);if(x.by){row('Bayar',rp(x.by));row(x.by>=x.tt?'Kembali':'Kurang',rp(Math.abs(x.by-x.tt)))}
-  g.textAlign='center';g.fillStyle='#98a2b6';g.font='400 21px system-ui,sans-serif';g.fillText('TAP Bagan Batu · Terima kasih',W/2,y+30);
+  g.textAlign='center';g.fillStyle='#98a2b6';g.font='400 21px system-ui,sans-serif';g.fillText('Cluster Rokan Hilir · Terima kasih',W/2,y+30);
   const out=document.createElement('canvas');out.width=W;out.height=y+70;out.getContext('2d').drawImage(c,0,0);return out}
 SK.addEventListener('click',async e=>{const b=e.target.closest('[data-sk]');if(!b){if(e.target===SK)SK.style.display='none';return}const h=HL[SI],k=b.dataset.sk;
   if(k==='x'){SK.style.display='none';return}

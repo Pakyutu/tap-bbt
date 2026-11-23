@@ -1,7 +1,7 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}#otab tr>:first-child,#otab tr>.fz2,#otab tr>.fz3{left:auto!important;box-shadow:none!important}#otab td:first-child,#otab td.fz2,#otab td.fz3{position:static!important}</style><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0b3a6e"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="apple-touch-icon" href="icon-192.png"><script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"))</script></head><body>
 <!doctype html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Penjualan TAP BBT</title>
+<title>Penjualan Cluster Rokan Hilir</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -269,7 +269,7 @@ h1::before{width:14px;height:13px;border-radius:0;vertical-align:0;margin-right:
 <div id="app">
 <div class="top"><div class="w" style="padding-bottom:0">
   <div class="row" style="justify-content:space-between">
-    <div><h1>Dashboard TAP Bagan Batu</h1><div class="sub" id="sub"></div><div id="capinfo"></div></div>
+    <div><h1>Dashboard Cluster Rohil<br><span style="font-weight:500;font-size:.72em;opacity:.88">TAP Bagan Batu</span></h1><div class="sub" id="sub"></div><div id="capinfo"></div></div>
     <div class="row">
       <span class="lbl">Produk</span><div class="seg" id="prod"><button data-v="PV" class="on">PV</button><button data-v="SA">SA</button><button data-v="NGRS">NGRS<span class="shtx"> TRX</span></button></div><span id="pvw" style="display:none"><span class="lbl">Varian</span><div class="seg" id="pvar"></div></span>
       <span class="lbl">Tanggal</span><select id="fa" title="Dari tanggal"></select><span class="mu" style="font-size:12px">s.d.</span><select id="fb" title="Sampai tanggal"></select><div class="gsearch"><input id="gq" type="search" placeholder="Cari outlet, ID, SF…" autocomplete="off" aria-label="Pencarian cepat"><div id="gres" hidden></div></div><button class="btn ftog" id="ftog">Filter</button><button class="btn" id="fsbtn" title="Layar penuh">⛶<span class="shtx"> Layar penuh</span></button><button class="btn" id="wabtn" title="Salin teks laporan untuk WhatsApp">📝<span class="shtx"> Teks WA</span></button><span class="shotw"><button class="btn" id="shot" title="Simpan sebagai gambar">📷<span class="shtx"> Gambar</span></button><div id="shotmenu"><button data-a="share">Bagikan ke WhatsApp…</button><button data-a="copy">Salin gambar</button><button data-a="dl">Unduh JPG</button></div></span>
@@ -625,7 +625,7 @@ function waText(){
       if(pl.length)O.push(`👤 *Petugas tumbuh:* ${pl.map(r=>`${fst(tcase(r.nm))} ${sgn(r.mtd-r.m1)}`).join(', ')}`)}
     if(I.lo.length)O.push(`📦 *Stok rawan (≤2 hari):* ${I.lo.map(r=>`${fst(tcase(r.nm))} ${r.days} hari`).join(', ')}`);
     O.push(`📦 *Stok gudang:* ${f(I.PP.tap.stok)} (${I.PP.tap.days} hari)`)}
-  O.push('');O.push(`_Dashboard Penjualan TAP BBT · data s.d. ${rb()} Nov_`);
+  O.push('');O.push(`_Dashboard Penjualan Cluster Rohil · TAP BBT · data s.d. ${rb()} Nov_`);
   return O.join('\n').replace(/\n{3,}/g,'\n\n');
 }
 function showText(t,title){$('watitle').textContent=title||'Teks laporan WA';$('watext').value=t;$('wamodal').classList.add('open')}
@@ -795,7 +795,7 @@ async function shot(a){
     const b=await capture('jpg');
     if(a==='share'){const file=new File([b],fname(),{type:'image/jpeg'});
       if(navigator.canShare&&navigator.canShare({files:[file]})){
-        try{await navigator.share({files:[file],title:'Dashboard TAP BBT'});return}
+        try{await navigator.share({files:[file],title:'Dashboard Cluster Rohil'});return}
         catch(e){if(e&&e.name==='AbortError'){toast('Dibatalkan');return}}}
       toast('Bagikan langsung tidak bisa di sini, gambar disimpan dulu.');}
     await saveFile(b);

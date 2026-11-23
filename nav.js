@@ -1,4 +1,4 @@
-// Navigasi bawah TAP BBT: Beranda · DIGIPOS · Penjualan · Alat (Penyusun WL, Kalkulator, Cek WL, Backup)
+// Navigasi bawah Cluster Rohil: Beranda · DIGIPOS · Penjualan · Alat (Penyusun WL, Kalkulator, Cek WL, Backup)
 (function(){
   var here = location.pathname.split("/").pop() || "index.html";
   var ic = {

@@ -1,6 +1,6 @@
 {
-  "name": "TAP Bagan Batu",
-  "short_name": "TAP BBT",
+  "name": "Cluster Rokan Hilir",
+  "short_name": "Rohil",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
@@ -34,7 +34,7 @@
       "purpose": "maskable"
     }
   ],
-  "description": "Dashboard DIGIPOS dan Penjualan TAP Bagan Batu",
+  "description": "Dashboard DIGIPOS dan Penjualan Cluster Rokan Hilir",
   "shortcuts": [
     {
       "name": "Dashboard DIGIPOS",

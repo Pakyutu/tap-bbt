@@ -1,5 +1,5 @@
 // Versi cache: naikkan angka ini kalau ada perubahan besar pada file app.
-const V = "tap-bbt-v163";
+const V = "tap-bbt-v164";
 const SAME = self.location.origin;
 const SHELL = [
   "./", "index.html", "digipos.html", "penjualan.html", "wl.html","kalkulator.html","backup.html","cekst.html","cekst-data.js","c128.js", "manifest.json",
@@ -80,7 +80,7 @@ self.addEventListener("push", e => {
       const tg = new Date(mx + "T00:00:00");
       body = nm.slice(0, 5).join(", ") + (nm.length > 5 ? " +" + (nm.length - 5) : "") + " · " + tg.getDate() + "/" + (tg.getMonth() + 1);
     } catch {}
-    await self.registration.showNotification("TAP BBT · Data baru masuk", { body, icon: "icon-192.png", badge: "icon-192.png", tag: "data-baru" });
+    await self.registration.showNotification("Cluster Rohil · Data baru masuk", { body, icon: "icon-192.png", badge: "icon-192.png", tag: "data-baru" });
   })());
 });
 self.addEventListener("notificationclick", e => {
