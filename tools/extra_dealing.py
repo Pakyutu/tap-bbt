@@ -1,7 +1,7 @@
 # Extra Dealing Misi (file "Dealing_EXTRA_..._<bulan>.xlsx"): sheet Raw = outlet yang berhak, Sheet1 = outlet yang sudah ikut (klik) Extra Dealing.
-# Pakai: python3 tools/extra_dealing.py <file.xlsx> "DD Nov"  -> baris const XD=... di digipos-xd.js (hanya outlet PJP di D.O)
+# Pakai: python3 tools/extra_dealing.py <file.xlsx> "DD Nov"  -> baris const XD=... di digipos-xd.js (outlet PJP semua TAP Rohil: BBT+BAA+UJT)
 import sys,json,re,openpyxl
-s=open('digipos.html').read();i=s.index('const D=')+8;D,_=json.JSONDecoder().raw_decode(s[i:]);ids={o[0] for o in D['O']}
+s=open('digipos.html').read();i=s.index('const D=')+8;D,_=json.JSONDecoder().raw_decode(s[i:]);from tapids import ALL as ids
 wb=openpyxl.load_workbook(sys.argv[1],read_only=True,data_only=True)
 n=lambda v:int(v) if isinstance(v,(int,float)) else 0
 J={str(r[3]):r for r in wb['Sheet1'].iter_rows(min_row=2,max_col=14,values_only=True) if r[3]}

@@ -1,10 +1,13 @@
 # Program Dealing Misi Sultan Spesial SO (file "Monitoting_Program_Dealing_Misi_Sultan_Spesial_SO.xlsx", sheet Raw)
-# Pakai: python3 tools/sultan_so.py <file.xlsx> "DD Nov"  -> baris const CSO=... di digipos-sso.js (hanya outlet PJP di D.O)
+# Pakai: python3 tools/sultan_so.py <file.xlsx> "DD Nov"  -> baris const CSO=... di digipos-sso.js (outlet PJP semua TAP Rohil: BBT+BAA+UJT)
 import sys,json,re,openpyxl
-s=open('digipos.html').read();i=s.index('const D=')+8;D,_=json.JSONDecoder().raw_decode(s[i:]);ids={o[0] for o in D['O']}
+s=open('digipos.html').read();i=s.index('const D=')+8;D,_=json.JSONDecoder().raw_decode(s[i:]);from tapids import ALL as ids
 wb=openpyxl.load_workbook(sys.argv[1],read_only=True,data_only=True)
 n=lambda v:v if isinstance(v,(int,float)) else 0
 per=next((str(c) for c in next(wb['Raw'].iter_rows(max_row=1,values_only=True)) if c and 'tgl' in str(c)),'').replace('tgl ','').strip()
+if not per:  # format baru: dua sel tanggal (mulai, akhir)
+    dd=[c for c in next(wb['Raw'].iter_rows(max_row=1,values_only=True)) if hasattr(c,'day')]
+    if len(dd)>=2:per=f"{dd[0].day}-{dd[-1].day} {dd[-1].strftime('%b')} {dd[-1].year}"
 o={}
 for r in wb['Raw'].iter_rows(min_row=3,max_col=12,values_only=True):
     if r[0] and str(r[0]) in ids:o[str(r[0])]=[int(n(r[2])),int(n(r[6])),int(n(r[7])),round(float(n(r[10])),3)]

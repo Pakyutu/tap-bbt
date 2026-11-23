@@ -1,8 +1,8 @@
 # Program Cuan PV Redeem: python3 tools/cuan_pv.py <Monitoring_Klik_Misi_dan_FR.xlsx | CUAN_PV_Redeem_YYYYMMDD.xlsx> "DD Nov"
-# Ambil sheet "Reedem PV" -> baris const CU=... di digipos-cuan.js (hanya outlet PJP di D.O).
+# Ambil sheet "Reedem PV" -> baris const CU=... di digipos-cuan.js (outlet PJP semua TAP Rohil: BBT+BAA+UJT).
 import sys,json,re,openpyxl
 s=open('digipos.html').read();i=s.index('const D=')+8
-D,_=json.JSONDecoder().raw_decode(s[i:]);ids={o[0] for o in D['O']}
+D,_=json.JSONDecoder().raw_decode(s[i:]);from tapids import ALL as ids
 wb=openpyxl.load_workbook(sys.argv[1],read_only=True,data_only=True)
 n=lambda v:v if isinstance(v,(int,float)) else 0
 o={}

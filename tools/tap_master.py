@@ -12,7 +12,7 @@ for r in R[1:]:
     t=SH.get(r[ix['TAP']])
     if not t or r[ix['KET PJP']]!=1: continue
     i=str(r[ix['Outlet ID']])
-    O.setdefault(t,[]).append([i,r[ix['Nama Outlet']],str(r[ix['No Rs']] or ''),(r[ix['Hari']] or '').title(),(r[ix['Nama Sf']] or '').title(),(r[ix['Kecamatan']] or '').title(),0,0,0,0])
+    O.setdefault(t,[]).append([i,str(r[ix['Nama Outlet']] or '').strip(),str(r[ix['No Rs']] or ''),(r[ix['Hari']] or '').title(),(r[ix['Nama Sf']] or '').title(),(r[ix['Kecamatan']] or '').title(),0,0,0,0])
     if r[ix['LOGIN CODE']]: U[i]=r[ix['LOGIN CODE']]
 out={}
 for t,L in O.items():
@@ -24,6 +24,8 @@ if os.path.exists('data-tap.js'):  # pertahankan ST yang sudah terisi
     for x in out.values():
         for o in x['O']:
             if o[0] in M:o[6:]=M[o[0]]
-    for k,x in out.items():x['K']=KK.get(k,{})
+    for k,x in out.items():
+        x['K']=KK.get(k,{})
+        if old.get(k,{}).get('FR'):x['FR']=old[k]['FR']
 open('data-tap.js','w').write('window.TAPD='+json.dumps(out,ensure_ascii=False,separators=(',',':'))+';\n')
 print({t:len(v['O']) for t,v in out.items()})

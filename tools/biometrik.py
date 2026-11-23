@@ -3,6 +3,7 @@
 #  2) digipos.html: D.FR = Top 20 outlet TAP BBT (Sheet1 kolom "TOP 20" = TOP 20 OUTLET TAP, tap BAGAN BATU), nama/SF/kecamatan dari PJP (D.O), jumlah = Nov MTD, flag = jumlah>0
 # Pakai: python3 tools/biometrik.py <file.xlsx> "DD Nov"   (lalu update status.json: Biometrik + FR Biometric)
 import sys,json,re,collections,openpyxl
+from tapids import ALL,TD
 f,lab=sys.argv[1],sys.argv[2];d=int(lab.split()[0])
 w=openpyxl.load_workbook(f,read_only=True,data_only=True)
 c=collections.defaultdict(lambda:[0,0,0])
@@ -15,10 +16,13 @@ for r in it:
         c[oid][0]+=1
         if dt.day<=d:c[oid][1]+=1
     elif dt.month==11 and dt.day<=d:c[oid][2]+=1
-top={}
+top={};topx={'BAGAN SIAPI-API':{},'UJUNG TANJUNG':{}}
 for r in w['Sheet1'].iter_rows(min_row=5,values_only=True):
     if r[2]=='TOP 20 OUTLET TAP' and r[5]=='BAGAN BATU':top.setdefault(str(r[0]),(r[3],r[4]))
+    elif r[2]=='TOP 20 OUTLET TAP' and r[5] in topx:topx[r[5]].setdefault(str(r[0]),(r[3],r[4]))
 p='digipos-cvm.js';t=open(p).read();m=re.search(r'const CV=',t);CV,e=json.JSONDecoder().raw_decode(t[m.end():])
+for oid in ALL:
+    if oid not in CV['v']:CV['v'][oid]=[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
 ch=0
 for oid,v in CV['v'].items():
     n=c.get(oid,[0,0,0])
@@ -38,3 +42,13 @@ rows.sort(key=lambda r:(r[2],r[3],r[0]))
 old={r[0] for r in D['FR']['rows']};D['FR']={'d':d,'rows':rows}
 s=s[:i]+json.dumps(D,ensure_ascii=False,separators=(',',':'))+s[i+e:];open(p,'w').write(s)
 print('FR Top 20:',len(rows),'ikut',sum(r[5] for r in rows),'masuk',sorted({r[0] for r in rows}-old),'keluar',sorted(old-{r[0] for r in rows}))
+
+# FR Top 20 BAA & UJT -> data-tap.js
+for k,nmk in (('BAA','BAGAN SIAPI-API'),('UJT','UJUNG TANJUNG')):
+    OO={o[0]:o for o in TD[k]['O']};rr=[]
+    for oid,(kec,sf) in topx[nmk].items():
+        o=OO.get(oid);n=c.get(oid,[0,0,0])[2]
+        rr.append([oid,o[1] if o else '?',(o[4] if o else str(sf).title()),(o[5] if o else str(kec).title()),n,1 if n>0 else 0])
+    rr.sort(key=lambda r:(r[2],r[3],r[0]));TD[k]['FR']={'d':d,'rows':rr}
+    print('FR',k,len(rr),'ikut',sum(r[5] for r in rr))
+open('data-tap.js','w').write('window.TAPD='+json.dumps(TD,ensure_ascii=False,separators=(',',':'))+';\n')
