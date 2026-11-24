@@ -64,6 +64,14 @@ a.mc.wide{grid-column:1/-1;flex-direction:row;align-items:center}
 .ban .nudge{background:rgba(255,255,255,.16);color:#fff;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2)}
 .ban .nudge b{color:#fff;text-decoration:underline}
 .ban .pill,.ban .pill.ok,.ban .pill.wn,.ban .pill.in,.ban .pill.bd{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.22)}
+.ban{background:linear-gradient(135deg,#e0364e,#b3123a 45%,#3b3fd1);background-size:200% 200%;animation:aur 14s ease-in-out infinite alternate}
+.ban::after{content:"";position:absolute;inset:-40%;pointer-events:none;background:radial-gradient(40% 35% at 25% 30%,rgba(255,170,120,.35),transparent 70%),radial-gradient(35% 30% at 80% 70%,rgba(90,140,255,.45),transparent 70%);animation:aur2 18s ease-in-out infinite alternate;mix-blend-mode:screen}
+.ban::before{animation:wv 9s linear infinite}
+.hero.k,.menu a.mc{will-change:transform}
+@keyframes aur{to{background-position:100% 100%}}
+@keyframes aur2{to{transform:translate(8%,-6%) rotate(12deg)}}
+@keyframes wv{to{background-position:160px bottom,-160px 30px}}
+@media (prefers-reduced-motion:reduce){.ban,.ban::after,.ban::before{animation:none}}
 .rise{animation:rise .45s cubic-bezier(.2,.7,.2,1) both}.rise:nth-child(2){animation-delay:.05s}.rise:nth-child(3){animation-delay:.1s}.rise:nth-child(4){animation-delay:.15s}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}}
 </style>
