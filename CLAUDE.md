@@ -10,7 +10,7 @@
 - Desain "Titik Gerak": token & gaya global di `ui.css` (dipasang di semua halaman, memetakan variabel lama --bg/--card/--tx/--mu/--bd/--ac dst). Navigasi bawah di `nav.js`. Halaman baru wajib pakai ui.css + nav.js.
 - SN terpakai (tidak bisa di-ST lagi) dicatat di `tools/cekst_terpakai.txt` → otomatis tidak dihitung di Cek WL. Tanpa build ulang: `python3 tools/cekst_terpakai_apply.py`.
 - Outlet PV/SA/NGRS (export SURYA csv): `python3 tools/surya_outlet.py --pv Detail_Outlet_PV_*.csv --sa Detail_Outlet_SA_*.csv --ngrs NGRS_2026_TRX.csv` (cutoff dari header "2026-10 MoM 1-DD"), update status.json. CVM: cek dulu, kalau Nov program masih 0 jangan dimasukkan.
-- Stock Gudang per SF (export SURYA Stock_Gudang_SF_*.csv): `python3 tools/surya_sgsf.py <csv> <tgl>` -> X.SGF (kartu "Stok lengkap per SF" di tab Stok, melengkapi Stock on Hand).
+- Stock Gudang per SF (export SURYA Stock_Gudang_SF_*.csv): `python3 tools/surya_sgsf.py <csv> <tgl>` -> X.SGF BBT + TAPJ[BAA|UJT].SGF (satu file semua TAP; kartu "Stok lengkap per SF" di tab Stok, melengkapi Stock on Hand).
 - Stock Gudang TAP (export SURYA Stock_Gudang_ALL_*.csv): `python3 tools/surya_sgall.py <csv> <tgl>` -> D.STK snapshot.
 - ST per outlet juga bisa dari file "Monitoring ST Product <bulan> Cluster Rohil": `python3 tools/st_product.py <file.xlsx>` (pakai yang paling baru antara ini dan ST_DIGIPOS), lalu ganti label "update DD Nov" + D.VER.
 - Extra Dealing Misi (file Dealing_EXTRA_*.xlsx, sheet Raw + Sheet1): `python3 tools/extra_dealing.py <file.xlsx> "DD Nov"` -> digipos-xd.js (tab 🎯 Extra Dealing), update status.json.
