@@ -120,6 +120,14 @@ def proses(msg):
         nm=doc['file_name'];spec=re.sub(r'\.txt$','',nm,flags=re.I)
     else:
         t=(msg.get('text') or '').strip()
+        ls=re.findall(r'https?://\S+',t)
+        if len(ls)>=2 and not re.sub(r'https?://\S+|/?link\b','',t,flags=re.I).strip():  # banyak link sekaligus -> proses satu per satu
+            ub=False
+            for k,u in enumerate(ls,1):
+                PG[0]=None;say(f'🔗 Link {k}/{len(ls)}')
+                try:ub|=bool(proses({**msg,'text':u}))
+                except Exception as e:say(f'Error link {k}: {str(e)[:200]}')
+            return ub
         # paste panjang dipecah beberapa pesan: "mulai mom pv 21" -> bagian-bagian paste -> "selesai"
         BUF=R/'.inbox'/'paste.txt';BUF.parent.mkdir(exist_ok=True)
         if re.match(r'^/?tes[\s_]*notif(?:ikasi)?$',t,re.I):  # uji notifikasi push ke semua HP yang sudah mengaktifkan lonceng
@@ -161,7 +169,7 @@ def proses(msg):
         qm=QRY.match(t) if not lm else None
         if qm:kueri(msg,qm.group(1).lower(),qm.group(2));return False
         if not lm and not CMD.match(spec):
-            PG[0]=ACK;pg('Kirim FILE (xlsx/csv), atau perintah: status · tes notif · sn <nomor> · outlet <id/nama> · mom pv 20 · soh sa 19 · mulai mom pv 21 (paste panjang) · tempel link Drive saja');return False
+            PG[0]=ACK;pg('Kirim FILE (xlsx/csv), atau perintah: status · tes notif · sn <nomor> · outlet <id/nama> · mom pv 20 · soh sa 19 · mulai mom pv 21 (paste panjang) · tempel link Drive saja (boleh banyak link sekaligus, satu per baris)');return False
     low=re.sub(r'[\s]+','_',nm.lower());cap=msg.get('caption')
     d,mo,iso=tgl(cap);fd=re.search(r'(\d{4})-(\d\d)-(\d\d)',nm)
     if fd and not cap:iso=fd.group(0);d=int(fd.group(3));mo=int(fd.group(2))
