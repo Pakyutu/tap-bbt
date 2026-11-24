@@ -67,6 +67,11 @@
 },
 {
 "g": "Penjualan",
+"n": "Tren bulanan & inject (semua TAP)",
+"d": "2026-11-24"
+},
+{
+"g": "Penjualan",
 "n": "Stock on Hand",
 "d": "2026-11-23"
 },
