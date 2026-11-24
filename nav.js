@@ -55,3 +55,6 @@
   function net(){off.style.display=navigator.onLine?"none":"block"}
   addEventListener("online",net);addEventListener("offline",net);net();
 })();
+// Versi baru aplikasi: muat ulang sekali otomatis supaya tampilan terbaru langsung terlihat
+(function(){try{if(!navigator.serviceWorker)return;var had=!!navigator.serviceWorker.controller,done=false;
+navigator.serviceWorker.addEventListener("controllerchange",function(){if(!had||done)return;done=true;location.reload()})}catch(_){}})();
