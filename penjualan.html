@@ -323,7 +323,8 @@ if(TAP!=="BBT"){const ks=TAP==="ALL"?["BAA","UJT"]:[TAP];let O2=[],N2=[];
  if(TAP==="ALL"){const n=D.CP.length,j=D.CP.indexOf(D.C),m=D.CN.length,jn=D.CN.length-1,sl=(a,k,q)=>a.slice(0,10).concat([a[10+q],a[10+k+q]]);
   O2=D.O.map(o=>Object.assign({},o,{pv:sl(o.pv,n,j),sa:sl(o.sa,n,j)}));N2=D.N.map(r=>Object.assign({},r,{v:sl(r.v,m,jn)}))}
  ks.forEach(k=>{O2.push(...TAPJ[k].O);N2.push(...TAPJ[k].N)});
- D.O=O2;D.N=N2;D.CP=[D.C];D.CN=[D.C];D.STK=TAP==='ALL'?[]:(TAPJ[TAP].STK||[]);
+ D.O=O2;D.N=N2;D.CP=[D.C];D.CN=[D.C];D.STK=TAP==='ALL'?(()=>{const src=[D.STK||[]].concat(ks.map(k=>TAPJ[k].STK||[]));if(src.some(a=>!a.length))return [];const ds=[...new Set([].concat(...src.map(a=>a.map(x=>x.d))))].sort((a,b)=>a-b),o=[];
+  ds.forEach(d=>{const pk=src.map(a=>a.filter(x=>x.d<=d).pop());if(pk.some(x=>!x))return;const m=new Map();pk.forEach(s=>s.items.forEach(([g,n,q,...r])=>{const key=g+'|'+n;const e=m.get(key);if(e)e[2]+=q;else m.set(key,[g,n,q,...r])}));o.push({d,items:[...m.values()]})});return o})():(TAPJ[TAP].STK||[]);
  if(TAP!=="ALL")D.P=TAPJ[TAP].P||{};else{const P0=D.P,P2={};for(const key in P0){P2[key]={};for(const day in P0[key]){const L=[P0[key][day]].concat(ks.map(k=>((TAPJ[k].P||{})[key]||{})[day]));if(L.some(x=>!x))continue;const t={nm:"CLUSTER ROHIL",mtd:0,m1:0,full:0,daily:0,stok:0,days:null};L.forEach(x=>{["mtd","m1","full","daily","stok"].forEach(f=>t[f]+=x.tap[f]||0)});t.days=t.daily?Math.round(t.stok/t.daily):null;P2[key][day]={tap:t,rows:[].concat(...L.map(x=>x.rows))}}}D.P=P2}}
 const MON=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt'];
 const HARI=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
@@ -830,7 +831,7 @@ $('q').oninput=e=>{S.q=e.target.value;S.page=0;render()};
 $('st').onchange=e=>{S.st=e.target.value;S.page=0;render()};
 rStok();render();
 </script><script>(function(){const e=document.getElementById("ftap");if(!e)return;e.value=TAP;e.onchange=function(){try{localStorage.setItem("tap",e.value)}catch(x){}location.search="?tap="+e.value};
-if(TAP!=="BBT"){const b=document.createElement("div");b.className="card";b.style.cssText="margin:10px 12px;font-size:.85em";b.innerHTML="ℹ️ <b>"+(TAP==="ALL"?"Gabungan Rohil":TAPS[TAP])+"</b>: data outlet (PV, SA, NGRS) per 20 Nov. MoM Petugas (1–21 Nov, varian Reguler/By.U/Simpati hanya tgl 21) &amp; Stok Gudang (23 Nov) sudah ada; Target &amp; riwayat outlet tanggal lain belum.";const p=document.querySelector(".panel,#P,main")||document.body.firstElementChild;p.parentNode.insertBefore(b,p)}})()</script>
+if(TAP!=="BBT"){const b=document.createElement("div");b.className="card";b.style.cssText="margin:10px 12px;font-size:.85em";b.innerHTML="ℹ️ <b>"+(TAP==="ALL"?"Gabungan Rohil":TAPS[TAP])+"</b>: data outlet (PV, SA, NGRS) s/d "+D.C+" Nov; Petugas, Stok, Target SF &amp; Inject ikut TAP terpilih. Riwayat outlet tanggal lain hanya tersedia untuk BBT.";const p=document.querySelector(".panel,#P,main")||document.body.firstElementChild;p.parentNode.insertBefore(b,p)}})()</script>
 </body></html>
 
 <script src="penjualan-x.js"></script><script src="penjualan-tgt.js"></script><script>window.TABG={key:'pj',groups:[['ring','📊 Ringkasan',['ring','tren','tem']],['wil','🗺️ Wilayah',['kec','sf']],['pet','👥 Petugas',['pet','tgt']],['out','🏪 Outlet',['out','kunj']],['stok','📦 Stok',['stok']]],names:{ring:'Ringkasan',tren:'Tren bulanan',tem:'Temuan',kec:'Kecamatan',sf:'SF',pet:'Petugas (SURYA)',tgt:'Target SF',out:'Outlet',kunj:'Kunjungan',stok:'Stok'}};</script><script src="tabgroup.js"></script><script src="nav.js"></script><style>

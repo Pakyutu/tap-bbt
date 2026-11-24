@@ -233,7 +233,7 @@ const X={"cut": 23, "mon": ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ag
   }
   document.addEventListener('click',e=>{const c=e.target.closest('#xsgf td[title]');if(!c)return;const d=document.getElementById('xsgfd');if(d)d.textContent=c.title||'–'});
   function putSoh(){const ps=document.getElementById('p-stok');if(!ps)return;const old=document.getElementById('xsoh');const h=sohCard();
-    if(old)old.outerHTML=h;else ps.insertAdjacentHTML('afterbegin',h);const ov=document.getElementById('xsohv');if(ov)ov.remove();const om=document.getElementById('xsohm');if(om)om.remove();const og=document.getElementById('xsgf');if(og)og.remove();document.getElementById('xsoh').insertAdjacentHTML('afterend',sohMx()+((NB?'':(sohP==='PV'?sohVal():''))+sgfCard()))}
+    if(old)old.outerHTML=h;else ps.insertAdjacentHTML('afterbegin',h);const ov=document.getElementById('xsohv');if(ov)ov.remove();const om=document.getElementById('xsohm');if(om)om.remove();const og=document.getElementById('xsgf');if(og)og.remove();document.getElementById('xsoh').insertAdjacentHTML('afterend',sohMx()+((sohP==='PV'?sohVal():'')+sgfCard()))}
   document.addEventListener('click',e=>{const b=e.target.closest('#xsoh [data-sp]');if(b){sohP=b.dataset.sp;putSoh()}const m=e.target.closest('#xsohm [data-mb]');if(m){mxB=m.dataset.mb;const o=document.getElementById('xsohm');if(o)o.outerHTML=sohMx()}});
   const oPet=window.rPet,oStok=window.rStok;
   const bbBar=()=>{const c=(typeof BB!=='undefined')&&BB[S.prod];return c?`<div class="note" style="margin-bottom:10px">📌 <b>Catatan khusus:</b> ${c.ket}</div>`:''};
