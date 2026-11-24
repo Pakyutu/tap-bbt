@@ -14,19 +14,19 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:6px 5px;b
 .wn{color:var(--wn);font-size:12.5px;margin:4px 0}.tw{overflow-x:auto}.mono{font:12px ui-monospace,Menlo,monospace}
 .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px}.kpi div{background:var(--soft);border-radius:10px;padding:9px 11px;font-size:12px;color:var(--mu)}.kpi b{display:block;font-size:19px;color:var(--tx)}
 </style></head><body><div class="w">
-<h1>Dropingan WL · Bagan Siapi-api</h1><div class="sub" id="sub"></div>
-<div class="tabs" id="tp"></div><div id="o"></div>
+<h1 id="h1">Dropingan WL</h1><div class="sub" id="sub"></div>
+<div class="tabs" id="tt"></div><div class="tabs" id="tp"></div><div id="o"></div>
 <div class="sub">Pembanding ke ST belum ada (butuh raw ST BAA). Untuk TAP lain, tambahkan lewat <span class="mono">tools/wl_tap.py</span>.</div>
 </div>
 <script src="wl-tap.js"></script>
 <script>
 const nf=v=>Math.round(v).toLocaleString('id-ID'),es=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const T='BAA',W=WLT[T];let P='VF';
+const TN={BAA:'Bagan Siapi-api',UJT:'Ujung Tanjung'},TK=Object.keys(WLT);let T=TK[0],W=WLT[T],P='VF';
 const MN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],fd=s=>{const[y,m,d]=s.split('-');return +d+' '+MN[+m-1]};
 function wr(R){const w=[];const S=[...R].sort((a,b)=>a[3].length-b[3].length||(a[3]<b[3]?-1:1));
  for(let i=1;i<S.length;i++){const x=S[i-1],y=S[i];if(x[3].length===y[3].length&&BigInt(y[3])<=BigInt(x[4]))w.push(`SN tumpang tindih: ${x[3]}–${x[4]} (${x[1]}, ${fd(x[0])}) dan ${y[3]}–${y[4]} (${y[1]}, ${fd(y[0])})`)}
  R.forEach(r=>{if(/VF 7GB (52|57)H/.test(r[2]))w.push(`Denom meragukan "${r[2]}": ${r[1]} ${r[3]}–${r[4]} (${nf(r[5])} pcs, ${fd(r[0])})`)});return w}
-function draw(){const R=W[P],sfs=[...new Set(R.map(r=>r[1]))],pk=[...new Set(R.map(r=>r[2]))].sort(),tot=R.reduce((a,r)=>a+r[5],0);
+function draw(){W=WLT[T];const R=W[P],sfs=[...new Set(R.map(r=>r[1]))],pk=[...new Set(R.map(r=>r[2]))].sort(),tot=R.reduce((a,r)=>a+r[5],0);
  const M={};R.forEach(r=>{(M[r[1]]=M[r[1]]||{})[r[2]]=(M[r[1]][r[2]]||0)+r[5]});
  const dd={};R.forEach(r=>dd[r[0]]=(dd[r[0]]||0)+r[5]);const ds=Object.keys(dd).sort();
  const w=wr(R);
@@ -35,7 +35,9 @@ function draw(){const R=W[P],sfs=[...new Set(R.map(r=>r[1]))],pk=[...new Set(R.m
  <tr><td><b>Total</b></td>${pk.map(p=>`<td><b>${nf(sfs.reduce((a,s)=>a+(M[s][p]||0),0))}</b></td>`).join('')}<td><b>${nf(tot)}</b></td></tr></table></div></div>
  <div class="card"><h2>Per tanggal drop</h2><div class="tw"><table><tr><th>Tanggal</th><th>Pcs</th></tr>${ds.map(d=>`<tr><td>${fd(d)}</td><td>${nf(dd[d])}</td></tr>`).join('')}</table></div></div>
  ${w.length?`<div class="card"><h2>⚠️ Perlu dicek (${w.length})</h2>${w.map(x=>`<div class="wn">${es(x)}</div>`).join('')}</div>`:''}`}
-document.getElementById('sub').textContent='Data SN STOCK SF Nov 2026 · sampai '+fd(W.upd);
+function hd(){W=WLT[T];document.getElementById('h1').textContent='Dropingan WL · '+(TN[T]||T);document.getElementById('sub').textContent='Data SN STOCK SF Nov 2026 · sampai '+fd(W.upd)}
+document.getElementById('tt').innerHTML=TK.length>1?TK.map(k=>`<button data-t="${k}" class="${k===T?'on':''}">${TN[k]||k}</button>`).join(''):'';
+document.getElementById('tt').onclick=e=>{const b=e.target.closest('button');if(!b)return;T=b.dataset.t;[...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));hd();draw()};hd();
 document.getElementById('tp').innerHTML=['VF','SA'].map(k=>`<button data-k="${k}" class="${k===P?'on':''}">${k==='VF'?'VF (Reguler & ByU)':'SA'}</button>`).join('');
 document.getElementById('tp').onclick=e=>{const b=e.target.closest('button');if(!b)return;P=b.dataset.k;[...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));draw()};draw();
 </script><script src="nav.js"></script></body></html>
