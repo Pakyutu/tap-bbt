@@ -28,11 +28,11 @@ details summary{cursor:pointer;color:var(--mu);font-size:12.5px;margin-top:6px}
 table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px 8px;border-bottom:1px solid var(--bd);text-align:right}th{color:var(--mu);font-size:11.5px;font-weight:600}td:first-child,th:first-child{text-align:left}
 .ag{font-size:12.5px;margin-top:8px}.ag.a3{color:var(--ac)}.ag.a2{color:var(--wn)}.ag.a4{color:var(--mu)}td.ag{font-size:13px;margin:0}
 .bk{margin:2px 0 3px;font-size:12.5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}.cpb{border:1px solid var(--bd);background:var(--soft);color:var(--tx);border-radius:999px;padding:2px 9px;font-size:11.5px;cursor:pointer}</style><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="ui.css"></head><body><div class="w">
-<h1>Cek WL vs ST</h1><div class="sub" id="sub"></div><a href="wl-tap.html" class="card" style="display:block;text-decoration:none;color:inherit"><b>📦 Dropingan BAA &amp; UJT</b><div class="sub" style="margin:2px 0 0">SN yang di-drop ke SF (Nov). Pembanding ST menyusul.</div></a>
+<h1>Cek WL vs ST</h1><div class="sub" id="sub"></div><div class="tabs" id="tapb"></div>
 <div class="tabs" id="pt"></div>
 <div id="res"></div>
 </div>
-<script src="cekst-data.js"></script>
+<script src="cekst-data.js"></script><script src="wl-tap.js"></script>
 <script>
 const $=i=>document.getElementById(i),nf=v=>Math.round(v).toLocaleString('id-ID'),pc=(a,b)=>b?Math.round(a/b*100):0,esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const col=p=>p>=90?'var(--ok)':p>=75?'var(--wn)':'var(--ac)',tg=d=>{const x=new Date(d+'T00:00:00');return x.getDate()+' '+['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][x.getMonth()]};
@@ -90,6 +90,26 @@ document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{};if(d.cp){
   if(d.p){P=d.p;document.querySelectorAll('#pt button').forEach(b=>b.classList.toggle('on',b.dataset.p===P));draw()}
   if(d.f){F=d.f;draw()}
   if(d.cs!=null)copy(sfTxt(CK.G[P].sf[+d.cs]),t);if(t.id==='cpr')copy(rekap(),t);if(t.id==='cpb')copy(belum(),t)});
-draw();
+
+// ---- Filter TAP: BBT = Cek WL vs ST (tab di bawah); BAA/UJT = dropingan SN per SF (pembanding ST menyusul)
+const TN={BBT:'BBT',BAA:'BAA',UJT:'UJT'};let TP='BBT';try{const t=new URLSearchParams(location.search).get('tap')||localStorage.getItem('tap');if(TN[t])TP=t}catch(e){}
+let DP='VF';const MNm=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],fdd=s=>{const[y,m,d]=s.split('-');return +d+' '+MNm[+m-1]};
+function drawD(){const W=(typeof WLT!=='undefined')&&WLT[TP];const R0=$('res');
+  if(!W){R0.innerHTML=`<div class="card"><h2>Dropingan ${TP}</h2><div class="sub">Belum ada data dropingan ${TP}. Kirim file "SN STOCK SF" ${TP} ke bot.</div></div>`;return}
+  const R=W[DP],sfs=[...new Set(R.map(r=>r[1]))],pk=[...new Set(R.map(r=>r[2]))].sort(),tot=R.reduce((a,r)=>a+r[5],0),M={};
+  R.forEach(r=>{(M[r[1]]=M[r[1]]||{})[r[2]]=(M[r[1]][r[2]]||0)+r[5]});const dd={};R.forEach(r=>dd[r[0]]=(dd[r[0]]||0)+r[5]);const ds=Object.keys(dd).sort();
+  const X=(W.X||[]).filter(r=>r[0]===DP),xt=X.reduce((a,r)=>a+r[6],0);
+  R0.innerHTML=`<div class="tabs">${['VF','SA'].map(k=>`<button data-dp="${k}" class="${k===DP?'on':''}">${k==='VF'?'VF · Reguler & ByU':'SA · Simpati & ByU'}</button>`).join('')}</div>
+  <div class="card"><div class="kpi" style="grid-template-columns:repeat(3,1fr)"><div><small>Total di-drop</small><b>${nf(tot)}</b></div><div><small>Baris SN</small><b>${R.length}</b></div><div><small>Tgl terakhir</small><b>${fdd(ds[ds.length-1])}</b></div></div>
+  <div class="sub" style="margin:10px 0 0">Data SN STOCK SF Nov 2026 s/d ${fdd(W.upd)}. Pembanding ST ${TP} belum ada (butuh raw ST yang memuat ${TP}).</div></div>
+  <div class="card"><h2>Per SF × paket</h2><div style="overflow-x:auto"><table><tr><th>SF</th>${pk.map(p=>`<th>${esc(p)}</th>`).join('')}<th>Total</th></tr>${sfs.map(s=>`<tr><td>${esc(s)}</td>${pk.map(p=>`<td>${M[s][p]?nf(M[s][p]):'–'}</td>`).join('')}<td><b>${nf(Object.values(M[s]).reduce((a,b)=>a+b,0))}</b></td></tr>`).join('')}<tr><td><b>Total</b></td>${pk.map(p=>`<td><b>${nf(sfs.reduce((a,s)=>a+(M[s][p]||0),0))}</b></td>`).join('')}<td><b>${nf(tot)}</b></td></tr></table></div></div>
+  <div class="card"><h2>Per tanggal drop</h2><table><tr><th>Tanggal</th><th>Pcs</th></tr>${ds.map(d=>`<tr><td>${fdd(d)}</td><td>${nf(dd[d])}</td></tr>`).join('')}</table></div>
+  ${X.length?`<div class="card"><h2>⚠️ Anomali dipisah (${X.length} baris · ${nf(xt)} pcs)</h2><div class="sub">SN tumpang tindih dengan baris lain, tidak dihitung di atas sampai dikoreksi admin.</div><div style="overflow-x:auto"><table><tr><th>Tgl</th><th>SF</th><th>Paket</th><th>SN</th><th>Pcs</th></tr>${[...X].sort((a,b)=>a[4]<b[4]?-1:1).map(r=>`<tr><td>${fdd(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td>${r[4]}–${r[5]}</td><td>${nf(r[6])}</td></tr>`).join('')}</table></div></div>`:''}`}
+function setTap(t){TP=t;try{localStorage.setItem('tap',t)}catch(e){}
+  document.querySelectorAll('#tapb button').forEach(b=>b.classList.toggle('on',b.dataset.tp===TP));$('pt').style.display=TP==='BBT'?'':'none';
+  const sb=$('sub');if(TP==='BBT'){sb.style.display='';draw()}else{sb.style.display='none';drawD()}}
+$('tapb').innerHTML=Object.keys(TN).map(k=>`<button data-tp="${k}" class="${k===TP?'on':''}">${TN[k]}</button>`).join('');
+document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;if(t.dataset.tp)setTap(t.dataset.tp);if(t.dataset.dp){DP=t.dataset.dp;drawD()}});
+setTap(TP);
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
 </script><script src="nav.js"></script></body></html>
