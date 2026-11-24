@@ -61,7 +61,7 @@ a.mc.wide{grid-column:1/-1;flex-direction:row;align-items:center}
 .ban .bx{display:inline-flex;align-items:center;gap:8px}
 .ban #bell{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.16);border-radius:999px;width:34px;height:34px;font-size:15px;line-height:1;cursor:pointer;padding:0}
 .ban .lbl,.ban .clock{color:rgba(255,255,255,.85)}.ban .clock b,.ban .hello{color:#fff}
-.ban .nudge{background:rgba(255,255,255,.16);color:#fff;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2)}
+.ban .nudge{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.2)}
 .ban .nudge b{color:#fff;text-decoration:underline}
 .ban .pill,.ban .pill.ok,.ban .pill.wn,.ban .pill.in,.ban .pill.bd{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.22)}
 .ban::before,.ban::after{display:none}
@@ -72,7 +72,7 @@ html body{background:transparent!important}
 #scene svg{width:100%;height:100%;display:block}
 #scene::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,5,20,0) 0,rgba(10,5,20,.35) 55%,rgba(10,5,20,.7) 100%)}
 html[data-theme="light"] #scene::after{background:linear-gradient(180deg,rgba(255,255,255,.35) 0,rgba(252,246,248,.72) 50%,rgba(252,246,248,.92) 100%)}
-html body .box,html body .hero,html body a.mc,html[data-theme="dark"] body a.mc,html[data-theme="dark"] body .box{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:color-mix(in srgb,var(--card) 90%,transparent)}
+html body .box,html body .hero,html body a.mc,html[data-theme="dark"] body a.mc,html[data-theme="dark"] body .box{backdrop-filter:none!important;background:color-mix(in srgb,var(--card) 90%,transparent)}
 html body .menu a.mc:nth-child(1),html body .menu a.mc:nth-child(2){background:color-mix(in srgb,var(--card) 90%,transparent)}
 .rise{animation:rise .45s cubic-bezier(.2,.7,.2,1) both}.rise:nth-child(2){animation-delay:.05s}.rise:nth-child(3){animation-delay:.1s}.rise:nth-child(4){animation-delay:.15s}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}}

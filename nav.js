@@ -16,7 +16,7 @@
   var isTool=tools.some(function(t){return t[0]===here});
   var main=[["index.html","Beranda","home"],["digipos.html","DIGIPOS","dg"],["penjualan.html","Penjualan","pj"]];
   var css=''
-   +'#bbtnav{position:fixed;left:0;right:0;bottom:0;z-index:40;font-family:var(--font,system-ui,sans-serif);background:color-mix(in srgb,var(--card,#fff) 92%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);border-top:1px solid var(--bd,#dce3ed);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}'
+   +'#bbtnav{position:fixed;left:0;right:0;bottom:0;z-index:40;font-family:var(--font,system-ui,sans-serif);background:var(--card,#fff);border-top:1px solid var(--bd,#dce3ed);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}'
    +'#bbtnav .bn{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;max-width:560px;margin:0 auto}'
    +'#bbtnav .it{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;border-radius:14px;text-decoration:none;color:var(--mu,#526078);font-size:11.5px;font-weight:600;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,color .15s}'
    +'#bbtnav .it svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}'
