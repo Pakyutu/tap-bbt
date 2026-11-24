@@ -12,7 +12,7 @@ html:root{
   --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --radius-md:14px;--radius-lg:20px;
   --shadow-sm:0 1px 3px rgb(120 40 70 / .06);--shadow-card:0 10px 30px -8px rgb(120 40 70 / .13);
-  --nav-h:64px;
+  --nav-h:82px;
   --bg:#fcf6f8;--bg2:#f6e9ee;--card:#fff;--tx:#221b26;--ink:#221b26;--mu:#675f6e;--mute:#675f6e;--bd:#efe4e9;--soft:#f7eff2;
   --ac:#d9334a;--ac2:#f0675a;--red:#d9334a;--red2:#f0675a;--ok:#0f8a63;--up:#0f8a63;--dn:#c8304f;
   --wr:#8a5a00;--wn:#8a5a00;--warn:#8a5a00;--blue:#2f6be0;
@@ -90,3 +90,23 @@ html body:has(.tot){padding-bottom:calc(var(--nav-h) + 140px + env(safe-area-ins
 html body #shotmsg{bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom,0px))}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 @media print{html body{padding-bottom:0}}
+
+/* Liquid glass: navigasi mengambang, kartu kaca di mode gelap */
+html body #bbtnav{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));border-radius:26px;border:1px solid rgb(255 255 255 / .16);
+  background:color-mix(in srgb,var(--card) 62%,transparent);-webkit-backdrop-filter:saturate(1.8) blur(22px);backdrop-filter:saturate(1.8) blur(22px);
+  box-shadow:inset 0 1px 0 rgb(255 255 255 / .22),0 14px 40px -12px rgb(0 0 0 / .45);max-width:560px;margin:0 auto}
+html body #bbtnav .it.cur{background:color-mix(in srgb,var(--ac) 18%,transparent);box-shadow:inset 0 1px 0 rgb(255 255 255 / .18)}
+html body #bbtsh .pn{background:color-mix(in srgb,var(--card) 80%,transparent);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6);border-top:1px solid rgb(255 255 255 / .14)}
+html[data-theme="dark"] body .card,html[data-theme="dark"] body .box,html[data-theme="dark"] body .hero,html[data-theme="dark"] body a.mc{
+  background:color-mix(in srgb,var(--card) 78%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-color:rgb(255 255 255 / .09);
+  box-shadow:inset 0 1px 0 rgb(255 255 255 / .06),0 12px 30px -16px rgb(0 0 0 / .6)}
+html[data-theme="dark"] body{background-color:#0b0e1a}
+html body{padding-bottom:calc(var(--nav-h) + 40px + env(safe-area-inset-bottom,0px))}
+/* Bento beranda: ukuran kotak mengikuti kepentingan */
+html body .menu{grid-auto-flow:dense}
+html body .menu a.mc:nth-child(1),html body .menu a.mc:nth-child(2){grid-column:span 1;min-height:178px;justify-content:space-between}
+html body .menu a.mc:nth-child(1){background:linear-gradient(150deg,color-mix(in srgb,var(--ac) 22%,var(--card)),var(--card))}
+html body .menu a.mc:nth-child(2){background:linear-gradient(150deg,color-mix(in srgb,#3d7df5 22%,var(--card)),var(--card))}
+html body .menu a.mc:nth-child(1) .ic,html body .menu a.mc:nth-child(2) .ic{width:52px;height:52px;border-radius:16px}
+html body .menu a.mc:nth-child(5){grid-column:1/-1;flex-direction:row;align-items:center}
+@media(hover:hover){html body a.mc:hover{transform:translateY(-2px)}}
