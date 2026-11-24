@@ -64,20 +64,39 @@ a.mc.wide{grid-column:1/-1;flex-direction:row;align-items:center}
 .ban .nudge{background:rgba(255,255,255,.16);color:#fff;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2)}
 .ban .nudge b{color:#fff;text-decoration:underline}
 .ban .pill,.ban .pill.ok,.ban .pill.wn,.ban .pill.in,.ban .pill.bd{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.22)}
-.ban{background:linear-gradient(135deg,#e0364e,#b3123a 45%,#3b3fd1);background-size:200% 200%;animation:aur 14s ease-in-out infinite alternate}
-.ban::after{content:"";position:absolute;inset:-40%;pointer-events:none;background:radial-gradient(40% 35% at 25% 30%,rgba(255,170,120,.35),transparent 70%),radial-gradient(35% 30% at 80% 70%,rgba(90,140,255,.45),transparent 70%);animation:aur2 18s ease-in-out infinite alternate;mix-blend-mode:screen}
-.ban::before{animation:wv 9s linear infinite}
-.hero.k,.menu a.mc{will-change:transform}
-@keyframes aur{to{background-position:100% 100%}}
-@keyframes aur2{to{transform:translate(8%,-6%) rotate(12deg)}}
-@keyframes wv{to{background-position:160px bottom,-160px 30px}}
-@media (prefers-reduced-motion:reduce){.ban,.ban::after,.ban::before{animation:none}}
+.ban::before,.ban::after{display:none}
+.ban{background:linear-gradient(135deg,rgba(224,54,78,.92),rgba(150,22,60,.92) 55%,rgba(59,63,209,.85));animation:none}
+/* Latar Rohil: statis, ringan (satu SVG tetap, tanpa animasi & tanpa blur) */
+html body{background:transparent!important}
+#scene{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+#scene svg{width:100%;height:100%;display:block}
+#scene::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,5,20,0) 0,rgba(10,5,20,.35) 55%,rgba(10,5,20,.7) 100%)}
+html[data-theme="light"] #scene::after{background:linear-gradient(180deg,rgba(255,255,255,.35) 0,rgba(252,246,248,.72) 50%,rgba(252,246,248,.92) 100%)}
+html body .box,html body .hero,html body a.mc,html[data-theme="dark"] body a.mc,html[data-theme="dark"] body .box{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:color-mix(in srgb,var(--card) 90%,transparent)}
+html body .menu a.mc:nth-child(1),html body .menu a.mc:nth-child(2){background:color-mix(in srgb,var(--card) 90%,transparent)}
 .rise{animation:rise .45s cubic-bezier(.2,.7,.2,1) both}.rise:nth-child(2){animation-delay:.05s}.rise:nth-child(3){animation-delay:.1s}.rise:nth-child(4){animation-delay:.15s}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}}
 </style>
 <link rel="stylesheet" href="ui.css"><script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")||"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
 </head>
 <body>
+<div id="scene" aria-hidden="true"><svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"><defs>
+<linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c0a3a"/><stop offset=".38" stop-color="#7a1646"/><stop offset=".6" stop-color="#e0464e"/><stop offset=".72" stop-color="#ff9a5c"/></linearGradient>
+<linearGradient id="rv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a57"/><stop offset=".25" stop-color="#b8284a"/><stop offset="1" stop-color="#220a33"/></linearGradient>
+<radialGradient id="sn" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff2c4"/><stop offset=".35" stop-color="#ffc27a" stop-opacity=".85"/><stop offset="1" stop-color="#ff7a50" stop-opacity="0"/></radialGradient>
+<symbol id="pl" viewBox="0 0 100 200"><path d="M52 200C50 150 56 100 48 40" fill="none" stroke="#12051c" stroke-width="5" stroke-linecap="round"/><g fill="none" stroke="#12051c" stroke-width="4" stroke-linecap="round"><path d="M48 40Q20 22 2 40"/><path d="M48 40Q24 14 8 14"/><path d="M48 40Q40 8 28 0"/><path d="M48 40Q62 6 76 2"/><path d="M48 40Q78 16 98 20"/><path d="M48 40Q82 30 100 52"/><path d="M48 40Q14 36 0 62"/></g></symbol></defs>
+<rect width="400" height="800" fill="url(#sk)"/>
+<circle cx="250" cy="500" r="110" fill="url(#sn)"/><circle cx="250" cy="500" r="30" fill="#fff0c0" opacity=".95"/>
+<path d="M0 520 L0 500 Q30 470 60 495 T130 490 T200 498 T270 488 T340 497 T400 486 L400 535Z" fill="#2a0b2e"/>
+<g fill="#12051c"><path d="M0 535H400V800H0Z" opacity="0"/></g>
+<rect y="530" width="400" height="270" fill="url(#rv)"/>
+<g stroke="#ffd2a0" stroke-linecap="round" fill="none" opacity=".55"><path d="M205 548h90" stroke-width="3"/><path d="M215 562h70" stroke-width="2.5"/><path d="M225 578h50" stroke-width="2"/><path d="M235 598h30" stroke-width="2"/></g>
+<g stroke="#ff9a7a" stroke-linecap="round" fill="none" opacity=".25"><path d="M20 620q20-8 40 0t40 0t40 0"/><path d="M200 660q25-9 50 0t50 0t50 0"/><path d="M60 710q25-9 50 0t50 0t50 0"/><path d="M250 760q25-9 50 0t50 0"/></g>
+<g fill="#12051c" stroke="#12051c"><g transform="translate(92 0)"><path d="M30 538h4v-22h-4z M70 538h4v-22h-4z M20 516h64v4h-64z" stroke="none"/><path d="M52 516L12 470M52 516L96 470" stroke-width="2.5" fill="none"/><path d="M12 470Q52 508 96 470" stroke-width="1.5" fill="none"/><path d="M40 516v-22h24v22z" stroke="none"/><path d="M36 494l16-12 16 12z" stroke="none"/></g></g>
+<path d="M0 560 Q40 548 90 556 T200 552 L200 530 L0 530Z" fill="#12051c" opacity="0"/>
+<use href="#pl" x="-18" y="380" width="120" height="240"/><use href="#pl" x="52" y="440" width="70" height="140"/><use href="#pl" x="318" y="360" width="130" height="260"/><use href="#pl" x="282" y="450" width="64" height="128"/>
+<path d="M0 800V648Q60 626 130 660T260 650T400 640V800Z" fill="#12051c" opacity=".92"/>
+</svg></div>
 <div id="splash"><div><img src="icon-192.png" alt=""><p>CLUSTER ROKAN HILIR</p></div></div>
 <main class="wrap">
   <section class="ban rise">
