@@ -51,7 +51,7 @@ const rgH=list=>blk(list).map((g,i,A)=>(A.length>1||g.lines.length>1?`<div class
 // umur SN belum ST: tanggal drop dari CK.DM (peta rentang SN -> tanggal drop), umur = cutoff ST - tanggal drop
 const AG=[[0,3,'0–3 hari'],[4,7,'4–7 hari'],[8,14,'8–14 hari'],[15,9999,'Lebih dari 14 hari']];
 const dAge=d=>Math.max(0,Math.round((new Date(cut()+'T00:00:00')-new Date(d+'T00:00:00'))/864e5)),agB=n=>AG.findIndex(g=>n>=g[0]&&n<=g[1]);
-function aged(list){const M=CK.DM&&CK.DM[P];if(!M)return null;const out=[];
+function aged(list){const M=CT().DM&&CT().DM[P];if(!M)return null;const out=[];
   list.forEach(r=>{const [x,y]=r.split('-'),w=x.length;let a=+x;const b=+(y||x);let lo=0,hi=M.length;while(lo<hi){const m=(lo+hi)>>1;if(M[m][1]<a)lo=m+1;else hi=m}
     for(let i=lo;i<M.length&&M[i][0]<=b&&a<=b;i++){const s=Math.max(a,M[i][0]);if(s>a)out.push([a,s-1,w,'']);const e=Math.min(b,M[i][1]);out.push([s,e,w,M[i][2]]);a=e+1}
     if(a<=b)out.push([a,b,w,''])});return out}
@@ -61,16 +61,17 @@ function ageG(list){const A=aged(list);if(!A)return null;const B=[0,1,2,3,4].map
 const dr=g=>{const u=[...new Set(g.d)].sort();return !u.length?'-':u.length>1?tg(u[0])+' – '+tg(u[u.length-1]):tg(u[0])};
 const ageH=list=>{const G=ageG(list);return G?G.map(g=>`<div class="ag a${g.i}"><b>${g.l}</b> · ${nf(g.n)} pcs <span class="mu">(drop ${dr(g)})</span></div>`+rgH(g.r)).join('<span style="display:block;height:12px"></span>'):rgH(list)};
 const ageT=list=>{const G=ageG(list);return G?G.map(g=>`⏳ ${g.l} (drop ${dr(g)}) · ${nf(g.n)} pcs\n`+rgT(g.r)).join('\n\n'):rgT(list)};
-const oldN=o=>{if(!CK.DM||!CK.DM[P])return 0;let n=0;o.p.forEach(x=>{if(x.b.length){const G=ageG(x.b);G.forEach(g=>{if(g.i===3)n+=g.n})}});return n};
-function ageStat(S){if(!CK.DM||!CK.DM[P])return '';const T=[0,0,0,0,0];S.forEach(o=>o.p.forEach(x=>{if(x.b.length)ageG(x.b).forEach(g=>T[g.i]+=g.n)}));const tot=T.reduce((a,b)=>a+b,0);if(!tot)return '';
+const oldN=o=>{if(!CT().DM||!CT().DM[P])return 0;let n=0;o.p.forEach(x=>{if(x.b.length){const G=ageG(x.b);G.forEach(g=>{if(g.i===3)n+=g.n})}});return n};
+function ageStat(S){if(!CT().DM||!CT().DM[P])return '';const T=[0,0,0,0,0];S.forEach(o=>o.p.forEach(x=>{if(x.b.length)ageG(x.b).forEach(g=>T[g.i]+=g.n)}));const tot=T.reduce((a,b)=>a+b,0);if(!tot)return '';
   return `<div class="card"><h2>Umur SN belum ST</h2><div class="sub">Dihitung dari tanggal drop sampai ${tg(cut())}. Yang paling lama dikejar duluan.</div><table><tr><th>Umur</th><th>Belum ST</th><th>%</th></tr>${[3,2,1,0,4].filter(i=>T[i]).map(i=>`<tr><td class="ag a${i}"><b>${i<4?AG[i][2]:'Tanggal drop tidak ada'}</b></td><td>${nf(T[i])}</td><td>${pc(T[i],tot)}%</td></tr>`).join('')}</table></div>`}
 async function copy(t,btn){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}if(btn){const o=btn.textContent;btn.textContent='Tersalin ✓';setTimeout(()=>btn.textContent=o,1500)}}
 const BL=['JAN','FEB','MAR','APR','MEI','JUN','JUL','AGU','AGS','SEP','OKT','NOV','DES'],mi=k=>{const m=k.split(' ')[1]||'';const i=BL.indexOf(m);return i<0?99:(m==='AGS'?7:i>7?i-1:i)};
-const GK=Object.keys(CK.G||{}).sort((a,b)=>mi(a)-mi(b)||(a.split(' ')[0]>b.split(' ')[0]?-1:a.split(' ')[0]<b.split(' ')[0]?1:0));let P=GK[0]||'VF NOV',F='all';
-$('pt').innerHTML=GK.map(k=>`<button data-p="${k}" class="${k===P?'on':''}">${k}</button>`).join('');
-const cut=()=>P.startsWith('VF')?CK.cutVF:CK.cutSA;
-function draw(){const C=CK.G[P];
-  $('sub').innerHTML=`WL dropingan vs transaksi ST Digipos per SN (raw ST Agustus s/d ${tg(CK.cutVF||CK.cutSA)}). ${CK.ft?`<br>📄 File WL: <b>${ft(CK.ft.wl)}</b> · raw ST PV: <b>${ft(CK.ft.pv)}</b> · raw ST SA: <b>${ft(CK.ft.sa)}</b> (WIB)`:''}`;
+let TP='BBT';const CT=()=>TP==='BBT'?CK:((CK.TAP||{})[TP]||{G:{},DM:{}});
+const gks=()=>Object.keys(CT().G||{}).sort((a,b)=>mi(a)-mi(b)||(a.split(' ')[0]>b.split(' ')[0]?-1:a.split(' ')[0]<b.split(' ')[0]?1:0));let P='VF NOV',F='all';
+function ptabs(){const g=gks();if(!g.includes(P))P=g.includes('VF NOV')?'VF NOV':(g[0]||'VF NOV');$('pt').innerHTML=g.map(k=>`<button data-p="${k}" class="${k===P?'on':''}">${k}</button>`).join('')}
+const cut=()=>P.startsWith('VF')?CT().cutVF:CT().cutSA;
+function draw(){const C=CT().G[P];
+  $('sub').innerHTML=`WL dropingan vs transaksi ST Digipos per SN (raw ST s/d ${tg(CT().cutVF||CT().cutSA)}). ${CK.ft?`<br>📄 File WL: <b>${ft(CK.ft.wl)}</b> · raw ST PV: <b>${ft(CK.ft.pv)}</b> · raw ST SA: <b>${ft(CK.ft.sa)}</b> (WIB)`:''}`;
   if(!C){$('res').innerHTML='<div class="card">Belum ada data.</div>';return}
   const S=C.sf,T=S.reduce((a,o)=>a+o.d,0),Y=S.reduce((a,o)=>a+o.s,0);
   let V=S;if(F==='bl')V=S.filter(o=>o.s<o.d);
@@ -80,20 +81,21 @@ function draw(){const C=CK.G[P];
     ${ageStat(S)}<div class="card"><h2>Per SF</h2><div class="tabs">${[['all','Semua ('+S.length+')'],['bl','Belum lengkap ('+S.filter(o=>o.s<o.d).length+')']].map(([k,t])=>`<button data-f="${k}" class="${F===k?'on':''}">${t}</button>`).join('')}</div>
     ${V.map(o=>{const p=pc(o.s,o.d);return `<div class="ol"><div class="h"><b>${esc(o.n)}</b><span class="pc" style="color:${col(p)}">${nf(o.s)}/${nf(o.d)} · ${p}%</span></div><button class="btn s" data-cs="${S.indexOf(o)}" style="padding:6px 12px;font-size:13px;margin:6px 0 2px">📋 Salin ${esc(o.n.split(' ')[0])}</button>${oldN(o)?`<span class="tag w">⚠ ${nf(oldN(o))} pcs sudah > 14 hari</span>`:''}<div class="bar"><i style="width:${p}%;background:${col(p)}"></i></div>
       ${o.p.map(x=>`<div class="pk"><b>${esc(x.p)}</b>: ${nf(x.s)}/${nf(x.d)} ST${x.b.length?` · <span style="color:var(--ac)">belum ${nf(x.d-x.s)}</span><details><summary>${x.b.length} rentang belum ST</summary><div class="rg">${ageH(x.b)}</div></details>`:' ✓'}</div>`).join('')}</div>`}).join('')}</div>
-    ${C.tgl.length?`<div class="card"><h2>Per tanggal drop</h2><table><tr><th>Tanggal</th><th>Drop</th><th>Sudah ST</th><th>%</th></tr>${C.tgl.map(([d,a,b])=>`<tr><td>${tg(d)}</td><td>${nf(a)}</td><td>${nf(b)}</td><td style="color:${col(pc(b,a))};font-weight:700">${pc(b,a)}%</td></tr>`).join('')}</table></div>`:''}`}
-function rekap(){const C=CK.G[P],S=C.sf,T=S.reduce((a,o)=>a+o.d,0),Y=S.reduce((a,o)=>a+o.s,0);
+    ${C.tgl.length?`<div class="card"><h2>Per tanggal drop</h2><table><tr><th>Tanggal</th><th>Drop</th><th>Sudah ST</th><th>%</th></tr>${C.tgl.map(([d,a,b])=>`<tr><td>${tg(d)}</td><td>${nf(a)}</td><td>${nf(b)}</td><td style="color:${col(pc(b,a))};font-weight:700">${pc(b,a)}%</td></tr>`).join('')}</table></div>`:''}${TP==='BBT'?'':anoCard()}`}
+function rekap(){const C=CT().G[P],S=C.sf,T=S.reduce((a,o)=>a+o.d,0),Y=S.reduce((a,o)=>a+o.s,0);
   return `*Cek WL ${P} vs ST Digipos*\nST s/d ${tg(cut())}: ${nf(Y)}/${nf(T)} (${pc(Y,T)}%) · belum ${nf(T-Y)}\n\n`+S.map((o,i)=>`${i+1}. ${o.n}: ${nf(o.s)}/${nf(o.d)} (${pc(o.s,o.d)}%)`).join('\n')}
 function sfTxt(o){return `*Cek WL ${P} vs ST Digipos*\n*${o.n}*\nST s/d ${tg(cut())}: ${nf(o.s)}/${nf(o.d)} (${pc(o.s,o.d)}%) · belum ${nf(o.d-o.s)} pcs\n\n`+o.p.map(x=>`${x.p}: ${nf(x.s)}/${nf(x.d)} ST`+(x.b.length?` · belum ${nf(x.d-x.s)} pcs\n${ageT(x.b)}`:' ✓')).join('\n\n')}
-function belum(){const C=CK.G[P],B=C.sf.filter(o=>o.s<o.d);
+function belum(){const C=CT().G[P],B=C.sf.filter(o=>o.s<o.d);
   return `*SN ${P} belum ST* (s/d ${tg(cut())})\n\n`+B.map((o,i)=>`${i+1}. ${o.n} (${nf(o.d-o.s)} pcs)\n\n`+o.p.filter(x=>x.b.length).map(x=>`${x.p} (${nf(x.d-x.s)} pcs)\n${ageT(x.b)}`).join('\n\n')).join('\n\n\n')+`\n\nTotal belum ST: ${nf(B.reduce((a,o)=>a+o.d-o.s,0))} pcs`}
 document.addEventListener('click',e=>{const t=e.target,d=t.dataset||{};if(d.cp){const [x,y]=d.cp.split('|');copy(x+' - '+y,t);return}
   if(d.p){P=d.p;document.querySelectorAll('#pt button').forEach(b=>b.classList.toggle('on',b.dataset.p===P));draw()}
   if(d.f){F=d.f;draw()}
-  if(d.cs!=null)copy(sfTxt(CK.G[P].sf[+d.cs]),t);if(t.id==='cpr')copy(rekap(),t);if(t.id==='cpb')copy(belum(),t)});
+  if(d.cs!=null)copy(sfTxt(CT().G[P].sf[+d.cs]),t);if(t.id==='cpr')copy(rekap(),t);if(t.id==='cpb')copy(belum(),t)});
 
 // ---- Filter TAP: BBT = Cek WL vs ST (tab di bawah); BAA/UJT = dropingan SN per SF (pembanding ST menyusul)
-const TN={BBT:'BBT',BAA:'BAA',UJT:'UJT'};let TP='BBT';try{const t=new URLSearchParams(location.search).get('tap')||localStorage.getItem('tap');if(TN[t])TP=t}catch(e){}
+const TN={BBT:'BBT',BAA:'BAA',UJT:'UJT'};try{const t=new URLSearchParams(location.search).get('tap')||localStorage.getItem('tap');if(TN[t])TP=t}catch(e){}
 let DP='VF';const MNm=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],fdd=s=>{const[y,m,d]=s.split('-');return +d+' '+MNm[+m-1]};
+function anoCard(){const W=(typeof WLT!=='undefined')&&WLT[TP]; if(!W)return '';const X=(W.X||[]).filter(r=>r[0]===(P.startsWith('SA')?'SA':'VF')),xt=X.reduce((a,r)=>a+r[6],0);return length?`<div class="card"><h2>⚠️ Anomali dipisah (${X.length} baris · ${nf(xt)} pcs)</h2><div class="sub">SN tumpang tindih dengan baris lain, tidak dihitung di atas sampai dikoreksi admin.</div><div style="overflow-x:auto"><table><tr><th>Tgl</th><th>SF</th><th>Paket</th><th>SN</th><th>Pcs</th></tr>${[...X].sort((a,b)=>a[4]<b[4]?-1:1).map(r=>`<tr><td>${fdd(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td>${r[4]}–${r[5]}</td><td>${nf(r[6])}</td></tr>`).join('')}</table></div></div>`:''}
 function drawD(){const W=(typeof WLT!=='undefined')&&WLT[TP];const R0=$('res');
   if(!W){R0.innerHTML=`<div class="card"><h2>Dropingan ${TP}</h2><div class="sub">Belum ada data dropingan ${TP}. Kirim file "SN STOCK SF" ${TP} ke bot.</div></div>`;return}
   const R=W[DP],sfs=[...new Set(R.map(r=>r[1]))],pk=[...new Set(R.map(r=>r[2]))].sort(),tot=R.reduce((a,r)=>a+r[5],0),M={};
@@ -104,10 +106,12 @@ function drawD(){const W=(typeof WLT!=='undefined')&&WLT[TP];const R0=$('res');
   <div class="sub" style="margin:10px 0 0">Data SN STOCK SF Nov 2026 s/d ${fdd(W.upd)}. Pembanding ST ${TP} belum ada (butuh raw ST yang memuat ${TP}).</div></div>
   <div class="card"><h2>Per SF × paket</h2><div style="overflow-x:auto"><table><tr><th>SF</th>${pk.map(p=>`<th>${esc(p)}</th>`).join('')}<th>Total</th></tr>${sfs.map(s=>`<tr><td>${esc(s)}</td>${pk.map(p=>`<td>${M[s][p]?nf(M[s][p]):'–'}</td>`).join('')}<td><b>${nf(Object.values(M[s]).reduce((a,b)=>a+b,0))}</b></td></tr>`).join('')}<tr><td><b>Total</b></td>${pk.map(p=>`<td><b>${nf(sfs.reduce((a,s)=>a+(M[s][p]||0),0))}</b></td>`).join('')}<td><b>${nf(tot)}</b></td></tr></table></div></div>
   <div class="card"><h2>Per tanggal drop</h2><table><tr><th>Tanggal</th><th>Pcs</th></tr>${ds.map(d=>`<tr><td>${fdd(d)}</td><td>${nf(dd[d])}</td></tr>`).join('')}</table></div>
-  ${X.length?`<div class="card"><h2>⚠️ Anomali dipisah (${X.length} baris · ${nf(xt)} pcs)</h2><div class="sub">SN tumpang tindih dengan baris lain, tidak dihitung di atas sampai dikoreksi admin.</div><div style="overflow-x:auto"><table><tr><th>Tgl</th><th>SF</th><th>Paket</th><th>SN</th><th>Pcs</th></tr>${[...X].sort((a,b)=>a[4]<b[4]?-1:1).map(r=>`<tr><td>${fdd(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td>${r[4]}–${r[5]}</td><td>${nf(r[6])}</td></tr>`).join('')}</table></div></div>`:''}`}
+  ${anoCard()}`}
 function setTap(t){TP=t;try{localStorage.setItem('tap',t)}catch(e){}
-  document.querySelectorAll('#tapb button').forEach(b=>b.classList.toggle('on',b.dataset.tp===TP));$('pt').style.display=TP==='BBT'?'':'none';
-  const sb=$('sub');if(TP==='BBT'){sb.style.display='';draw()}else{sb.style.display='none';drawD()}}
+  document.querySelectorAll('#tapb button').forEach(b=>b.classList.toggle('on',b.dataset.tp===TP));
+  const ok=TP==='BBT'||(CK.TAP&&CK.TAP[TP]&&Object.keys(CK.TAP[TP].G).length);
+  $('pt').style.display=ok?'':'none';$('sub').style.display=ok?'':'none';
+  if(ok){ptabs();draw()}else drawD()}
 $('tapb').innerHTML=Object.keys(TN).map(k=>`<button data-tp="${k}" class="${k===TP?'on':''}">${TN[k]}</button>`).join('');
 document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;if(t.dataset.tp)setTap(t.dataset.tp);if(t.dataset.dp){DP=t.dataset.dp;drawD()}});
 setTap(TP);

@@ -187,4 +187,6 @@ if __name__=='__main__':
         out['G'][k]=build(rows,st)
         if tpn.get(k):out['G'][k]['tp']=tpn[k]
         print(k,sum(o['s'] for o in out['G'][k]['sf']),'/',len(rows),file=sys.stderr)
+    try:out['TAP']=old.get('TAP',{})
+    except Exception:pass
     open('cekst-data.js','w').write('// Hasil cek WL dropingan vs ST Digipos (dibuat dari tools/cekst_build.py)\nconst CK='+json.dumps(out,separators=(',',':'),ensure_ascii=False)+';\n')
