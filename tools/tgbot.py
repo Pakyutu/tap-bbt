@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 """Bot Telegram update dashboard (tanpa AI). Jalan dari GitHub Actions.
 Kirim FILE ke bot (caption opsional "19 Nov"; kosong = hari ini WIB). Hanya chat TG_CHAT yang dilayani."""
-import shutil,os,sys,json,re,subprocess,urllib.request,urllib.parse,datetime,pathlib
+import time,urllib.error,shutil,os,sys,json,re,subprocess,urllib.request,urllib.parse,datetime,pathlib
 T=os.environ['TG_TOKEN'];CH=str(os.environ['TG_CHAT'])
 API=f'https://api.telegram.org/bot{T}/';R=pathlib.Path(__file__).resolve().parent.parent
 OFF=R/'tools/.tg_offset'
 BLN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']
+def retry(f,n=4):  # koneksi putus sesaat (Errno 104 dsb): ulangi beberapa kali
+    for i in range(n):
+        try:return f()
+        except (urllib.error.URLError,ConnectionError,TimeoutError,OSError):
+            if i==n-1:raise
+            time.sleep(2*(i+1))
 def call(m,**p):
     d=urllib.parse.urlencode(p).encode()
-    return json.load(urllib.request.urlopen(API+m,d,timeout=60))
+    return retry(lambda:json.load(urllib.request.urlopen(API+m,d,timeout=60)))
 def say(t):return call('sendMessage',chat_id=CH,text=t[:3500])['result']['message_id']
 PG=[None]
 def pg(t):
@@ -48,7 +54,9 @@ def ambil(url,out):
     else:
         if 'dropbox.com' in url:url=re.sub(r'dl=0','dl=1',url)
         rq=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
-        with urllib.request.urlopen(rq,timeout=600) as r,open(out,'wb') as f:shutil.copyfileobj(r,f)
+        def dl():
+            with urllib.request.urlopen(rq,timeout=600) as r,open(out,'wb') as f:shutil.copyfileobj(r,f)
+        retry(dl)
 QRY=re.compile(r'^/?(status|sn|outlet)\b\s*(.*)',re.I|re.S)
 def jl(f,k):
     t=(R/f).read_text();i=t.index(k)+len(k);return json.JSONDecoder().raw_decode(t[i:])[0]
@@ -208,7 +216,7 @@ def proses(msg):
         except Exception as e:pg(f'❌ gagal unduh: {str(e)[:200]}');return False
     elif doc:
         fp=call('getFile',file_id=doc['file_id'])['result']['file_path']
-        dst.write_bytes(urllib.request.urlopen(f'https://api.telegram.org/file/bot{T}/{fp}',timeout=120).read())
+        dst.write_bytes(retry(lambda:urllib.request.urlopen(f'https://api.telegram.org/file/bot{T}/{fp}',timeout=120).read()))
     else:dst.write_text(body,encoding='utf-8')
     pg(f'⏳ 25% · {nm} terunduh')
     if kind=='inbox':
