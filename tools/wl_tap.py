@@ -38,10 +38,6 @@ def load(p,sa,only=None):
         dd0=den(dn,sa)
         if re.match(r'VF 7GB (52|57)H',dd0):warn.append(f'denom meragukan "{dn}" ({sf} {a}-{b}, {q} pcs)')
         R.append([f'{y}-{mm}-{dd}',sfn(sf),dd0,a,b,q])
-    # SN ganda / tumpang tindih
-    S=sorted(R,key=lambda r:(len(r[3]),r[3]));
-    for x,y in zip(S,S[1:]):
-        if len(x[3])==len(y[3]) and int(y[3])<=int(x[4]):warn.append(f'SN tumpang tindih {x[3]}-{x[4]} & {y[3]}-{y[4]} ({x[1]} {x[0]} / {y[1]} {y[0]})')
     return R,warn
 taps=sorted({t for t,_ in lines(sys.argv[1],False,'DROPINGAN VF')}|{t for t,_ in lines(sys.argv[2] if not XL else sys.argv[1],True,'DROPINGAN SA')}) if XL else [tap]
 taps=[t for t in taps if t!='BBT']  # BBT sudah punya Cek WL sendiri
@@ -51,10 +47,19 @@ try:
 except Exception:W={}
 for tp_ in taps:
     VF,w1=load(sys.argv[1],False,tp_);SA,w2=load(sys.argv[1] if XL else sys.argv[2],True,tp_)
+    def pisah(R,k):  # baris yang SN-nya tumpang tindih dengan baris lain dipisah sebagai anomali
+        bad=set();L=[(i,r) for i,r in enumerate(R)]
+        for x in range(len(L)):
+            for y in range(x+1,len(L)):
+                r1,r2=L[x][1],L[y][1]
+                if len(r1[3])==len(r2[3]) and int(r1[3])<=int(r2[4]) and int(r2[3])<=int(r1[4]):bad.add(L[x][0]);bad.add(L[y][0])
+        return [r for i,r in enumerate(R) if i not in bad],[[k]+r for i,r in enumerate(R) if i in bad]
+    VF,x1=pisah(VF,'VF');SA,x2=pisah(SA,'SA');XX=x1+x2
+    print('Anomali dipisah:',len(XX),'baris,',sum(r[6] for r in XX),'pcs')
     print('==',tp_)
     for w in w1+w2:print('!',w)
     print('VF',len(VF),sum(r[5] for r in VF),'SA',len(SA),sum(r[5] for r in SA))
     if not VF and not SA:continue
-    W[tp_]={'upd':max(r[0] for r in VF+SA),'VF':VF,'SA':SA}
+    W[tp_]={'upd':max(r[0] for r in VF+SA+[r[1:] for r in XX]),'VF':VF,'SA':SA,'X':XX}
 open(p,'w').write('// Dropingan SN per SF (TAP selain BBT), dibuat dari tools/wl_tap.py\nconst WLT='+json.dumps(W,ensure_ascii=False,separators=(',',':'))+';\n')
 print('Dropingan masuk:',', '.join(taps),'sampai',max(W[t]['upd'] for t in taps if t in W))
