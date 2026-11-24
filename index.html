@@ -52,6 +52,18 @@ a.mc.wide{grid-column:1/-1;flex-direction:row;align-items:center}
 #splash img{width:84px;height:84px;border-radius:24px;box-shadow:0 18px 50px -12px rgba(200,16,46,.55);animation:pop .6s cubic-bezier(.2,.7,.2,1) both}
 #splash p{margin:16px 0 0;font-size:12px;font-weight:700;letter-spacing:.2em;color:var(--mu);text-align:center}
 @keyframes pop{from{transform:scale(.8);opacity:0}}
+.ban{position:relative;overflow:hidden;border-radius:28px;padding:18px;color:#fff;background:var(--grad-hero);box-shadow:0 18px 40px -18px rgb(200 16 46 / .65)}
+.ban::before{content:"";position:absolute;inset:auto -20px -6px -20px;height:90px;opacity:.16;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='40' viewBox='0 0 160 40'%3E%3Cpath d='M0 20q20-16 40 0t40 0t40 0t40 0' fill='none' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E") repeat-x bottom/160px 40px,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='40' viewBox='0 0 160 40'%3E%3Cpath d='M0 20q20-16 40 0t40 0t40 0t40 0' fill='none' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E") repeat-x 0 30px/160px 40px}
+.ban>*{position:relative}
+.ban .bt{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.ban .brand img{width:48px;height:48px;border-radius:14px;box-shadow:0 6px 16px -4px rgb(0 0 0 / .35)}
+.ban .brand b{font-size:19px;color:#fff}.ban .brand small{color:rgba(255,255,255,.82)}
+.ban .bx{display:inline-flex;align-items:center;gap:8px}
+.ban #bell{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.16);border-radius:999px;width:34px;height:34px;font-size:15px;line-height:1;cursor:pointer;padding:0}
+.ban .lbl,.ban .clock{color:rgba(255,255,255,.85)}.ban .clock b,.ban .hello{color:#fff}
+.ban .nudge{background:rgba(255,255,255,.16);color:#fff;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2)}
+.ban .nudge b{color:#fff;text-decoration:underline}
+.ban .pill,.ban .pill.ok,.ban .pill.wn,.ban .pill.in,.ban .pill.bd{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.22)}
 .rise{animation:rise .45s cubic-bezier(.2,.7,.2,1) both}.rise:nth-child(2){animation-delay:.05s}.rise:nth-child(3){animation-delay:.1s}.rise:nth-child(4){animation-delay:.15s}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}}
 </style>
@@ -60,12 +72,11 @@ a.mc.wide{grid-column:1/-1;flex-direction:row;align-items:center}
 <body>
 <div id="splash"><div><img src="icon-192.png" alt=""><p>CLUSTER ROKAN HILIR</p></div></div>
 <main class="wrap">
-  <header class="top">
-    <div class="brand"><img src="icon-192.png" alt=""><div><b>Cluster Rohil</b><small>Sales Intelligence</small></div></div>
-    <span style="display:inline-flex;align-items:center;gap:8px"><button id="bell" type="button" aria-label="Notifikasi" title="Notifikasi data baru" style="border:1px solid var(--bd);background:var(--card);border-radius:999px;width:32px;height:32px;font-size:15px;line-height:1;cursor:pointer;padding:0">🔕</button><span class="pill ok" id="net"><span class="dot"></span><span id="netx">Online</span></span></span>
-  </header>
-
-  <section class="hero rise">
+  <section class="ban rise">
+    <div class="bt">
+      <div class="brand"><img src="logo-rohil.svg" alt="Logo Cluster Rohil"><div><b>Cluster Rohil</b><small>Rokan Hilir · 3 TAP</small></div></div>
+      <span class="bx"><button id="bell" type="button" aria-label="Notifikasi" title="Notifikasi data baru" >🔕</button><span class="pill ok" id="net"><span class="dot"></span><span id="netx">Online</span></span></span>
+    </div>
     <div class="lbl" id="date"></div>
     <h1 class="hello"><span id="greet">Halo</span> 👋</h1>
     <div class="clock">Pukul <b id="time">--:--</b> WIB</div>
