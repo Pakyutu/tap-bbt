@@ -71,7 +71,10 @@ def raw(paths,need,ST,mx):
             print(path.split('/')[-1],ws.title,'baris',n,file=sys.stderr)
 def build(rows,ST,home='BAGAN BATU'):
     by=collections.OrderedDict();dd=collections.defaultdict(lambda:[0,0]);mon=collections.Counter();lain=collections.Counter()
+    sudah=set()
     for d,s,p,n in rows:
+        if key(s) in sudah:continue  # SN dobel di WL dihitung sekali
+        sudah.add(key(s))
         o=by.setdefault(n,{});x=o.setdefault(p,{'d':0,'s':0,'b':[]})
         x['d']+=1;st=ST.get(key(s))
         if st:

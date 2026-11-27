@@ -27,7 +27,7 @@ RT=[('sn_stock_sf','wl_tap.py',['Dropingan SN per SF']),('monitoring_program_kli
     ('sultan','sultan_so.py',['Sultan Spesial SO']),
     ('dealing_extra','extra_dealing.py',['Extra Dealing']),('extra','extra_dealing.py',['Extra Dealing']),
     ('cuan_pv','cuan_pv.py',['Cuan PV Redeem']),
-    ('monitoring_performance','site_rev.py',['Site ID & performa site']),('site','site_rev.py',['Site ID & performa site'])]
+    ('update_pjp','site_pjp.py',['Site ID & performa site']),('monitoring_performance','site_rev.py',['Site ID & performa site']),('site','site_rev.py',['Site ID & performa site'])]
 CSV=[('detail_outlet_cvm','CVM',['CVM']),('detail_outlet_pv','--pv',['Outlet PV / SA']),('detail_outlet_sa','--sa',['Outlet PV / SA']),('ngrs','--ngrs',['NGRS'])]
 def stat(names,iso):
     p=R/'status.json';j=json.loads(p.read_text())
@@ -74,7 +74,7 @@ def ambil(url,out):
         def dl():
             with urllib.request.urlopen(rq,timeout=600) as r,open(out,'wb') as f:shutil.copyfileobj(r,f)
         retry(dl)
-QRY=re.compile(r'^/?(status|sn|outlet)\b\s*(.*)',re.I|re.S)
+QRY=re.compile(r'^/?(status|perlu|sn|outlet)\b\s*(.*)',re.I|re.S)
 def jl(f,k):
     t=(R/f).read_text();i=t.index(k)+len(k);return json.JSONDecoder().raw_decode(t[i:])[0]
 def wib():return datetime.datetime.utcnow()+datetime.timedelta(hours=7)
@@ -84,6 +84,19 @@ def q_status():
         d=datetime.date.fromisoformat(i['d']);t=(n-d).days
         o.append(f"{'⚠️' if t>1 else '✅'} {i['n']}: {d.day} {BLN[d.month-1]}"+(f' ({t} hari lalu)' if t>1 else '')+(f" · data s/d {int(i['c'][8:])} {BLN[int(i['c'][5:7])-1]}" if i.get('c') else ''))
     return 'Status data (hari ini '+f'{n.day} {BLN[n.month-1]}):\n'+'\n'.join(o)
+PERLU={'Cuan PV Redeem':'Monitoring Klik Misi & FR (sheet Reedem PV) / CUAN_PV_Redeem','FR Biometric':'Outlet_Biometrik_Sumbagteng_2026_*.xlsx','Biometrik':'Outlet_Biometrik_Sumbagteng_2026_*.xlsx',
+ 'Site ID & performa site':'Update_PJP_dan_Site_*.xlsx + Monitoring_Performance_Region','CVM':'Detail_Outlet_CVM_*.csv (export SURYA, Nov harus terisi)','Redeem vs ST (branch)':'paste laporan Branch "VF <tgl>" (sesi Claude)',
+ 'Extra Dealing':'Dealing_EXTRA_*.xlsx','Sultan Spesial SO':'Monitoting_Program_Dealing_Misi_Sultan_Spesial_SO.xlsx','Dropingan SN per SF':'SN_Stock_SF dropingan (kalau ada drop baru; UJT belum ada)',
+ 'ST VF & SA':'ST_DIGIPOS atau Monitoring ST Product Cluster Rohil','WL vs ST (VF & SA)':'raw_st_pv + raw_st_sp terbaru','Outlet PV / SA':'Detail_Outlet_PV_*.csv + Detail_Outlet_SA_*.csv',
+ 'NGRS':'NGRS_2026_TRX.csv','Petugas (MoM)':'paste MoM Sales Tap (SURYA)','Stock on Hand':'paste Stock on Hand (SURYA)','Stock Gudang':'Stock_Gudang_ALL_*.csv','Stok per SF (PV/ByU/SA)':'Stock_Gudang_SF_*.csv','Klik Misi':'Monitoring_Program_Klik_Misi_*.xlsx'}
+def q_perlu(batas=2):
+    j=json.loads((R/'status.json').read_text());n=wib().date();o=[]
+    for i in j['items']:
+        c=i.get('c') or i['d'];t=(n-datetime.date.fromisoformat(c)).days
+        if t>batas:o.append((t,i['n'],PERLU.get(i['n'],'file terbaru')))
+    o.sort(reverse=True)
+    if not o:return None
+    return f'📥 Perlu diupdate ({len(o)}), hari ini {n.day} {BLN[n.month-1]}:\n'+'\n'.join(f'⚠️ {a} · {b} → {c}' for a,b,c in o)
 def q_sn(txt):
     sn=list(dict.fromkeys(re.findall(r'\d{10,}',txt)))[:40]
     if not sn:return 'Kirim nomor SN, contoh: sn 0150000076531300 (boleh banyak, satu per baris).'
@@ -119,7 +132,7 @@ def q_outlet(txt):
     return '\n\n'.join(out)
 def kueri(m,k,a):
     PG[0]=ACK
-    r={'status':lambda:q_status(),'sn':lambda:q_sn(a),'outlet':lambda:q_outlet(a)}[k]()
+    r={'status':lambda:q_status(),'perlu':lambda:q_perlu(0) or 'Semua data sudah hari ini ✅','sn':lambda:q_sn(a),'outlet':lambda:q_outlet(a)}[k]()
     pg(r)
 CMD=re.compile(r'^(mom|soh)[\s_]+(pv|sa)[\s_]+(\d{1,2})(?:[\s_]+(\d{1,2}))?',re.I)
 def ver_label(d,iso):
@@ -191,6 +204,14 @@ def proses(msg):
                 except Exception as e:
                     PG[0]=ACK;pg('❌ link tidak terbaca: '+str(e)[:150]+' (pastikan akses "siapa saja yang memiliki link")');return False
             spec=nm;doc={'file_name':nm,'_url':lm.group(1),'_pre':(r if not lm.group(2) else None)}
+        sm=re.match(r'^/?site\s+(\d{8,12})\s+([A-Za-z]{3}\d{3})\s*$',t)
+        if sm and not lm:
+            PG[0]=ACK;oid,sid=sm.group(1),sm.group(2).upper()
+            ov=R/'tools/site_override.txt';ov.write_text(ov.read_text().rstrip('\n')+f'\n{oid} {sid}  # via bot\n')
+            js=R/'digipos-site.js';t0=js.read_text();k=t0.index('const SITE=')+11;S,e=json.JSONDecoder().raw_decode(t0[k:])
+            if oid not in S['SI']:ov.write_text(ov.read_text().rsplit('\n',2)[0]+'\n');pg(f'❌ Outlet {oid} tidak ada di daftar site.');return False
+            S['SI'][oid]=[sid,S['SI'][oid][1]];js.write_text(t0[:k]+json.dumps(S,separators=(',',':'),ensure_ascii=False)+t0[k+e:])
+            pg(f'✅ Site outlet {oid} = {sid} (tayang ±1 mnt)');return True
         qm=QRY.match(t) if not lm else None
         if qm:kueri(msg,qm.group(1).lower(),qm.group(2));return False
         if not lm and not CMD.match(spec):
@@ -284,6 +305,10 @@ def bump():
     s=re.sub(r'tap-bbt-v(\d+)',lambda x:f'tap-bbt-v{int(x.group(1))+1}',s,count=1)
     (R/'sw.js').write_text(s)
 def main():
+    if os.environ.get('TG_REMIND'):
+        x=q_perlu(2)
+        if x:say(x)
+        return
     if os.environ.get('TG_UPDATE'):  # mode webhook (Worker)
         m=json.loads(os.environ['TG_UPDATE']).get('message')
         if m and str(m['chat']['id'])==CH:
