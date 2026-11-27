@@ -34,5 +34,8 @@ window.TABG={key:'dgp',
   ['fkec','fsf','fpjp'].forEach(i=>{const e=$(i);if(e)e.addEventListener('change',()=>setTimeout(cnt))});
   addEventListener('keydown',e=>{if(e.key==='Escape')M.classList.remove('open')});
   const od=window.draw;if(typeof od==='function')window.draw=function(){const r=od.apply(this,arguments);try{cnt()}catch(e){}return r};
-  cnt();
+  const NP=['km','cvm','bio','xd','sso','cuan','bc','so'];
+  const sh=()=>{try{prod.style.display=NP.includes(st.tab)?'none':''}catch(e){}};
+  const od2=window.draw;if(typeof od2==='function')window.draw=function(){const r=od2.apply(this,arguments);sh();return r};
+  sh();cnt();
 })();

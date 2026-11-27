@@ -141,7 +141,7 @@ input[type=search],select{border-radius:9px}
 <div class="top"><div class="w" style="padding-bottom:0">
   <div><h1>Dashboard DIGIPOS Cluster Rohil<br><select id="ftap" aria-label="TAP" style="font-weight:600;font-size:.72em;margin-top:2px"><option value="BBT">TAP Bagan Batu</option><option value="BAA">TAP Bagan Siapi-api</option><option value="UJT">TAP Ujung Tanjung</option><option value="ALL">Cluster Rohil</option></select></h1><div class="sub" id="sub"></div></div>
   <div class="row" style="margin-top:10px">
-    <span class="seg" id="prod"><button data-v="VF">VF</button><button data-v="SA">SA (Perdana)</button></span><select id="fkec" aria-label="Kecamatan"></select><select id="fsf" aria-label="Sales force"></select><select id="fpjp" aria-label="Hari PJP"></select>
+    <span class="seg" id="prod"><button data-v="VF">VF</button><button data-v="SA">SA</button></span><select id="fkec" aria-label="Kecamatan"></select><select id="fsf" aria-label="Sales force"></select><select id="fpjp" aria-label="Hari PJP"></select>
     <button class="btn" id="reset">Reset filter</button><button class="btn" id="jpg">Simpan JPEG</button><button class="btn" id="cimg">Salin gambar</button><button class="btn" id="upbtn">Upload data</button><button class="btn" id="fsbtn">Layar penuh</button><input type="file" id="upf" accept=".xlsx,.xls,.csv,.txt" multiple hidden><span id="cpst" role="status"></span>
   </div>
   <div id="upbar" class="upbar" hidden><span id="upinfo"></span><button class="btn" id="upreset">Kembali ke data asli</button></div>
@@ -270,7 +270,7 @@ function tem(){
   <li>OA SA By.U <b>${all.byu}</b> dari target <b>${tB}</b> (${pc(all.byu,tB)}), gap <b class="dn">${all.byu-tB}</b>. Per SF: ${bs}.${(n=>n?` ${n} outlet terisi tepat 5 pcs, yaitu batas minimal.`:"")(O.filter(o=>o.sb===5).length)}</li>
   <li>Sudah tembus target By.U: ${SF.filter(s=>agg(O.filter(o=>o.sf===s)).byu>=TT[s][1]).join(", ")||"belum ada"}. Hampir tembus: ${SF.filter(s=>{const b=agg(O.filter(o=>o.sf===s)).byu;return b<TT[s][1]&&b>=TT[s][1]-5}).join(", ")||"–"}.</li>
   <li>Terendah: <b>${sfb[0].s}</b> (${sfb[0].byu}/${TT[sfb[0].s][1]}) dan <b>${sfb[1].s}</b> (${sfb[1].byu}/${TT[sfb[1].s][1]}).</li>
-  <li>Outlet yang sudah OA VF Reguler tapi belum ambil SA By.U: <b>${O.filter(o=>o.vr>=20&&o.sb<5).length}</b> outlet. Ini yang paling mudah ditawari perdana karena sudah aktif order.</li>`}
+  <li>Outlet yang sudah OA VF Reguler tapi belum ambil SA By.U: <b>${O.filter(o=>o.vr>=20&&o.sb<5).length}</b> outlet. Ini yang paling mudah ditawari SA By.U karena sudah aktif order.</li>`}
   const kmli=[["r","Reguler"],["b","By.U"]].map(([t,nm])=>{const KB=O.map(o=>({o,k:D.K[o.id]&&D.K[o.id][t]})).filter(x=>x.k);if(!KB.length)return"";
     const kk=KB.filter(x=>x.k[2]>0),ka=KB.filter(x=>x.k[1]>0);
     const ks=SF.map(s=>{const x=KB.filter(y=>y.o.sf===s),c=x.filter(y=>y.k[2]>0).length;return{s,n:x.length,c,b:x.length-c}}).filter(x=>x.n).sort((a,b)=>a.c/a.n-b.c/b.n);

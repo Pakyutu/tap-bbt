@@ -15,7 +15,7 @@
     const by={};A.forEach(o=>(by[o.sf]=by[o.sf]||[]).push(o));
     const rows=Object.entries(by).map(([sf,a])=>({sf,...sum(a)})).sort((a,b)=>(b.s[2]+b.s[5])-(a.s[2]+a.s[5]));
     const tr=rows.map(r=>`<tr><td class="l"><b>${es(tc(r.sf))}</b></td><td>${r.n}</td>${r.s.map((q,i)=>`<td${i===2||i===5?' style="font-weight:700"':''}>${q?nf(q):'<span class="mu">–</span>'}</td>`).join('')}</tr>`).join('');
-    const key=mode==='sa'?2:5;
+    const key=st.prod==='SA'?2:5;
     const LL=A.filter(o=>v(o.id)[key]>0).sort((a,b)=>st.ord==='min'?v(a.id)[key]-v(b.id)[key]:v(b.id)[key]-v(a.id)[key]).slice(0,100);
     const ol=LL.map((o,i)=>{const x=v(o.id);return `<tr><td class="mu">${i+1}</td><td class="l"><b>${es(o.nm)}</b><br><span class="mu" style="font-size:11px">${o.id} · ${es(tc(o.sf).split(' ')[0])} · ${es(o.kec||'')}</span></td>${x.map((q,j)=>`<td${j===key?' style="font-weight:700"':''}>${q?nf(q):'<span class="mu">–</span>'}</td>`).join('')}</tr>`}).join('');
     return (typeof fbar==='function'?fbar():'')+`<div class="card"><h3>📦 Titip Jual</h3><div class="sub">Posisi titip jual terkini per outlet (SURYA, data ${TJ.d} Nov). Hanya outlet yang punya titip jual. Ikut filter di atas.</div>
@@ -25,9 +25,9 @@
       <div class="card tw" style="margin-top:12px"><h3>Per SF</h3><table class="tj-t"><tr><th></th><th></th><th colspan="3" style="text-align:center">SA</th><th colspan="3" style="text-align:center">VF</th></tr><tr><th class="l">SF</th><th>Outlet</th>${['Simpati','By.U','All','Reg','By.U','All'].map(k=>`<th>${k}</th>`).join('')}</tr>${tr}
       <tr class="t"><td class="l">Total</td><td>${T.n}</td>${T.s.map(q=>`<td>${nf(q)}</td>`).join('')}</tr></table></div>
       <div class="card tw" style="margin-top:12px"><h3>Daftar outlet</h3>
-      <div class="tj-ch"><button data-tjm="pv" class="${mode==='pv'?'on':''}">VF</button><button data-tjm="sa" class="${mode==='sa'?'on':''}">SA</button></div>
+      
       <div class="sub">${LL.length} outlet${LL.length>=100?' (100 teratas)':''}</div>
       <table class="tj-t"><tr><th></th><th></th><th colspan="3" style="text-align:center">SA</th><th colspan="3" style="text-align:center">VF</th></tr><tr><th>#</th><th class="l">Outlet</th>${['Simpati','By.U','All','Reg','By.U','All'].map(k=>`<th>${k}</th>`).join('')}</tr>${ol}</table></div>`};
-  document.addEventListener('click',e=>{const b=e.target.closest('[data-tjm]');if(!b)return;mode=b.dataset.tjm;draw()});
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-tjm]');if(!b)return;draw()});
   try{if(st.tab==='tj')draw()}catch(e){}
 })();
