@@ -17,6 +17,6 @@ CV['g']=G;CV['v']=V;CV['d']=d;CV['dd']={}
 open(p,'w').write(t[:i]+json.dumps(CV,separators=(',',':'),ensure_ascii=False)+t[i+e:])
 # Titip Jual (posisi terkini): SA Simpati, SA By.U, SA All, PV Reg, PV By.U, PV All -> digipos-tj.js
 TJ={r[0]:[n(x) for x in r[47:53]] for r in R if any(n(x) for x in r[47:53])}
-open('digipos-tj.js','w').write('// Titip Jual per outlet (SURYA Detail Outlet, posisi terkini): [SA Simpati, SA By.U, SA All, PV Reg, PV By.U, PV All]. Dibuat tools/detail_outlet.py\nconst TJ='+json.dumps({'d':d,'v':TJ},separators=(',',':'))+';\n')
+open('digipos-tj.js','w').write('// Titip Jual per outlet (SURYA Detail Outlet, posisi terkini): [SA Simpati, SA By.U, SA All, VF Reg, VF By.U, VF All]. Dibuat tools/detail_outlet.py\nconst TJ='+json.dumps({'d':d,'v':TJ},separators=(',',':'))+';\n')
 tot=[sum(v[k][2] for v in V.values()) for k in range(len(G))]
 print(f'Detail Outlet {d} Nov: '+' · '.join(f'{g} {x}' for g,x in zip(G,tot)),f'({len(V)} outlet)',f'· Titip Jual {len(TJ)} outlet')
