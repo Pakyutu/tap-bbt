@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}#otab tr>:first-child,#otab tr>.fz2,#otab tr>.fz3{left:auto!important;box-shadow:none!important}#otab td:first-child,#otab td.fz2,#otab td.fz3{position:static!important}</style><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0b3a6e"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="apple-touch-icon" href="icon-192.png"><script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"))</script></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>.fbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 10px;font-size:12px;color:var(--mu)}.fbar span{margin-left:6px}.fbar span:first-child{margin-left:0}.fbar button{border:1px solid var(--bd);background:transparent;color:inherit;border-radius:999px;padding:5px 11px;font-size:12.5px;cursor:pointer}.fbar button.on{background:var(--ac);color:#fff;border-color:var(--ac)}:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}#otab tr>:first-child,#otab tr>.fz2,#otab tr>.fz3{left:auto!important;box-shadow:none!important}#otab td:first-child,#otab td.fz2,#otab td.fz3{position:static!important}</style><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0b3a6e"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="apple-touch-icon" href="icon-192.png"><script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"))</script></head><body>
 <!doctype html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Penjualan Cluster Rokan Hilir</title>
@@ -276,7 +276,7 @@ h1::before{width:14px;height:13px;border-radius:0;vertical-align:0;margin-right:
     </div>
   </div>
   <div class="row" id="frow" style="margin-top:10px">
-    <select id="fkec"></select><select id="fsf"></select><select id="fkat"></select><select id="fpjp"></select>
+    <select id="fkec"></select><select id="fsf"></select><select id="fpjp"></select>
     <button class="btn" id="reset">Reset filter</button><span id="fchips"></span>
   </div>
 </div></div>
@@ -293,7 +293,7 @@ h1::before{width:14px;height:13px;border-radius:0;vertical-align:0;margin-right:
     <div class="row nocap"><button class="btn" id="outwa" style="order:3">📝 Salin daftar untuk WA</button><input type="search" id="q" placeholder="Cari nama / ID outlet / nomor RS" style="flex:1;min-width:200px">
       <select id="st"><option value="all">Semua outlet</option><option value="belum">Belum order Nov (Okt ada)</option><option value="turun">Turun vs Okt</option><option value="naik">Naik vs Okt</option><option value="d6">Order tanggal 6 Nov</option><option value="nol">Nol 3 bulan (Sep–Nov)</option></select>
     </div>
-    <div class="card tw" id="owrap" style="padding:0"><table id="otab"></table></div>
+    <div class="fbar" id="obar"></div><div class="card tw" id="owrap" style="padding:0"><table id="otab"></table></div>
     <div class="pg" id="pg"></div>
   </section>
   <section class="panel" id="p-kunj"></section>
@@ -371,7 +371,7 @@ function fillSel(){
   const b=base();const u=k=>[...new Set(b.map(r=>r[k]))].sort();
   const opt=(id,lab,vals,cur)=>{$(id).innerHTML=`<option value="">${lab}: semua</option>`+vals.map(v=>`<option${v===cur?' selected':''}>${esc(v)}</option>`).join('')};
   if(S.kec&&!u('kec').includes(S.kec))S.kec='';if(S.sf&&!u('sf').includes(S.sf))S.sf='';if(S.kat&&!u('kat').includes(S.kat))S.kat='';if(S.pjp&&!u('pjp').includes(S.pjp))S.pjp='';
-  opt('fkec','Kecamatan',u('kec'),S.kec);opt('fsf','SF',u('sf'),S.sf);opt('fkat','Kategori',u('kat'),S.kat);
+  opt('fkec','Kecamatan',u('kec'),S.kec);opt('fsf','SF',u('sf'),S.sf);
   const pj=u('pjp').sort((a,b)=>PJP.indexOf(a)-PJP.indexOf(b));opt('fpjp','Hari PJP',pj,S.pjp);
   const ch=[['kec',S.kec],['sf',S.sf],['kat',S.kat],['pjp',S.pjp]].filter(x=>x[1]);
   $('fchips').innerHTML=ch.length?ch.map(x=>`<span class="chip">${esc(x[1])}</span>`).join(''):'';$('ftog').textContent=ch.length?`Filter (${ch.length})`:'Filter';
@@ -456,6 +456,8 @@ function rOut(rs){
       h+=`<tr class="det"><td colspan="${cols.length}"><div style="font-size:12px;margin-bottom:4px"><b>${esc(x.nm)}</b> · ID ${x.id} · RS ${x.rs} · ${S.prod} per bulan</div><div class="mini">${x.m.concat([x.n]).map((v,i)=>`<div class="${i==10?'nv':''}" style="height:${Math.max(2,v/mx*46)}px" title="${i<10?MON[i]:'Nov MTD'}: ${f(v)}"></div>`).join('')}</div><div class="minil">${MON.concat(['Nov*']).map(m=>`<span>${m}</span>`).join('')}</div><div class="minil">${x.m.concat([x.n]).map(v=>`<span>${f(v)}</span>`).join('')}</div></td></tr>`}});
   if(!sl.length)h+=`<tr><td colspan="${cols.length}" class="mu">Tidak ada outlet yang cocok</td></tr>`;
   $('otab').innerHTML=h;
+  {const c=(on,k,v,l)=>`<button data-${k}="${v}" class="${on?'on':''}">${l}</button>`;
+   $('obar').innerHTML='<span>Outlet</span>'+c(!S.kat,'fk','','Semua')+c(S.kat==='Top 20','fk','Top 20','Top 20')+c(S.kat==='Reguler','fk','Reguler','Reguler')+'<span>Urutan</span>'+c(S.sk==='gap'&&S.sd===1,'fo','def','Default')+c(S.sk==='n'&&S.sd===-1,'fo','max','Terbesar')+c(S.sk==='n'&&S.sd===1,'fo','min','Terkecil')}
   $('pg').innerHTML=`${f(r.length)} outlet`;
 }
 function rTren(rs){
@@ -771,7 +773,7 @@ document.addEventListener('click',e=>{
   if(tr&&tr.dataset.k){S[tr.dataset.k]=tr.dataset.v;S.tab='out';S.page=0;render();window.scrollTo(0,0)}
 });
 $('fa').onchange=e=>{S.a=+e.target.value;if(S.a>S.b)S.b=S.a;S.page=0;render()};$('fb').onchange=e=>{S.b=+e.target.value;if(S.b<S.a)S.a=S.b;S.page=0;render()};
-['fkec','fsf','fkat','fpjp'].forEach((id,i)=>$(id).onchange=e=>{S[['kec','sf','kat','pjp'][i]]=e.target.value;S.page=0;render()});
+['fkec','fsf','fpjp'].forEach((id,i)=>$(id).onchange=e=>{S[['kec','sf','pjp'][i]]=e.target.value;S.page=0;render()});
 const TABN={kunj:'Kunjungan',ring:'Ringkasan',kec:'Kecamatan',sf:'SF',out:'Outlet',tren:'Tren bulanan',pet:'Petugas',stok:'Stok',tem:'Temuan'};
 function toast(m){const e=$('shotmsg');e.textContent=m;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',2600)}
 async function capture(type){
@@ -826,7 +828,8 @@ document.addEventListener('fullscreenchange',fsSync);
 {let fsAuto=0;const fsFirst=e=>{if(fsAuto++||e.target.closest('#fsbtn'))return;const el=document.documentElement;if(!document.fullscreenElement&&el.requestFullscreen)el.requestFullscreen().then(fsSync).catch(()=>{})};document.addEventListener('pointerdown',fsFirst,{capture:true,once:false})}
 $('wabtn').onclick=()=>showText(waText());$('wacopy').onclick=copyText;$('waclose').onclick=()=>$('wamodal').classList.remove('open');$('wamodal').onclick=e=>{if(e.target.id==='wamodal')$('wamodal').classList.remove('open')};
 $('ftog').onclick=()=>$('frow').classList.toggle('open');
-$('reset').onclick=()=>{S.kec=S.sf=S.kat=S.pjp='';S.q='';$('q').value='';S.st='all';$('st').value='all';S.page=0;render()};
+document.addEventListener('click',e=>{const b=e.target.closest('#obar [data-fk],#obar [data-fo]');if(!b)return;if(b.dataset.fk!==undefined)S.kat=b.dataset.fk;else{const o=b.dataset.fo;S.sk=o==='def'?'gap':'n';S.sd=o==='max'?-1:1}S.page=0;render()});
+$('reset').onclick=()=>{S.kec=S.sf=S.kat=S.pjp='';S.sk='gap';S.sd=1;S.q='';$('q').value='';S.st='all';$('st').value='all';S.page=0;render()};
 $('q').oninput=e=>{S.q=e.target.value;S.page=0;render()};
 $('st').onchange=e=>{S.st=e.target.value;S.page=0;render()};
 rStok();render();
