@@ -1,5 +1,5 @@
 // Versi cache: naikkan angka ini kalau ada perubahan besar pada file app.
-const V = "tap-bbt-v218";
+const V = "tap-bbt-v219";
 const SAME = self.location.origin;
 const SHELL = [
   "./", "index.html", "digipos.html", "penjualan.html", "wl.html","kalkulator.html","backup.html","cekst.html","cekst-data.js","wl-tap.html","wl-tap.js","c128.js", "manifest.json",
