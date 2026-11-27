@@ -42,7 +42,7 @@ const CV={"d":26,"g":["CVM","Super Seru","Comsak","Hot Promo","Biometrik","Renew
     const dr=O.map(o=>({o,x:CC.v[o.id][gi]})).filter(r=>r.x[1]>0).map(r=>({...r,g:r.x[2]-r.x[1]})).sort((a,b)=>a.g-b.g),stop=dr.filter(r=>r.x[2]===0),down=dr.filter(r=>r.g<0);
     const tl=down.slice(0,15).map(r=>`<tr><td style="text-align:left">${es(r.o.nm)}<div class="mu" style="font-size:11px">${r.o.id} · ${es(r.o.kec)}</div></td><td style="text-align:left">${es(r.o.sf)}</td><td>${r.o.pjp}</td><td>${nf(r.x[1])}</td><td>${nf(r.x[2])}</td><td class="dn">${sg(r.g)}</td></tr>`).join('');
     const A=agg(O,gi),gp=A[2]-A[1];
-    return `<div class="note">Sumber: <b>Detail Outlet CVM</b> SURYA, ${O.length} outlet PJP${fl?' (ikut filter)':''}. 1–${CC.d} Nov vs 1–${CC.d} Okt. Sama untuk mode VF & SA.</div>
+    return (typeof fbar==='function'?fbar():'')+`<div class="note">Sumber: <b>Detail Outlet CVM</b> SURYA, ${O.length} outlet PJP${fl?' (ikut filter)':''}. 1–${CC.d} Nov vs 1–${CC.d} Okt. Sama untuk mode VF & SA.</div>
       <div class="kpi">${kp}</div><div class="cg">${G.map((g,i)=>`<button data-cg="${i}" class="${i===gi?'on':''}">${g}</button>`).join('')}</div>
       <div class="note">${G[gi]}: ${nf(A[2])} vs ${nf(A[1])} → <b>${sg(gp)} (${pf(pc(A[2],A[1]))})</b>. ${down.length} outlet turun, <b>${stop.length} outlet Okt ada tapi Nov masih 0</b>.</div>
       ${grp(O,'sf','SF')}${grp(O,'kec','Kecamatan')}

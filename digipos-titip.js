@@ -18,7 +18,7 @@
     const key=mode==='sa'?2:5;
     const LL=A.filter(o=>v(o.id)[key]>0).sort((a,b)=>st.ord==='min'?v(a.id)[key]-v(b.id)[key]:v(b.id)[key]-v(a.id)[key]).slice(0,100);
     const ol=LL.map((o,i)=>{const x=v(o.id);return `<tr><td class="mu">${i+1}</td><td class="l"><b>${es(o.nm)}</b><br><span class="mu" style="font-size:11px">${o.id} · ${es(tc(o.sf).split(' ')[0])} · ${es(o.kec||'')}</span></td>${x.map((q,j)=>`<td${j===key?' style="font-weight:700"':''}>${q?nf(q):'<span class="mu">–</span>'}</td>`).join('')}</tr>`}).join('');
-    return `<div class="card"><h3>📦 Titip Jual</h3><div class="sub">Posisi titip jual terkini per outlet (SURYA, data ${TJ.d} Nov). Hanya outlet yang punya titip jual. Ikut filter di atas.</div>
+    return (typeof fbar==='function'?fbar():'')+`<div class="card"><h3>📦 Titip Jual</h3><div class="sub">Posisi titip jual terkini per outlet (SURYA, data ${TJ.d} Nov). Hanya outlet yang punya titip jual. Ikut filter di atas.</div>
       <div class="kpi" style="margin-top:10px"><div class="k"><div class="t">Outlet titip jual</div><div class="v">${nf(T.n)}</div><div class="s">dari ${nf(L.length)} outlet terpilih</div></div>
       <div class="k"><div class="t">SA All</div><div class="v">${nf(T.s[2])}</div><div class="s">Simpati ${nf(T.s[0])} · By.U ${nf(T.s[1])}</div></div>
       <div class="k"><div class="t">VF All</div><div class="v">${nf(T.s[5])}</div><div class="s">Reg ${nf(T.s[3])} · By.U ${nf(T.s[4])}</div></div></div></div>
