@@ -141,7 +141,7 @@ input[type=search],select{border-radius:9px}
 <div class="top"><div class="w" style="padding-bottom:0">
   <div><h1>Dashboard DIGIPOS Cluster Rohil<br><select id="ftap" aria-label="TAP" style="font-weight:600;font-size:.72em;margin-top:2px"><option value="BBT">TAP Bagan Batu</option><option value="BAA">TAP Bagan Siapi-api</option><option value="UJT">TAP Ujung Tanjung</option><option value="ALL">Cluster Rohil</option></select></h1><div class="sub" id="sub"></div></div>
   <div class="row" style="margin-top:10px">
-    <span class="seg" id="prod"><button data-v="VF">VF</button><button data-v="SA">SA</button></span><select id="fkec" aria-label="Kecamatan"></select><select id="fsf" aria-label="Sales force"></select><select id="fpjp" aria-label="Hari PJP"></select>
+    <span class="seg" id="prod"><button data-v="VF">VF</button><button data-v="SA">SA</button><button data-v="ALL">Semua</button><button data-v="BYU">By.U</button></span><select id="fkec" aria-label="Kecamatan"></select><select id="fsf" aria-label="Sales force"></select><select id="fpjp" aria-label="Hari PJP"></select>
     <button class="btn" id="reset">Reset filter</button><button class="btn" id="jpg">Simpan JPEG</button><button class="btn" id="cimg">Salin gambar</button><button class="btn" id="upbtn">Upload data</button><button class="btn" id="fsbtn">Layar penuh</button><input type="file" id="upf" accept=".xlsx,.xls,.csv,.txt" multiple hidden><span id="cpst" role="status"></span>
   </div>
   <div id="upbar" class="upbar" hidden><span id="upinfo"></span><button class="btn" id="upreset">Kembali ke data asli</button></div>
@@ -165,9 +165,13 @@ const O=D.O.map(r=>({id:r[0],nm:r[1],rs:r[2],pjp:r[3],sf:r[4],kec:r[5],vr:r[6],v
 const PR={VF:{a:"VF Reguler",b:"VF By.U",sa:"Reg",sb:"By.U",ta:20,tb:10,ua:"trx",ub:"pcs",ka:"vr",kb:"vb",T:"T",sub:"ST VF Reguler &amp; By.U update 26 Nov 2026 · OA VF Reg = outlet ≥20 trx, By.U ≥10 pcs · PJP terbaru, target dihitung ulang: Reg 95%, By.U 31% PJP",
  bk:[["0",o=>o.reg===0],["1–19",o=>o.reg>0&&o.reg<20],["20–50",o=>o.reg>=20&&o.reg<=50],["51–100",o=>o.reg>50&&o.reg<=100],["101–149",o=>o.reg>100&&o.reg<150],["≥150",o=>o.reg>=150]]},
  SA:{a:"SA Simpati",b:"SA By.U",sa:"Simpati",sb:"By.U",ta:5,tb:5,ua:"pcs",ub:"pcs",ka:"ss",kb:"sb",T:"TS",sub:"ST SA Simpati &amp; By.U update 26 Nov 2026 · OA = outlet ≥5 pcs · PJP terbaru, target dihitung ulang: Simpati 79%, By.U 36% PJP",
- bk:[["0",o=>o.reg===0],["1–4",o=>o.reg>0&&o.reg<5],["5–9",o=>o.reg>=5&&o.reg<10],["≥10",o=>o.reg>=10]]}};
+ bk:[["0",o=>o.reg===0],["1–4",o=>o.reg>0&&o.reg<5],["5–9",o=>o.reg>=5&&o.reg<10],["≥10",o=>o.reg>=10]]},
+ ALL:{a:"VF+SA Reguler",b:"VF+SA By.U",sa:"Reg+Simpati",sb:"By.U",ta:25,tb:15,ua:"ST",ub:"ST",ka:o=>o.vr+o.ss,kb:o=>o.vb+o.sb,T:"TA",sub:"Gabungan VF + SA · Reguler = VF Reg + SA Simpati, By.U = VF By.U + SA By.U · OA Reguler = total ≥25 (20+5), By.U ≥15 (10+5) · target = jumlah target VF + SA",
+ bk:[["0",o=>o.reg===0],["1–24",o=>o.reg>0&&o.reg<25],["25–50",o=>o.reg>=25&&o.reg<=50],["51–100",o=>o.reg>50&&o.reg<=100],["101–149",o=>o.reg>100&&o.reg<150],["≥150",o=>o.reg>=150]]},
+ BYU:{a:"VF By.U",b:"SA By.U",sa:"VF By.U",sb:"SA By.U",ta:10,tb:5,ua:"pcs",ub:"pcs",ka:"vb",kb:"sb",T:"TB",sub:"Khusus By.U · VF By.U (OA ≥10 pcs) &amp; SA By.U (OA ≥5 pcs) · target = target By.U masing-masing",
+ bk:[["0",o=>o.reg===0],["1–9",o=>o.reg>0&&o.reg<10],["10–49",o=>o.reg>=10&&o.reg<50],["≥50",o=>o.reg>=50]]}};
 let L=PR.VF,TT=D.T;
-function setProd(p){st.prod=p;L=PR[p];TT=D[L.T];O.forEach(o=>{o.reg=o[L.ka];o.byu=o[L.kb]})}
+function setProd(p){if(!PR[p])p="VF";st.prod=p;L=PR[p];if(!D.TA){D.TA={};D.TB={};for(const s in D.T){const a=D.T[s],b=D.TS[s]||[0,0];D.TA[s]=[a[0]+b[0],a[1]+b[1]];D.TB[s]=[a[1],b[1]]}}TT=D[L.T];const g=(o,k)=>typeof k==="function"?k(o):o[k];O.forEach(o=>{o.reg=g(o,L.ka);o.byu=g(o,L.kb)})}
 const HARI=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"];
 const SF=Object.keys(D.T);
 const KEC=[...new Set(O.map(o=>o.kec))].sort();

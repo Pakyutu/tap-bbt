@@ -15,8 +15,8 @@
     const by={};A.forEach(o=>(by[o.sf]=by[o.sf]||[]).push(o));
     const rows=Object.entries(by).map(([sf,a])=>({sf,...sum(a)})).sort((a,b)=>(b.s[2]+b.s[5])-(a.s[2]+a.s[5]));
     const tr=rows.map(r=>`<tr><td class="l"><b>${es(tc(r.sf))}</b></td><td>${r.n}</td>${r.s.map((q,i)=>`<td${i===2||i===5?' style="font-weight:700"':''}>${q?nf(q):'<span class="mu">–</span>'}</td>`).join('')}</tr>`).join('');
-    const key=st.prod==='SA'?2:5;
-    const LL=A.filter(o=>v(o.id)[key]>0).sort((a,b)=>st.ord==='min'?v(a.id)[key]-v(b.id)[key]:v(b.id)[key]-v(a.id)[key]).slice(0,100);
+    const key=st.prod==='SA'?2:st.prod==='VF'?5:-1,kv=x=>key>=0?x[key]:st.prod==='ALL'?x[2]+x[5]:x[1]+x[4];
+    const LL=A.filter(o=>kv(v(o.id))>0).sort((a,b)=>st.ord==='min'?kv(v(a.id))-kv(v(b.id)):kv(v(b.id))-kv(v(a.id))).slice(0,100);
     const ol=LL.map((o,i)=>{const x=v(o.id);return `<tr><td class="mu">${i+1}</td><td class="l"><b>${es(o.nm)}</b><br><span class="mu" style="font-size:11px">${o.id} · ${es(tc(o.sf).split(' ')[0])} · ${es(o.kec||'')}</span></td>${x.map((q,j)=>`<td${j===key?' style="font-weight:700"':''}>${q?nf(q):'<span class="mu">–</span>'}</td>`).join('')}</tr>`}).join('');
     return (typeof fbar==='function'?fbar():'')+`<div class="card"><h3>📦 Titip Jual</h3><div class="sub">Posisi titip jual terkini per outlet (SURYA, data ${TJ.d} Nov). Hanya outlet yang punya titip jual. Ikut filter di atas.</div>
       <div class="kpi kc" style="margin-top:10px"><div class="k"><div class="t">Outlet titip jual</div><div class="v">${nf(T.n)}</div><div class="s">dari ${nf(L.length)} outlet terpilih</div></div>
