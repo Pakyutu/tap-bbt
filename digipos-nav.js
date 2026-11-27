@@ -1,7 +1,7 @@
 // DIGIPOS: konfigurasi grup tab (dipakai tabgroup.js) + header ringkas (Filter & menu ⋯).
 window.TABG={key:'dgp',
-  groups:[['ring','📊 Ringkasan',['ring','hari1','tem']],['sf','👥 Wilayah',['sf','hari','kec','site']],['out','🏪 Outlet',['out']],['prog','🎯 Program',['km','xd','sso','cuan','cvm','bio']],['alat','🏷️ Scan',['bc','so']]],
-  names:{ring:'Ringkasan',hari1:'Hari Ini',tem:'Temuan',sf:'Per SF',hari:'SF × Hari',kec:'Kecamatan',site:'Site',out:'Outlet',km:'Klik Misi',xd:'Extra Dealing',sso:'Sultan SO',cuan:'Cuan PV',cvm:'CVM',bio:'Biometrik',bc:'Barcode',so:'Sell Out'}};
+  groups:[['ring','📊 Ringkasan',['ring','hari1','tem']],['sf','👥 Wilayah',['sf','hari','kec','site']],['out','🏪 Outlet',['out']],['prog','🎯 Program',['km','xd','sso','cuan','cvm','bio','tj']],['alat','🏷️ Scan',['bc','so']]],
+  names:{ring:'Ringkasan',hari1:'Hari Ini',tem:'Temuan',sf:'Per SF',hari:'SF × Hari',kec:'Kecamatan',site:'Site',out:'Outlet',km:'Klik Misi',xd:'Extra Dealing',sso:'Sultan SO',cuan:'Cuan PV',cvm:'CVM',bio:'Biometrik',tj:'Titip Jual',bc:'Barcode',so:'Sell Out'}};
 (function(){
   const $=i=>document.getElementById(i),prod=$('prod'),row=prod&&prod.parentElement;if(!row)return;
   const css=document.createElement('style');css.textContent=`

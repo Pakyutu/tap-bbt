@@ -6,7 +6,7 @@ Pakai: python3 tools/detail_outlet.py <baris.json> <hari_cutoff> ; baris.json = 
 import json,sys,datetime
 R=json.load(open(sys.argv[1]));d=int(sys.argv[2])
 n=lambda x:int(str(x).replace(',','')) if str(x) not in('–','') else 0
-COL=[('CVM',17),('Super Seru',22),('Comsak',27),('Hot Promo',32),('Biometrik',42),('Renewal By.U',37)]
+COL=[('CVM',17),('Super Seru',22),('Comsak',27),('Hot Promo',32),('Biometrik',42),('Renewal By.U',37),('ST PV',12),('ST SA',7)]
 p='digipos-cvm.js';t=open(p).read();i=t.index('const CV=')+9;CV,e=json.JSONDecoder().raw_decode(t[i:])
 G=[g for g,_ in COL];old=CV['g']
 V={}
@@ -15,5 +15,8 @@ for k,v in CV['v'].items():  # outlet lama yang tidak ada di SURYA: pertahankan,
     if k not in V:V[k]=[v[old.index(g)] if g in old and old.index(g)<len(v) else [0,0,0] for g in G]
 CV['g']=G;CV['v']=V;CV['d']=d;CV['dd']={}
 open(p,'w').write(t[:i]+json.dumps(CV,separators=(',',':'),ensure_ascii=False)+t[i+e:])
+# Titip Jual (posisi terkini): SA Simpati, SA By.U, SA All, PV Reg, PV By.U, PV All -> digipos-tj.js
+TJ={r[0]:[n(x) for x in r[47:53]] for r in R if any(n(x) for x in r[47:53])}
+open('digipos-tj.js','w').write('// Titip Jual per outlet (SURYA Detail Outlet, posisi terkini): [SA Simpati, SA By.U, SA All, PV Reg, PV By.U, PV All]. Dibuat tools/detail_outlet.py\nconst TJ='+json.dumps({'d':d,'v':TJ},separators=(',',':'))+';\n')
 tot=[sum(v[k][2] for v in V.values()) for k in range(len(G))]
-print(f'Detail Outlet {d} Nov: '+' · '.join(f'{g} {x}' for g,x in zip(G,tot)),f'({len(V)} outlet)')
+print(f'Detail Outlet {d} Nov: '+' · '.join(f'{g} {x}' for g,x in zip(G,tot)),f'({len(V)} outlet)',f'· Titip Jual {len(TJ)} outlet')
