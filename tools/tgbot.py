@@ -180,6 +180,11 @@ def proses(msg):
         lm=LNK.match(t)
         if lm:
             nm=lm.group(2);body=None
+            r=None
+            if not nm and not re.search(r'drive\.google\.com|docs\.google\.com',lm.group(1)):  # Dropbox/link langsung: nama file dari alamat
+                nm=urllib.parse.unquote(urllib.parse.urlparse(lm.group(1)).path.rsplit('/',1)[-1])
+                if not re.search(r'\.(xlsx|csv|txt)$',nm,re.I):
+                    PG[0]=ACK;pg('❌ nama file tidak terbaca dari link. Tambahkan nama file di belakang link, contoh: <link> ST_DIGIPOS_NOV_2026.xlsx');return False
             if not nm:  # nama file tidak diberikan: ambil nama asli dari Drive
                 try:
                     import gdown
@@ -195,7 +200,7 @@ def proses(msg):
         if qm:kueri(msg,qm.group(1).lower(),qm.group(2));return False
         if not lm and not CMD.match(spec):
             PG[0]=ACK;pg('Kirim FILE (xlsx/csv), atau perintah: status · tes notif · sn <nomor> · outlet <id/nama> · mom pv 20 · soh sa 19 · mulai mom pv 21 (paste panjang) · tempel link Drive saja (boleh banyak link sekaligus, satu per baris)');return False
-    low=re.sub(r'[\s]+','_',nm.lower());cap=msg.get('caption')
+    low=re.sub(r'[\s\-]+','_',nm.lower());cap=msg.get('caption')
     d,mo,iso=tgl(cap);fd=re.search(r'(\d{4})-(\d\d)-(\d\d)',nm)
     if fd and not cap:iso=fd.group(0);d=int(fd.group(3));mo=int(fd.group(2))
     lab=f'{d} {BLN[mo-1]}';PY=sys.executable;ext=pathlib.Path(nm).suffix.lower()
