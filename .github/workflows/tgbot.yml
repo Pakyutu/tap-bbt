@@ -21,11 +21,13 @@ jobs:
         with: {python-version: '3.12'}
       - uses: actions/cache/restore@v4
         with: {path: .inbox, key: inbox-none, restore-keys: 'inbox-'}
-      - run: pip install -q openpyxl gdown
+      - run: pip install -q openpyxl gdown telethon
       - run: python3 tools/tgbot.py
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_CHAT: ${{ secrets.TG_CHAT }}
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
           TG_UPDATE: ${{ github.event_name == 'repository_dispatch' && toJSON(github.event.client_payload.update) || '' }}
           TG_ACK: ${{ github.event.client_payload.ack }}
       - uses: actions/cache/save@v4

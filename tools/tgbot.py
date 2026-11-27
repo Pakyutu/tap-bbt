@@ -48,6 +48,19 @@ def run(cmd):
     r=subprocess.run(cmd,cwd=R,capture_output=True,text=True)
     return r.returncode,(r.stdout+r.stderr).strip()
 LNK=re.compile(r'^/?(?:link\s+)?(https?://\S+)(?:\s+(\S+\.(?:xlsx|csv|txt)))?\s*$',re.I)
+def unduh_besar(chat,mid,dst):
+    # Bot API HTTP dibatasi 20MB; MTProto (Telethon, login sebagai bot) bisa sampai 2GB
+    import asyncio
+    from telethon import TelegramClient
+    async def go():
+        c=TelegramClient('/tmp/botsess',int(os.environ['TG_API_ID']),os.environ['TG_API_HASH'])
+        await c.start(bot_token=T)
+        try:
+            m=await c.get_messages(chat,ids=mid)
+            if not m or not m.media:raise RuntimeError('pesan/file tidak ditemukan')
+            await c.download_media(m,file=str(dst))
+        finally:await c.disconnect()
+    asyncio.run(go())
 def ambil(url,out):
     if 'drive.google.com' in url or 'docs.google.com' in url:
         import gdown
@@ -209,7 +222,8 @@ def proses(msg):
         sc,st,extra,kind='tools/'+rt[1],rt[2],[lab],'f'
     if kind=='st' and re.search(r'oct|okt|sep|agu|aug',low):
         PG[0]=ACK;pg(f'➖ {nm}: ini file bulan lalu, bukan data berjalan. Tidak dimasukkan supaya data Nov tidak tertimpa (kalau perlu, lewat sesi Claude).');return False
-    if doc and not doc.get('_url') and doc.get('file_size',0)>19*1024*1024:say('File >20MB, batas Telegram. Kirim lewat sesi Claude.');return False
+    BIG=bool(doc and not doc.get('_url') and doc.get('file_size',0)>19*1024*1024)
+    if BIG and not(os.environ.get('TG_API_ID') and os.environ.get('TG_API_HASH')):say('File >20MB, batas Bot API. Kirim lewat link atau sesi Claude.');return False
     PG[0]=ACK;pg(f'⏳ 5% · {nm} diterima, mulai diproses')
     dst=pathlib.Path('/tmp')/('in_'+re.sub(r'[^\w.\-]','_',nm or 'paste')+('' if doc else '.txt'))
     if doc and doc.get('_url'):
@@ -218,6 +232,10 @@ def proses(msg):
             if doc.get('_pre'):shutil.copy(doc['_pre'],dst)
             else:ambil(doc['_url'],dst)
         except Exception as e:pg(f'❌ gagal unduh: {str(e)[:200]}');return False
+    elif doc and BIG:
+        pg(f'⏳ 10% · mengunduh file besar ({doc["file_size"]//1048576} MB)')
+        try:unduh_besar(msg['chat']['id'],msg['message_id'],dst)
+        except Exception as e:pg(f'❌ gagal unduh file besar: {str(e)[:200]}');return False
     elif doc:
         fp=call('getFile',file_id=doc['file_id'])['result']['file_path']
         dst.write_bytes(retry(lambda:urllib.request.urlopen(f'https://api.telegram.org/file/bot{T}/{fp}',timeout=120).read()))
