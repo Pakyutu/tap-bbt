@@ -1,2 +1,3 @@
 # Koreksi manual site ID per outlet: <ID outlet> <site>  (dipakai site_pjp.py, menimpa file PJP)
 1201061183 UJT504  # Pegasus Cellular
+1201088043 UJT504  # Riska Ponsel
