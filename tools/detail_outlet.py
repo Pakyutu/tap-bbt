@@ -6,7 +6,7 @@ Pakai: python3 tools/detail_outlet.py <baris.json> <hari_cutoff> ; baris.json = 
 import json,sys,datetime
 R=json.load(open(sys.argv[1]));d=int(sys.argv[2])
 n=lambda x:int(str(x).replace(',','')) if str(x) not in('–','') else 0
-COL=[('CVM',17),('Super Seru',22),('Comsak',27),('Hot Promo',32),('Biometrik',42),('Renewal By.U',37),('ST PV',12),('ST SA',7)]
+COL=[('CVM',17),('Super Seru',22),('Comsak',27),('Hot Promo',32),('Biometrik',42),('Renewal By.U',37)]
 p='digipos-cvm.js';t=open(p).read();i=t.index('const CV=')+9;CV,e=json.JSONDecoder().raw_decode(t[i:])
 G=[g for g,_ in COL];old=CV['g']
 V={}
