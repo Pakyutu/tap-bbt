@@ -177,9 +177,9 @@ html body .menu a.mc:nth-child(1),html body .menu a.mc:nth-child(2){background:c
 <script>
 (function(){const B=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
 fetch("status.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{const t=new Date();t.setHours(0,0,0,0);let late=0,h="",g="",n=0;
- j.items.forEach(x=>{const d=new Date(x.d+"T00:00:00"),a=Math.round((t-d)/864e5),c=a<=2?"ok":a<=3?"wn":"bd",lb=a<=2?"Terbaru":a<=3?"Perlu cek":"Usang";if(a>2)late++;n++;
+ j.items.forEach(x=>{const d=new Date(x.d+"T00:00:00"),cu=x.c?new Date(x.c+"T00:00:00"):null,a=Math.round((t-(cu||d))/864e5),c=a<=2?"ok":a<=3?"wn":"bd",lb=a<=2?"Terbaru":a<=3?"Perlu cek":"Usang";if(a>2)late++;n++;
   if(x.g!==g){g=x.g;h+=`<div class="gr">${g}</div>`}
-  h+=`<div class="it"><span>${x.n}<small>${d.getDate()} ${B[d.getMonth()]}${a>0?" · "+a+" hari lalu":" · hari ini"}</small></span><span class="pill ${c}">${lb}</span></div>`});
+  h+=`<div class="it"><span>${x.n}<small>${d.getDate()} ${B[d.getMonth()]}${cu?" · data s/d "+cu.getDate()+" "+B[cu.getMonth()]:""}${a>0?" · "+a+" hari lalu":" · hari ini"}</small></span><span class="pill ${c}">${lb}</span></div>`});
  document.getElementById("dstl").innerHTML=h;
  document.getElementById("dsts").innerHTML=late?`<span class="pill bd">${late} perlu update</span>`:`<span class="pill ok">Semua terbaru</span>`;
  document.getElementById("hchips").innerHTML=`<span class="pill ${late?"wn":"ok"}"><span class="dot"></span>${n-late}/${n} data terbaru</span><span class="pill in">20 sales force</span>`;

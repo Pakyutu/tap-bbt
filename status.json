@@ -53,7 +53,8 @@
 {
 "g": "Penjualan",
 "n": "Outlet PV / SA",
-"d": "2026-11-25"
+"d": "2026-11-25",
+"c": "2026-11-25"
 },
 {
 "g": "Penjualan",
@@ -63,17 +64,20 @@
 {
 "g": "Penjualan",
 "n": "Petugas (MoM)",
-"d": "2026-11-26"
+"d": "2026-11-26",
+"c": "2026-11-26"
 },
 {
 "g": "Penjualan",
 "n": "Tren bulanan & inject (semua TAP)",
-"d": "2026-11-26"
+"d": "2026-11-26",
+"c": "2026-11-26"
 },
 {
 "g": "Penjualan",
 "n": "Stock on Hand",
-"d": "2026-11-27"
+"d": "2026-11-27",
+"c": "2026-11-26"
 },
 {
 "g": "Penjualan",

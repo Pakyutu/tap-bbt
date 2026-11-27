@@ -32,7 +32,11 @@ CSV=[('detail_outlet_cvm','CVM',['CVM']),('detail_outlet_pv','--pv',['Outlet PV 
 def stat(names,iso):
     p=R/'status.json';j=json.loads(p.read_text())
     for i in j['items']:
-        if i['n'] in names:i['d']=iso
+        if i['n'] in names:
+            i['d']=iso;i.pop('c',None)
+            if i['n']=='Outlet PV / SA':
+                s=(R/'penjualan.html').read_text();k=s.index('const D=')+8;c=json.JSONDecoder().raw_decode(s[k:])[0].get('C')
+                if c:i['c']=f"{iso[:8]}{int(c):02d}"
     p.write_text(json.dumps(j,ensure_ascii=False,indent=0).replace('\n ','\n'))
 def tgl(cap):
     m=re.search(r'(\d{1,2})\s*(Nov|Okt|Des)',cap or '',re.I)
@@ -65,7 +69,7 @@ def q_status():
     j=json.loads((R/'status.json').read_text());n=wib().date();o=[]
     for i in j['items']:
         d=datetime.date.fromisoformat(i['d']);t=(n-d).days
-        o.append(f"{'⚠️' if t>1 else '✅'} {i['n']}: {d.day} {BLN[d.month-1]}"+(f' ({t} hari lalu)' if t>1 else ''))
+        o.append(f"{'⚠️' if t>1 else '✅'} {i['n']}: {d.day} {BLN[d.month-1]}"+(f' ({t} hari lalu)' if t>1 else '')+(f" · data s/d {int(i['c'][8:])} {BLN[int(i['c'][5:7])-1]}" if i.get('c') else ''))
     return 'Status data (hari ini '+f'{n.day} {BLN[n.month-1]}):\n'+'\n'.join(o)
 def q_sn(txt):
     sn=list(dict.fromkeys(re.findall(r'\d{10,}',txt)))[:40]
