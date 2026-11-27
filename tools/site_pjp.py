@@ -17,5 +17,11 @@ for r in wb['PJP'].iter_rows(min_row=2,max_col=8,values_only=True):
     if r[0] and r[6]:SI[str(int(r[0]))]=[r[6],str(r[7] or '').strip()]
 miss=[k for k in SI.values() if k[0] not in S]
 SITE['S']=S;SITE['SI']=SI
+import os
+_o=os.path.join(os.path.dirname(os.path.abspath(__file__)),'site_override.txt')
+if os.path.exists(_o):
+    for _l in open(_o):
+        _x=_l.split('#')[0].split()
+        if len(_x)==2 and _x[0] in SI:SI[_x[0]]=[_x[1],SI[_x[0]][1]]
 open(p,'w').write(s[:i]+json.dumps(SITE,ensure_ascii=False,separators=(',',':'))+s[i+e:])
 print('site',len(S),'outlet->site',len(SI),'site tak ada di Detail',len(miss))
