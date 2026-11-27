@@ -141,7 +141,7 @@ input[type=search],select{border-radius:9px}
 <div class="top"><div class="w" style="padding-bottom:0">
   <div><h1>Dashboard DIGIPOS Cluster Rohil<br><select id="ftap" aria-label="TAP" style="font-weight:600;font-size:.72em;margin-top:2px"><option value="BBT">TAP Bagan Batu</option><option value="BAA">TAP Bagan Siapi-api</option><option value="UJT">TAP Ujung Tanjung</option><option value="ALL">Cluster Rohil</option></select></h1><div class="sub" id="sub"></div></div>
   <div class="row" style="margin-top:10px">
-    <span class="seg" id="prod"><button data-v="VF">VF</button><button data-v="SA">SA (Perdana)</button></span><select id="fkec" aria-label="Kecamatan"></select><select id="fsf" aria-label="Sales force"></select><select id="fpjp" aria-label="Hari PJP"></select>
+    <span class="seg" id="prod"><button data-v="VF">VF</button><button data-v="SA">SA (Perdana)</button></span><select id="fkec" aria-label="Kecamatan"></select><select id="fsf" aria-label="Sales force"></select><select id="fpjp" aria-label="Hari PJP"></select><select id="ftop" aria-label="Top 20"><option value="">Semua outlet</option><option value="1">Top 20 Nota (FR)</option></select>
     <button class="btn" id="reset">Reset filter</button><button class="btn" id="jpg">Simpan JPEG</button><button class="btn" id="cimg">Salin gambar</button><button class="btn" id="upbtn">Upload data</button><button class="btn" id="fsbtn">Layar penuh</button><input type="file" id="upf" accept=".xlsx,.xls,.csv,.txt" multiple hidden><span id="cpst" role="status"></span>
   </div>
   <div id="upbar" class="upbar" hidden><span id="upinfo"></span><button class="btn" id="upreset">Kembali ke data asli</button></div>
@@ -171,7 +171,7 @@ function setProd(p){st.prod=p;L=PR[p];TT=D[L.T];O.forEach(o=>{o.reg=o[L.ka];o.by
 const HARI=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"];
 const SF=Object.keys(D.T);
 const KEC=[...new Set(O.map(o=>o.kec))].sort();
-const st={km:"r",prod:"VF",kec:"",sf:"",pjp:"",tab:"ring",q:"",ost:"all",sort:"reg",pg:0};
+const st={km:"r",prod:"VF",kec:"",sf:"",pjp:"",top:"",tab:"ring",q:"",ost:"all",sort:"reg",pg:0};
 const $=id=>document.getElementById(id);
 const f=n=>n.toLocaleString("id-ID");
 const pc=(a,b)=>b?Math.round(a/b*100)+"%":"–";
@@ -181,8 +181,9 @@ function fill(el,lab,arr){el.innerHTML=`<option value="">${lab}</option>`+arr.ma
 fill($("fkec"),"Semua kecamatan",KEC);fill($("fsf"),"Semua SF",SF);fill($("fpjp"),"Semua hari PJP",HARI.filter(h=>O.some(o=>o.pjp===h)));
 try{const s=JSON.parse(localStorage.getItem("vfbbt")||"{}");Object.assign(st,s)}catch(e){}
 function save(){try{localStorage.setItem("vfbbt",JSON.stringify({prod:st.prod,kec:st.kec,sf:st.sf,pjp:st.pjp,tab:st.tab}))}catch(e){}}
-function sel(){return O.filter(o=>(!st.kec||o.kec===st.kec)&&(!st.sf||o.sf===st.sf)&&(!st.pjp||o.pjp===st.pjp))}
-const fullScope=()=>!st.kec&&!st.pjp;
+function sel(){return O.filter(o=>(!st.kec||o.kec===st.kec)&&(!st.sf||o.sf===st.sf)&&(!st.pjp||o.pjp===st.pjp)&&(!st.top||top20().has(String(o.id))))}
+function top20(){return new Set((((D.FR||{}).rows)||[]).map(r=>String(r[0])))}
+const fullScope=()=>!st.kec&&!st.pjp&&!st.top;
 function agg(a){return{n:a.length,reg:a.filter(isReg).length,byu:a.filter(isByu).length,nol:a.filter(o=>!o.reg&&!o.byu).length,stR:a.reduce((s,o)=>s+o.reg,0),stB:a.reduce((s,o)=>s+o.byu,0)}}
 function tgt(sfs){return sfs.reduce((s,x)=>[s[0]+TT[x][0],s[1]+TT[x][1]],[0,0])}
 function kpill(v,t){const p=t?Math.round(v/t*100):0;const c=p>=90?"k4":p>=75?"k3":p>=50?"k2":"k1";return `<span class="kp ${c}"><b>${p}%</b><i style="width:${Math.min(100,p)}%"></i></span>`}
@@ -323,7 +324,7 @@ function kmTab(){
 
 const R={ring,sf:sfTab,hari,kec:kecTab,km:kmTab,out:outTab,tem};
 if(!R[st.tab])st.tab="ring";
-function draw(){setProd(st.prod);$("sub").innerHTML=L.sub;document.querySelectorAll("#prod button").forEach(b=>b.classList.toggle("on",b.dataset.v===st.prod));$("fkec").value=st.kec;$("fsf").value=st.sf;$("fpjp").value=st.pjp;
+function draw(){setProd(st.prod);$("sub").innerHTML=L.sub;document.querySelectorAll("#prod button").forEach(b=>b.classList.toggle("on",b.dataset.v===st.prod));$("fkec").value=st.kec;$("fsf").value=st.sf;$("fpjp").value=st.pjp;$("ftop").value=st.top;
   document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===st.tab));
   $("P").innerHTML=R[st.tab]();
   if(st.tab==="hari")document.querySelectorAll("#hjsel button").forEach(b=>b.onclick=()=>{st.hj=b.dataset.v;draw()});
@@ -337,15 +338,15 @@ function draw(){setProd(st.prod);$("sub").innerHTML=L.sub;document.querySelector
     if($("osrt"))$("osrt").onchange=e=>{st.sort=e.target.value;st.pg=0;draw()};
     $("prv").onclick=()=>{st.pg--;draw()};$("nxt").onclick=()=>{st.pg++;draw()}}
   save()}
-["kec","sf","pjp"].forEach(k=>$("f"+k).onchange=e=>{st[k]=e.target.value;st.pg=0;draw()});
+["kec","sf","pjp","top"].forEach(k=>$("f"+k).onchange=e=>{st[k]=e.target.value;st.pg=0;draw()});
 document.querySelectorAll("#prod button").forEach(b=>b.onclick=()=>{st.prod=b.dataset.v;st.pg=0;draw()});
-$("reset").onclick=()=>{st.kec=st.sf=st.pjp=st.q="";st.ost="all";st.sort="reg";st.pg=0;try{document.dispatchEvent(new Event("dgp-reset"))}catch(e){}draw()};
+$("reset").onclick=()=>{st.kec=st.sf=st.pjp=st.top=st.q="";st.ost="all";st.sort="reg";st.pg=0;try{document.dispatchEvent(new Event("dgp-reset"))}catch(e){}draw()};
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{st.tab=b.dataset.t;draw()});
 const TABN={ring:"Ringkasan",sf:"Per SF",hari:"SF × Hari",kec:"Kecamatan",byu:"Belum OA By.U",km:"Klik Misi",out:"Outlet",tem:"Temuan"};
 function stamp(){const d=new Date(),p=n=>String(n).padStart(2,"0");return `${p(d.getDate())}-${p(d.getMonth()+1)}-${d.getFullYear()} ${p(d.getHours())}.${p(d.getMinutes())}`}
 async function shot(){
   if(!window.html2canvas)throw new Error("lib");
-  const c=$("cap"),flt=[st.kec,st.sf,st.pjp].filter(Boolean).join(" · ")||"Semua kecamatan, SF, dan hari";
+  const c=$("cap"),flt=[st.kec,st.sf,st.pjp,st.top?"Top 20 Nota":""].filter(Boolean).join(" · ")||"Semua kecamatan, SF, dan hari";
   c.innerHTML=`<div class="ch"><div><h1>${st.tab==="km"?(st.km==="b"?"Klik Misi By.U":"Klik Misi Reguler"):"Dashboard "+st.prod} Outlet ${TAP==="ALL"?"Cluster Rohil":"TAP "+TAPS[TAP]}</h1><div class="sub">${TABN[st.tab]} · ${esc(flt)}</div>${st.tab==="km"?"":`<div class="sub">${L.sub}</div>`}</div><div class="sub" style="text-align:right">Dibuat ${stamp()}</div></div>`+$("P").innerHTML;
   const bg=getComputedStyle(document.body).backgroundColor;
   try{return await html2canvas(c,{scale:2,backgroundColor:bg,logging:false,windowWidth:1000})}
