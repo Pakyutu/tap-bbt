@@ -141,7 +141,7 @@ input[type=search],select{border-radius:9px}
 <div class="top"><div class="w" style="padding-bottom:0">
   <div><h1>Dashboard DIGIPOS Cluster Rohil<br><select id="ftap" aria-label="TAP" style="font-weight:600;font-size:.72em;margin-top:2px"><option value="BBT">TAP Bagan Batu</option><option value="BAA">TAP Bagan Siapi-api</option><option value="UJT">TAP Ujung Tanjung</option><option value="ALL">Cluster Rohil</option></select></h1><div class="sub" id="sub"></div></div>
   <div class="row" style="margin-top:10px">
-    <span class="seg" id="prod"><button data-v="VF">VF</button><button data-v="SA">SA (Perdana)</button></span><select id="fkec" aria-label="Kecamatan"></select><select id="fsf" aria-label="Sales force"></select><select id="fpjp" aria-label="Hari PJP"></select><select id="ftop" aria-label="Top 20"><option value="">Semua outlet</option><option value="1">Top 20</option><option value="0">Reguler</option></select>
+    <span class="seg" id="prod"><button data-v="VF">VF</button><button data-v="SA">SA (Perdana)</button></span><select id="fkec" aria-label="Kecamatan"></select><select id="fsf" aria-label="Sales force"></select><select id="fpjp" aria-label="Hari PJP"></select><select id="ftop" aria-label="Top 20"><option value="">Semua outlet</option><option value="1">Top 20</option><option value="0">Reguler</option></select><select id="ford" aria-label="Urutan"><option value="">Urutan biasa</option><option value="max">Terbesar</option><option value="min">Terkecil</option></select>
     <button class="btn" id="reset">Reset filter</button><button class="btn" id="jpg">Simpan JPEG</button><button class="btn" id="cimg">Salin gambar</button><button class="btn" id="upbtn">Upload data</button><button class="btn" id="fsbtn">Layar penuh</button><input type="file" id="upf" accept=".xlsx,.xls,.csv,.txt" multiple hidden><span id="cpst" role="status"></span>
   </div>
   <div id="upbar" class="upbar" hidden><span id="upinfo"></span><button class="btn" id="upreset">Kembali ke data asli</button></div>
@@ -171,7 +171,7 @@ function setProd(p){st.prod=p;L=PR[p];TT=D[L.T];O.forEach(o=>{o.reg=o[L.ka];o.by
 const HARI=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"];
 const SF=Object.keys(D.T);
 const KEC=[...new Set(O.map(o=>o.kec))].sort();
-const st={km:"r",prod:"VF",kec:"",sf:"",pjp:"",top:"",tab:"ring",q:"",ost:"all",sort:"reg",pg:0};
+const st={km:"r",prod:"VF",kec:"",sf:"",pjp:"",top:"",ord:"",tab:"ring",q:"",ost:"all",sort:"reg",pg:0};
 const $=id=>document.getElementById(id);
 const f=n=>n.toLocaleString("id-ID");
 const pc=(a,b)=>b?Math.round(a/b*100)+"%":"–";
@@ -235,7 +235,7 @@ function outTab(){
   if(q)a=a.filter(o=>(o.nm+" "+o.id+" "+o.rs+" "+((D.U||{})[o.id]||"")+" "+(window.siteOf?siteOf(o.id):"")).toLowerCase().includes(q));
   if(st.ost==="nol")a=a.filter(o=>!o.reg&&!o.byu);else if(st.ost==="noreg")a=a.filter(o=>!isReg(o));else if(st.ost==="reg")a=a.filter(isReg);else if(st.ost==="byu")a=a.filter(isByu);else if(st.ost==="nobyu")a=a.filter(o=>!isByu(o));
   const SH=st.ost==="noreg"||st.ost==="reg"?"a":st.ost==="nobyu"||st.ost==="byu"?"b":"ab";
-  const S=SH==="b"&&st.sort==="reg"?"byu":SH==="a"&&st.sort==="byu"?"reg":st.sort;a=[...a].sort((p,r)=>S==="nm"?p.nm.localeCompare(r.nm):S==="sf"?p.sf.localeCompare(r.sf)||HARI.indexOf(p.pjp)-HARI.indexOf(r.pjp):S==="pjp"?HARI.indexOf(p.pjp)-HARI.indexOf(r.pjp):(r[S]-p[S]));
+  const S=SH==="b"&&st.sort==="reg"?"byu":SH==="a"&&st.sort==="byu"?"reg":st.sort;a=[...a].sort((p,r)=>S==="nm"?p.nm.localeCompare(r.nm):S==="sf"?p.sf.localeCompare(r.sf)||HARI.indexOf(p.pjp)-HARI.indexOf(r.pjp):S==="pjp"?HARI.indexOf(p.pjp)-HARI.indexOf(r.pjp):(r[S]-p[S]));if(st.ord){const K=(S==="byu"||S==="reg")?S:(SH==="b"?"byu":"reg");a=[...a].sort((p,r)=>st.ord==="min"?p[K]-r[K]:r[K]-p[K])}
   const per=100,pgs=Math.max(1,Math.ceil(a.length/per));st.pg=Math.min(st.pg,pgs-1);const v=a.slice(st.pg*per,st.pg*per+per);
   const th=(k,l,c="")=>`<th class="s ${c}" data-s="${k}">${l}${S===k?" ▾":""}</th>`;
   return `<div class="row"><input type="search" id="q" placeholder="Cari nama / ID outlet / RS / username / site ID" value="${esc(st.q)}" style="flex:1;min-width:200px">
@@ -324,7 +324,7 @@ function kmTab(){
 
 const R={ring,sf:sfTab,hari,kec:kecTab,km:kmTab,out:outTab,tem};
 if(!R[st.tab])st.tab="ring";
-function draw(){setProd(st.prod);$("sub").innerHTML=L.sub;document.querySelectorAll("#prod button").forEach(b=>b.classList.toggle("on",b.dataset.v===st.prod));$("fkec").value=st.kec;$("fsf").value=st.sf;$("fpjp").value=st.pjp;$("ftop").value=st.top;
+function draw(){setProd(st.prod);$("sub").innerHTML=L.sub;document.querySelectorAll("#prod button").forEach(b=>b.classList.toggle("on",b.dataset.v===st.prod));$("fkec").value=st.kec;$("fsf").value=st.sf;$("fpjp").value=st.pjp;$("ftop").value=st.top;$("ford").value=st.ord;
   document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===st.tab));
   $("P").innerHTML=R[st.tab]();
   if(st.tab==="hari")document.querySelectorAll("#hjsel button").forEach(b=>b.onclick=()=>{st.hj=b.dataset.v;draw()});
@@ -338,9 +338,9 @@ function draw(){setProd(st.prod);$("sub").innerHTML=L.sub;document.querySelector
     if($("osrt"))$("osrt").onchange=e=>{st.sort=e.target.value;st.pg=0;draw()};
     $("prv").onclick=()=>{st.pg--;draw()};$("nxt").onclick=()=>{st.pg++;draw()}}
   save()}
-["kec","sf","pjp","top"].forEach(k=>$("f"+k).onchange=e=>{st[k]=e.target.value;st.pg=0;draw()});
+["kec","sf","pjp","top","ord"].forEach(k=>$("f"+k).onchange=e=>{st[k]=e.target.value;st.pg=0;draw()});
 document.querySelectorAll("#prod button").forEach(b=>b.onclick=()=>{st.prod=b.dataset.v;st.pg=0;draw()});
-$("reset").onclick=()=>{st.kec=st.sf=st.pjp=st.top=st.q="";st.ost="all";st.sort="reg";st.pg=0;try{document.dispatchEvent(new Event("dgp-reset"))}catch(e){}draw()};
+$("reset").onclick=()=>{st.kec=st.sf=st.pjp=st.top=st.ord=st.q="";st.ost="all";st.sort="reg";st.pg=0;try{document.dispatchEvent(new Event("dgp-reset"))}catch(e){}draw()};
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{st.tab=b.dataset.t;draw()});
 const TABN={ring:"Ringkasan",sf:"Per SF",hari:"SF × Hari",kec:"Kecamatan",byu:"Belum OA By.U",km:"Klik Misi",out:"Outlet",tem:"Temuan"};
 function stamp(){const d=new Date(),p=n=>String(n).padStart(2,"0");return `${p(d.getDate())}-${p(d.getMonth()+1)}-${d.getFullYear()} ${p(d.getHours())}.${p(d.getMinutes())}`}

@@ -20,7 +20,7 @@ const CV={"d":26,"g":["CVM","Super Seru","Comsak","Hot Promo","Biometrik","Renew
     if(q)a=a.filter(r=>(r.o.nm+' '+r.o.id+' '+r.o.rs+' '+r.o.kec+' '+((typeof D!=='undefined'&&D.U&&D.U[r.o.id])||'')).toLowerCase().includes(q));
     const g=r=>r.x[gi];
     if(df==='stop')a=a.filter(r=>g(r)[1]>0&&g(r)[2]===0);else if(df==='turun')a=a.filter(r=>g(r)[2]<g(r)[1]);else if(df==='naik')a=a.filter(r=>g(r)[2]>g(r)[1]);else if(df==='nol')a=a.filter(r=>r.x.every(v=>v[0]===0&&v[2]===0));
-    a.sort((p,q2)=>(g(p)[2]-g(p)[1])-(g(q2)[2]-g(q2)[1])||g(q2)[1]-g(p)[1]);return a}
+    a.sort((p,q2)=>(g(p)[2]-g(p)[1])-(g(q2)[2]-g(q2)[1])||g(q2)[1]-g(p)[1]);if(st.ord)a.sort((p,q2)=>st.ord==="min"?g(p)[2]-g(q2)[2]:g(q2)[2]-g(p)[2]);return a}
   function detHTML(){const a=detRows(),pg=Math.min(dp,Math.max(0,Math.ceil(a.length/PER)-1)),sl=a.slice(pg*PER,pg*PER+PER),G=CC.g;
     const cell=(v,i)=>{const gp=v[2]-v[1];return `<td class="${i===gi?'cs':''}"><b>${nf(v[2])}</b><small>${nf(v[1])}${gp?` <span class="${gp<0?'dn':'up'}">${sg(gp)}</span>`:''}</small></td>`};
     const rows=sl.map(r=>`<tr><td style="text-align:left;white-space:normal;min-width:150px">${es(r.o.nm)}<div class="mu" style="font-size:11px">${r.o.id} · ${es(r.o.kec)}</div></td><td style="text-align:left">${es(r.o.sf.split(' ').slice(0,2).join(' '))}</td><td>${r.o.pjp.slice(0,3)}</td>${r.x.map(cell).join('')}<td class="mu">${nf(r.x[gi][0])}</td></tr>`).join('');
