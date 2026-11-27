@@ -164,6 +164,32 @@ def drop_tp(L):
     for k in L:
         b=len(L[k]);L[k]=[x for x in L[k] if key(x[1]) not in TP];tpn[k]=b-len(L[k])
     return tpn
+def refresh_okt(out,L,pv,sa):
+    # Okt yang disalin dari build lama: cocokkan ulang SN "belum" ke raw ST terbaru (ST susulan setelah Okt ditutup)
+    for gk in ('VF OKT','SA OKT'):
+        if gk in L and L[gk]:continue
+        g=out['G'].get(gk);paths=pv if gk.startswith('VF') else sa
+        if not g or not paths:continue
+        exp=lambda r:[str(v).zfill(len(r.split('-')[0])) for v in range(int(r.split('-')[0]),int(r.split('-')[-1])+1)]
+        need={key(sn) for o in g['sf'] for p in o['p'] for r in p['b'] for sn in exp(r)}
+        S2={};raw(paths,need,S2,{})
+        iv=out['DM'].get(gk,[]);dget=lambda n:next((d for x,y,d in iv if x<=n<=y),None)
+        tgl={t[0]:t for t in g['tgl']};mon=collections.Counter(dict(g['mon']));lain=collections.Counter(dict(g['lain']));mv=0
+        for o in g['sf']:
+            for p in o['p']:
+                nb=[]
+                for r in p['b']:
+                    for sn in exp(r):
+                        st=S2.get(key(sn))
+                        if st:
+                            p['s']+=1;o['s']+=1;mon[st[0][:7]]+=1;mv+=1
+                            if st[1] and st[1].upper()!='BAGAN BATU':lain[st[1]]+=1
+                            d=dget(int(key(sn)))
+                            if d in tgl:tgl[d][2]+=1
+                        else:nb.append(sn)
+                p['b']=comp(nb)
+        g['tgl']=sorted(tgl.values());g['mon']=sorted(mon.items());g['lain']=lain.most_common(10)
+        print(gk,'dicocokkan ulang ke ST baru:',mv,'SN',file=sys.stderr)
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('--wl');ap.add_argument('--wlnov');ap.add_argument('--byu');ap.add_argument('--add',nargs='*',default=[]);ap.add_argument('--pv',nargs='*',default=[]);ap.add_argument('--sa',nargs='*',default=[]);a=ap.parse_args()
     L=assemble(a)
@@ -187,6 +213,7 @@ if __name__=='__main__':
         out['G'][k]=build(rows,st)
         if tpn.get(k):out['G'][k]['tp']=tpn[k]
         print(k,sum(o['s'] for o in out['G'][k]['sf']),'/',len(rows),file=sys.stderr)
+    refresh_okt(out,L,a.pv,a.sa)
     try:out['TAP']=old.get('TAP',{})
     except Exception:pass
     open('cekst-data.js','w').write('// Hasil cek WL dropingan vs ST Digipos (dibuat dari tools/cekst_build.py)\nconst CK='+json.dumps(out,separators=(',',':'),ensure_ascii=False)+';\n')
