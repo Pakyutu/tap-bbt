@@ -44,7 +44,7 @@
   if(R.ring&&D.FR){const oR=R.ring;R.ring=function(){const h=oR.apply(this,arguments);if(st.prod!=='VF')return h;
     const rs=D.FR.rows.map(r=>{const o=O.find(x=>x.id===r[0]);return{id:r[0],nm:o?o.nm:r[1],sf:o?o.sf:tc(r[2]),fr:r[4],a:r[5]}}).filter(r=>(!st.sf||r.sf===st.sf));
     const ak=rs.filter(r=>r.a).length,tot=rs.reduce((t,r)=>t+r.fr,0),no=rs.filter(r=>!r.a);
-    return h+`<div class="card tw" style="margin-top:14px"><h3>FR Biometric · outlet Top 20 Nota</h3><div class="sub">Data ${D.FR.d} Nov. Outlet aktif FR <b>${ak} dari ${rs.length}</b> (${rs.length?Math.round(ak/rs.length*100):0}%), total FR <b>${nf(tot)}</b>.${no.length?` Belum aktif: <b>${no.map(r=>es(r.nm)+' ('+es(tc(r.sf).split(' ')[0])+')').join(', ')}</b>.`:''}</div>
+    return h+`<div class="card tw" style="margin-top:14px"><h3>FR Biometric · outlet Top 20 Nota</h3><div class="sub">Update ${D.FR.d} Nov</div>
       <table><tr><th style="text-align:left">Outlet</th><th style="text-align:left">SF</th><th>FR</th><th>Status</th></tr>${rs.sort((a,b)=>a.fr-b.fr).map(r=>`<tr><td style="text-align:left">${es(r.nm)}</td><td style="text-align:left">${es(tc(r.sf))}</td><td>${nf(r.fr)}</td><td>${r.a?'<span style="color:#0f8a52;font-weight:600">Aktif</span>':'<span style="color:#c8102e;font-weight:600">Belum</span>'}</td></tr>`).join('')}</table></div>`}}
   try{if(st.tab==='hari1'||st.tab==='ring')draw()}catch(e){}
 })();
