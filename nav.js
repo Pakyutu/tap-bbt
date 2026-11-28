@@ -46,7 +46,7 @@
   document.body.appendChild(sh);
   var tb=document.createElement("button");tb.type="button";tb.style.cssText="display:flex;align-items:center;gap:12px;width:100%;padding:12px;margin-top:6px;border:0;border-top:1px solid var(--bd);background:transparent;color:inherit;font:600 15px var(--font,system-ui);min-height:52px;cursor:pointer;text-align:left";
   var tl=function(){var d=document.documentElement.dataset.theme!=="light";tb.textContent=d?"☀️  Ganti ke tema terang":"🌙  Ganti ke tema gelap"};tl();
-  tb.addEventListener("click",function(){var n=document.documentElement.dataset.theme==="light"?"dark":"light";document.documentElement.dataset.theme=n;try{localStorage.setItem("theme",n)}catch(_){}tl()});
+  tb.addEventListener("click",function(){var n=document.documentElement.dataset.theme==="light"?"dark":"light";document.documentElement.dataset.theme=n;try{localStorage.setItem("theme2",n)}catch(_){}tl()});
   sh.querySelector(".pn").appendChild(tb);
   document.getElementById("bbttl").addEventListener("click",function(){try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}sh.classList.add("open")});
   sh.querySelector(".ov").addEventListener("click",function(){sh.classList.remove("open")});
