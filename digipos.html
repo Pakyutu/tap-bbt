@@ -290,7 +290,7 @@ function byuTab(){
     BY[s]=`Belum OA ${L.b} (≥${L.tb} pcs) - ${s}\n`+(fs?`Ach ${ach}/${tg}, kurang ${Math.max(0,tg-ach)} outlet\n`:"")+hs.map(h=>`\n*${h}*\n`+sorted(h).map((o,i)=>`${i+1}. ${o.nm.trim()} (${o.rs})${pk(o)?" - PRIORITAS":""}`).join("\n")).join("\n")+`\n\nPRIORITAS = ${plab}, sudah aktif order`;
     return `<details class="card grp" open><summary>${s} <span class="mu">${x.length} outlet belum${fs?` · ach ${ach}/${tg}, kurang ${Math.max(0,tg-ach)}`:""} · ${x.filter(pk).length} prioritas</span><button class="btn cp" data-s="${esc(s)}" style="margin-left:auto">Salin daftar</button></summary>
     ${hs.map(h=>`<div class="hh">${h} · ${sorted(h).length}</div><ol class="ol">${sorted(h).map(o=>`<li>${esc(o.nm)} <span class="mu">${o.rs}</span>${pk(o)?'<span class="pr">prioritas</span>':""}${o.byu?` <span class="mu">(${o.byu} pcs)</span>`:""}</li>`).join("")}</ol>`).join("")}</details>`}).join("");
-  return `<div class="note">Outlet yang belum mencapai ${L.tb} pcs ${L.b}, per SF dan hari PJP. Label <b>prioritas</b> = outlet ${plab}: sudah aktif order sehingga paling mudah ditawari By.U. "Salin daftar" menyalin teks siap kirim ke WhatsApp.</div>
+  return `
   <div class="mu" style="font-size:12.5px;margin-top:8px">${f(a.length)} outlet belum OA ${L.b} · ${f(a.filter(pk).length)} prioritas <span id="cpm"></span></div>${body||'<div class="card">Semua outlet di filter ini sudah OA.</div>'}
   <textarea id="cpt" aria-label="Teks salinan" style="position:absolute;left:-9999px" readonly></textarea>`;
 }
@@ -303,8 +303,7 @@ function kmTab(){
   const b=a.filter(o=>!kl(o)),nk=a.length-b.length,T=sum(b,0);
   const k=(tt,v,s)=>`<div class="k"><div class="t">${tt}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
   let h=`<div class="row"><span class="seg" id="kmsel"><button data-v="r" class="${t==="r"?"on":""}">Reguler</button><button data-v="b" class="${t==="b"?"on":""}">By.U</button></span><span class="mu" style="font-size:12.5px">Program Dealing Misi · SF dan hari mengikuti PJP terbaru</span></div>
-  <div class="kpi" style="margin-top:12px">${k("Outlet program",f(a.length),"outlet di file klik misi")}${k("Sudah klik misi",f(nk),`${pc(nk,a.length)} · ${a.filter(o=>o.k[1]>0).length} outlet sudah ada ach`)}${k("Belum klik misi",f(b.length),`<span class="dn">${pc(b.length,a.length)}</span> dari outlet program`)}${k("Target outlet belum klik",rp(T),`rata-rata ${rp(b.length?T/b.length:0)} per outlet`)}</div>
-  <div class="note">Hanya outlet yang ada di file klik misi yang dihitung. Data per 27 Nov 2026.</div>`;
+  <div class="kpi" style="margin-top:12px">${k("Outlet program",f(a.length),"outlet di file klik misi")}${k("Sudah klik misi",f(nk),`${pc(nk,a.length)} · ${a.filter(o=>o.k[1]>0).length} outlet sudah ada ach`)}${k("Belum klik misi",f(b.length),`<span class="dn">${pc(b.length,a.length)}</span> dari outlet program`)}${k("Target outlet belum klik",rp(T),`rata-rata ${rp(b.length?T/b.length:0)} per outlet`)}</div>`;
   let tt={n:0,k:0,T:0};
   const rows=SF.filter(s=>a.some(o=>o.sf===s)).map(s=>{const x=a.filter(o=>o.sf===s),xb=x.filter(o=>!kl(o)),q={n:x.length,k:x.length-xb.length,T:sum(xb,0)};for(const z in tt)tt[z]+=q[z];
     return `<tr><td>${s}</td><td>${q.n}</td><td>${q.k}</td><td>${kpill(q.k,q.n)}</td><td>${q.n-q.k}</td><td>${rp(q.T)}</td></tr>`}).join("");
