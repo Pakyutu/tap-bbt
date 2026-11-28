@@ -24,7 +24,7 @@ const RXT={"BAA":{"21":{"B":[["TAP BAGAN SIAPI-API",475.0,20.56,81.0,303.0,14.8,
     return `<table class="rv"><tr><th style="text-align:left">Kecamatan</th>${hd}<th>ST MTD</th><th>MoM</th><th>Gap</th><th>Rasio ST to Redeem</th></tr>${rows}</table><div class="sub" style="margin-top:6px">Rasio = ${nm}. Cutoff <b>${d} Nov</b>${pdx?` · ▲▼ dibanding ${pdx} Nov`:''}.</div>`;
   }
   function card(){
-    if(!Object.keys(RVx).length)return '<div class="card" style="margin-top:14px"><h3>Redeem vs ST VF Reguler</h3><div class="sub">Belum ada laporan Branch untuk TAP ini.</div></div>';
+    if(!Object.keys(RVx).length)return '<div class="card" style="margin-top:14px"><h3>Redeem vs ST VF Reguler</h3><div class="sub">Belum ada data.</div></div>';
     const ds=Object.keys(RVx).map(Number).sort((a,b)=>a-b),d=ds[ds.length-1],pd=ds.length>1?ds[ds.length-2]:null;
     const C=RVx[d],Pm=pd?Object.fromEntries(RVx[pd].map(r=>[r[0],r])):{};
     const sel=(typeof st!=='undefined'&&st.kec)?st.kec.toUpperCase():'';
@@ -36,8 +36,8 @@ const RXT={"BAA":{"21":{"B":[["TAP BAGAN SIAPI-API",475.0,20.56,81.0,303.0,14.8,
     const bars=K.map(r=>{const w=Math.abs(r[12])/mx*50;return `<span>${tc(r[0])}</span><div class="bx"><em></em><i style="${r[12]<0?`right:50%;width:${w}%;background:#c8102e`:`left:50%;width:${w}%;background:#0f8a52`}"></i><b style="${r[12]<0?`right:calc(50% + ${w}% + 4px)`:`left:calc(50% + ${w}% + 4px)`};color:${r[12]<0?'#c8102e':'#0f8a52'}">${sg(r[12])}</b></div>`}).join('');
     const T=C.find(r=>/^TAP/.test(r[0])),neg=K.filter(r=>r[12]<0),negS=neg.reduce((t,r)=>t+r[12],0);
     const worse=pd?K.filter(r=>Pm[r[0]]&&r[10]<Pm[r[0]][10]-0.05).map(r=>tc(r[0])):[];
-    return `<div class="card tw" style="margin-top:14px"><h3>Redeem vs ST VF Reguler · laporan Branch</h3>
-      <div class="sub">Cutoff <b>${d} Nov</b>${pd?` · ▲▼ = MoM dibanding laporan ${pd} Nov`:''}. Rasio ST to VFR = ST ÷ Redeem. Sumber beda dari data outlet di atas.</div>
+    return `<div class="card tw" style="margin-top:14px"><h3>Redeem vs ST VF Reguler</h3>
+      <div class="sub">Cutoff <b>${d} Nov</b>${pd?` · ▲▼ = MoM dibanding laporan ${pd} Nov`:''}.</div>
       <div class="seg" style="margin:6px 0 10px">${VL.map(([k,t])=>`<button class="${(window.__rvv||'R')===k?'on':''}" onclick="window.__rvv='${k}';draw()">${t}</button>`).join('')}</div>
       ${(window.__rvv||'R')!=='R'?varCard(d,window.__rvv,sel):`<table class="rv"><tr><th style="text-align:left">Kecamatan</th><th>Redeem MTD</th><th>MoM</th><th>Gap</th><th>ST MTD</th><th>MoM</th><th>Gap</th><th>Rasio ST/VFR</th></tr>${rows}</table>
       <h3 style="margin-top:14px">Gap ST VF Reguler per kecamatan</h3><div class="rvb">${bars}</div>`}
