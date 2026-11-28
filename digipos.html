@@ -211,7 +211,7 @@ function ring(){
   <div class="card"><h3>OA ${L.b} per SF</h3>${hbars(rows.map(r=>({nm:r.nm,v:r.b,t:r.tb})).sort((p,q)=>q.v-p.v),mxb)}<div class="lg"><span><i style="background:var(--bar)"></i>Ach (outlet ≥${L.tb} ${L.ub})</span>${fs?`<span><i style="background:var(--ac)"></i>Target OA</span>`:""}</div></div></div>`;
   const bk=L.bk;
   const bv=bk.map(([n,fn])=>({nm:n+" "+L.ua,v:a.filter(fn).length}));const mb=Math.max(1,...bv.map(b=>b.v));
-  h+=`<div class="card"><h3>Sebaran outlet menurut ST ${L.a}</h3>${hbars(bv,mb)}<div class="sub">${st.prod==="VF"?"Outlet hampir selalu 0 atau langsung ≥150. Gap OA berasal dari outlet yang belum diisi, bukan outlet yang kurang volume.":(g.reg?`${f(g.reg)} outlet sudah OA SA Simpati (≥5 pcs), ${f(g.n-g.reg)} outlet belum.`:"ST SA Simpati masih 0 di seluruh outlet.")}</div></div>`;
+  h+=`<div class="card"><h3>Sebaran outlet menurut ST ${L.a}</h3>${hbars(bv,mb)}<div class="sub">${st.prod==="VF"?"Mayoritas outlet 0 atau langsung ≥150. Gap OA = outlet belum terisi.":(g.reg?`OA SA Simpati ${f(g.reg)} outlet, belum ${f(g.n-g.reg)}.`:"ST SA Simpati masih 0.")}</div></div>`;
   return h;
 }
 function sfTab(){
@@ -220,7 +220,7 @@ function sfTab(){
     return `<tr><td>${s}</td><td>${f(x.n)}</td>${fs?`<td>${TT[s][0]}</td>`:""}<td>${x.reg}</td><td>${fs?pill(x.reg,TT[s][0]):pc(x.reg,x.n)}</td>${fs?`<td class="dn">${x.reg-TT[s][0]}</td><td>${TT[s][1]}</td>`:""}<td>${x.byu}</td><td>${fs?pill(x.byu,TT[s][1]):pc(x.byu,x.n)}</td>${fs?`<td class="dn">${x.byu-TT[s][1]}</td>`:""}<td>${x.nol}</td><td>${f(x.stR)}</td></tr>`}).join("");
   return `<div class="card tw"><h3>Pencapaian per sales force</h3><table><tr><th>SF</th><th>Outlet</th>${fs?`<th>Tgt ${L.sa}</th>`:""}<th>OA ${L.sa}</th><th>${fs?"% Tgt":"% Outlet"}</th>${fs?`<th>Gap</th><th>Tgt ${L.sb}</th>`:""}<th>OA ${L.sb}</th><th>${fs?"% Tgt":"% Outlet"}</th>${fs?"<th>Gap</th>":""}<th>Outlet nol</th><th>ST ${L.sa}</th></tr>${r}
   <tr class="tot"><td>Total</td><td>${f(T.n)}</td>${fs?`<td>${tt[0]}</td>`:""}<td>${T.reg}</td><td>${fs?pill(T.reg,tt[0]):pc(T.reg,T.n)}</td>${fs?`<td class="dn">${T.reg-tt[0]}</td><td>${tt[1]}</td>`:""}<td>${T.byu}</td><td>${fs?pill(T.byu,tt[1]):pc(T.byu,T.n)}</td>${fs?`<td class="dn">${T.byu-tt[1]}</td>`:""}<td>${T.nol}</td><td>${f(T.stR)}</td></tr></table>
-  ${fs?"":`<div class="sub" style="margin-top:6px">Target hanya ditampilkan tanpa filter kecamatan/hari, karena target ditetapkan per SF.</div>`}</div>`;
+  ${fs?"":`<div class="sub" style="margin-top:6px">Target tampil tanpa filter kecamatan/hari (target per SF).</div>`}</div>`;
 }
 function hari(){
   const a=sel(),hs=HARI.filter(h=>a.some(o=>o.pjp===h)),hb=st.hj==="b",nmh=hb?L.b:L.a,tg=hb?L.tb:L.ta,un=hb?L.ub:L.ua,val=x=>hb?x.byu:x.reg;
@@ -229,7 +229,7 @@ function hari(){
   const tot=`<tr class="tot"><td>Total</td>${hs.map(h=>cell(agg(a.filter(o=>o.pjp===h)))).join("")}${cell(agg(a))}</tr>`;
   return `<div class="seg" id="hjsel" style="margin-bottom:10px"><button data-v="r" class="${hb?"":"on"}">${L.a}</button><button data-v="b" class="${hb?"on":""}">${L.b}</button></div><div class="card tw"><h3>OA ${nmh} per rute hari (aktif / total outlet)</h3><table><tr><th>SF</th>${hs.map(h=>`<th style="text-align:center">${h}</th>`).join("")}<th style="text-align:center">Total</th></tr>${r}${tot}</table>
   <div class="lg"><span class="dn">■ 0 outlet aktif</span><span class="wr">■ di bawah 40%</span><span class="up">■ 40% ke atas</span></div></div>
-  <div class="note">Rute berwarna merah berarti satu hari kunjungan penuh tanpa satu pun outlet terisi ${hb?"By.U":"VF"}. Itu kandidat pertama untuk dikejar.</div>`;
+  <div class="note">Merah = satu hari kunjungan tanpa outlet terisi ${hb?"By.U":"VF"}. Kejar duluan.</div>`;
 }
 function kecTab(){
   const a=sel();const r=KEC.filter(k=>!st.kec||k===st.kec).map(k=>({k,...agg(a.filter(o=>o.kec===k))})).filter(x=>x.n).sort((p,q)=>q.n-p.n);
