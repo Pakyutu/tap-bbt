@@ -228,8 +228,7 @@ function hari(){
   const r=SF.filter(s=>!st.sf||s===st.sf).map(s=>`<tr><td>${s}</td>${hs.map(h=>cell(agg(a.filter(o=>o.sf===s&&o.pjp===h)))).join("")}${cell(agg(a.filter(o=>o.sf===s)))}</tr>`).join("");
   const tot=`<tr class="tot"><td>Total</td>${hs.map(h=>cell(agg(a.filter(o=>o.pjp===h)))).join("")}${cell(agg(a))}</tr>`;
   return `<div class="seg" id="hjsel" style="margin-bottom:10px"><button data-v="r" class="${hb?"":"on"}">${L.a}</button><button data-v="b" class="${hb?"on":""}">${L.b}</button></div><div class="card tw"><h3>OA ${nmh} per rute hari (aktif / total outlet)</h3><table><tr><th>SF</th>${hs.map(h=>`<th style="text-align:center">${h}</th>`).join("")}<th style="text-align:center">Total</th></tr>${r}${tot}</table>
-  <div class="lg"><span class="dn">■ 0 outlet aktif</span><span class="wr">■ di bawah 40%</span><span class="up">■ 40% ke atas</span></div></div>
-  <div class="note">Merah = satu hari kunjungan tanpa outlet terisi ${hb?"By.U":"VF"}. Kejar duluan.</div>`;
+  <div class="lg"><span class="dn">■ 0 outlet aktif</span><span class="wr">■ di bawah 40%</span><span class="up">■ 40% ke atas</span></div></div>`;
 }
 function kecTab(){
   const a=sel();const r=KEC.filter(k=>!st.kec||k===st.kec).map(k=>({k,...agg(a.filter(o=>o.kec===k))})).filter(x=>x.n).sort((p,q)=>q.n-p.n);
