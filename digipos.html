@@ -145,7 +145,7 @@ input[type=search],select{border-radius:9px}
     <button class="btn" id="reset">Reset filter</button><button class="btn" id="jpg">Simpan JPEG</button><button class="btn" id="cimg">Salin gambar</button><button class="btn" id="upbtn">Upload data</button><button class="btn" id="fsbtn">Layar penuh</button><input type="file" id="upf" accept=".xlsx,.xls,.csv,.txt" multiple hidden><span id="cpst" role="status"></span>
   </div>
   <div id="upbar" class="upbar" hidden><span id="upinfo"></span><button class="btn" id="upreset">Kembali ke data asli</button></div>
-  <div class="tabs" id="tabs"><button data-t="ring" class="on">Ringkasan</button><button data-t="sf">SF</button><button data-t="hari">SF × Hari</button><button data-t="kec">Kecamatan</button><button data-t="km">Klik Misi</button><button data-t="out">Outlet</button><button data-t="tem">Temuan</button></div>
+  <div class="tabs" id="tabs"><button data-t="ring" class="on">Ringkasan</button><button data-t="sf">SF</button><button data-t="hari">SF × Hari</button><button data-t="kec">Kecamatan</button><button data-t="km">Klik Misi</button><button data-t="out">Outlet</button></div>
 </div></div>
 <div class="w"><section class="panel" id="P"></section></div><div id="cap" aria-hidden="true"></div>
 <script src="data-tap.js"></script>
@@ -183,7 +183,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const isReg=o=>o.reg>=L.ta,isByu=o=>o.byu>=L.tb;
 function fill(el,lab,arr){el.innerHTML=`<option value="">${lab}</option>`+arr.map(v=>`<option>${v}</option>`).join("")}
 fill($("fkec"),"Semua kecamatan",KEC);fill($("fsf"),"Semua SF",SF);fill($("fpjp"),"Semua hari PJP",HARI.filter(h=>O.some(o=>o.pjp===h)));
-try{const s=JSON.parse(localStorage.getItem("vfbbt")||"{}");Object.assign(st,s)}catch(e){}
+try{const s=JSON.parse(localStorage.getItem("vfbbt")||"{}");Object.assign(st,s)}catch(e){}if(st.tab==="tem")st.tab="ring";
 function save(){try{localStorage.setItem("vfbbt",JSON.stringify({prod:st.prod,kec:st.kec,sf:st.sf,pjp:st.pjp,tab:st.tab}))}catch(e){}}
 function sel(){return O.filter(o=>(!st.kec||o.kec===st.kec)&&(!st.sf||o.sf===st.sf)&&(!st.pjp||o.pjp===st.pjp)&&(!st.top||!TOPT.includes(st.tab)||top20().has(String(o.id))===(st.top==="1")))}
 const TOPT=["out","cvm","bio","tj"];

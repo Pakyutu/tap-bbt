@@ -282,7 +282,7 @@ h1::before{width:14px;height:13px;border-radius:0;vertical-align:0;margin-right:
 </div></div>
 <div class="tabbar"><div class="w">
   <div class="tabs" id="tabs">
-    <button data-t="ring" class="on">Ringkasan</button><button data-t="kec">Kecamatan</button><button data-t="sf">SF</button><button data-t="out">Outlet</button><button data-t="kunj">Kunjungan</button><button data-t="tren">Tren bulanan</button><button data-t="pet">Petugas</button><button data-t="stok">Stok</button><button data-t="tem">Temuan</button>
+    <button data-t="ring" class="on">Ringkasan</button><button data-t="kec">Kecamatan</button><button data-t="sf">SF</button><button data-t="out">Outlet</button><button data-t="kunj">Kunjungan</button><button data-t="tren">Tren bulanan</button><button data-t="pet">Petugas</button><button data-t="stok">Stok</button>
   </div>
 </div></div>
 <div class="w">
@@ -331,7 +331,7 @@ const HARI=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 const PJP=['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 const byId={};D.O.forEach(o=>byId[o.id]=o);
 const S={prod:'PV',a:1,b:99,kec:'',sf:'',kat:'',pjp:'',tab:'ring',q:'',st:'all',sk:'gap',sd:1,page:0,open:null};
-try{const t=localStorage.getItem('vfbbt_tab');if(t)S.tab=t}catch(e){}
+try{const t=localStorage.getItem('vfbbt_tab');if(t&&t!=='tem')S.tab=t}catch(e){}
 const $=id=>document.getElementById(id);
 const f=v=>v==null?'–':Math.round(v).toLocaleString('id-ID');
 const cls=v=>v>0?'up':(v<0?'dn':'');
@@ -595,7 +595,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('.al[data-act],.
   else if(a==='belum'){S.st='belum';$('st').value='belum';S.tab='out'}
   else if(a==='d6'){S.st='all';$('st').value='all';S.tab='out';S.sk='d6';S.sd=1}
   else if(a==='stok'){S.tab='pet'}
-  else if(a==='anom'){S.tab='tem'}
+  else if(a==='anom'){S.tab='ring'}
   else if(a.startsWith('q:')){S.q=a.slice(2);$('q').value=S.q;S.st='all';$('st').value='all';S.tab='out'}
   S.page=0;render();window.scrollTo(0,0)});
 // (2) grafik kumulatif harian
@@ -837,7 +837,7 @@ rStok();render();
 if(TAP!=="BBT"){const b=document.createElement("div");b.className="card";b.style.cssText="margin:10px 12px;font-size:.85em";b.innerHTML="ℹ️ <b>"+(TAP==="ALL"?"Gabungan Rohil":TAPS[TAP])+"</b> · data outlet s/d "+D.C+" Nov · riwayat tanggal lain hanya BBT";const p=document.querySelector(".panel,#P,main")||document.body.firstElementChild;p.parentNode.insertBefore(b,p)}})()</script>
 </body></html>
 
-<script src="penjualan-x.js"></script><script src="penjualan-tgt.js"></script><script>window.TABG={key:'pj',groups:[['ring','📊 Ringkasan',['ring','tren','tem']],['wil','🗺️ Wilayah',['kec','sf']],['pet','👥 Petugas',['pet','tgt']],['out','🏪 Outlet',['out','kunj']],['stok','📦 Stok',['stok']]],names:{ring:'Ringkasan',tren:'Tren bulanan',tem:'Temuan',kec:'Kecamatan',sf:'SF',pet:'Petugas (SURYA)',tgt:'Target SF',out:'Outlet',kunj:'Kunjungan',stok:'Stok'}};</script><script src="tabgroup.js"></script><script src="nav.js"></script><style>
+<script src="penjualan-x.js"></script><script src="penjualan-tgt.js"></script><script>window.TABG={key:'pj',groups:[['ring','📊 Ringkasan',['ring','tren']],['wil','🗺️ Wilayah',['kec','sf']],['pet','👥 Petugas',['pet','tgt']],['out','🏪 Outlet',['out','kunj']],['stok','📦 Stok',['stok']]],names:{ring:'Ringkasan',tren:'Tren bulanan',tem:'Temuan',kec:'Kecamatan',sf:'SF',pet:'Petugas (SURYA)',tgt:'Target SF',out:'Outlet',kunj:'Kunjungan',stok:'Stok'}};</script><script src="tabgroup.js"></script><script src="nav.js"></script><style>
 .msort{display:none}
 @media(max-width:700px){
  #app:not(.cap) .msort{display:flex;gap:6px;align-items:center;margin:0 0 8px;font-size:12.5px}
